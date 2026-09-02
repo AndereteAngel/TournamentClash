@@ -1,12 +1,14 @@
-import { useState, useEffect } from "react";
-import { supabase } from "./supabaseClient";
-import { CreateTournament } from "./components/CreateTournament";
-import { GroupStageView } from "./components/GroupStageView";
-import { PlayoffBracket } from "./components/PlayoffBracket";
 import {
   calculateGroupStandings,
   generatePlayoffBrackets,
 } from "./utils/tournamentLogic";
+import { useEffect, useState } from "react";
+
+import { CreateTournament } from "./components/CreateTournament";
+import { GroupStageView } from "./components/GroupStageView";
+import { Navbar } from "./components/Navbar";
+import { PlayoffBracket } from "./components/PlayoffBracket";
+import { supabase } from "./supabaseClient";
 
 export function TournamentClashApp() {
   const [currentUser, setCurrentUser] = useState(() => {
@@ -92,6 +94,11 @@ export function TournamentClashApp() {
     setActiveTournament(null);
   };
 
+  const handleGoHome = () => {
+    setActiveTournament(null);
+    setActiveView("home");
+  };
+
   const handleCreateTournamentSubmit = async (config) => {
     const shuffled = [...config.teams].sort(() => 0.5 - Math.random());
     const groups = [];
@@ -142,7 +149,6 @@ export function TournamentClashApp() {
       status: "En curso",
     };
 
-    // Insertar en Supabase
     const { data, error } = await supabase
       .from("tournaments")
       .insert([newTournamentObj])
@@ -161,7 +167,6 @@ export function TournamentClashApp() {
     }
   };
 
-  // Función clave: Sincroniza los cambios de partidos y puntajes en Supabase en tiempo real
   const handleUpdateTournamentInSupabase = async (updatedTournament) => {
     setActiveTournament(updatedTournament);
 
@@ -177,7 +182,6 @@ export function TournamentClashApp() {
     if (error) {
       console.error("Error al actualizar la tabla en Supabase:", error);
     } else {
-      // Actualizar lista local
       setTournaments(
         tournaments.map((t) =>
           t.id === updatedTournament.id ? updatedTournament : t
@@ -236,8 +240,17 @@ export function TournamentClashApp() {
 
   return (
     <div className="cr-container">
+      {/* 🔹 NAVBAR ARRIBA (Solo se muestra si hay un usuario logueado) */}
+      {currentUser && (
+        <Navbar
+          onGoHome={handleGoHome}
+          currentTitle={activeTournament?.title}
+          tournamentCode={activeTournament?.code}
+        />
+      )}
+
       {!currentUser ? (
-        <div className="cr-card">
+        <div className="cr-card" style={{ margin: "auto" }}>
           <div className="cr-card-glow"></div>
           <div style={{ textAlign: "center", marginBottom: "1.5rem" }}>
             <div
@@ -353,7 +366,7 @@ export function TournamentClashApp() {
           </form>
         </div>
       ) : activeView === "home" ? (
-        <div className="cr-card" style={{ maxWidth: "480px" }}>
+        <div className="cr-card" style={{ maxWidth: "480px", margin: "auto" }}>
           <div
             style={{
               display: "flex",
@@ -670,7 +683,7 @@ export function TournamentClashApp() {
           onCancel={() => setActiveView("home")}
         />
       ) : activeView === "join" ? (
-        <div className="cr-card" style={{ maxWidth: "420px" }}>
+        <div className="cr-card" style={{ maxWidth: "420px", margin: "auto" }}>
           <div className="cr-card-glow"></div>
           <div
             style={{
@@ -757,4 +770,3 @@ export function TournamentClashApp() {
   );
 }
 
-export default TournamentClashApp;
