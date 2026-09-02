@@ -1,0 +1,298 @@
+export function PlayoffBracket({
+  tournament,
+  onUpdateTournament,
+  onFinishTournament,
+}) {
+  const rounds = tournament.playoffs || [];
+
+  const handleScoreChange = (roundIdx, matchId, field, value) => {
+    const numValue = value === "" ? null : Number(value);
+
+    // Copiamos las rondas actuales y eliminamos rondas posteriores si se modifica un resultado anterior
+    const updatedRounds = rounds.slice(0, roundIdx + 1).map((round, rIdx) => {
+      if (rIdx !== roundIdx) return round;
+
+      return round.map((match) => {
+        if (match.id !== matchId) return match;
+
+        const updated = { ...match, [field]: numValue };
+
+        if (updated.score1 !== null && updated.score2 !== null) {
+          if (updated.score1 > updated.score2) updated.winner = updated.team1;
+          else if (updated.score2 > updated.score1)
+            updated.winner = updated.team2;
+          else updated.winner = "Empate (Definir)";
+        } else {
+          updated.winner = null;
+        }
+
+        return updated;
+      });
+    });
+
+    const currentRound = updatedRounds[roundIdx];
+    const isCurrentRoundComplete = currentRound.every(
+      (m) => m.winner !== null && m.winner !== "Empate (Definir)"
+    );
+
+    // Si la ronda actual está completa y quedan más enfrentamientos por definir, generamos la siguiente ronda
+    if (isCurrentRoundComplete && currentRound.length > 1) {
+      const winners = currentRound.map((m) => m.winner);
+      const nextRoundMatches = [];
+
+      for (let i = 0; i < winners.length; i += 2) {
+        nextRoundMatches.push({
+          id: `r${roundIdx + 2}-m${nextRoundMatches.length + 1}`,
+          team1: winners[i],
+          team2: winners[i + 1] || "Pasaje Directo",
+          score1: null,
+          score2: null,
+          winner: null,
+        });
+      }
+
+      updatedRounds.push(nextRoundMatches);
+    }
+
+    onUpdateTournament({ ...tournament, playoffs: updatedRounds });
+  };
+
+  const finalRound = rounds[rounds.length - 1];
+  const champion =
+    finalRound && finalRound.length === 1 ? finalRound[0].winner : null;
+  const isTournamentComplete = champion && champion !== "Empate (Definir)";
+
+  return (
+    <div className="cr-card" style={{ maxWidth: "600px" }}>
+      <div className="cr-card-glow"></div>
+
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: "1rem",
+        }}
+      >
+        <div>
+          <span
+            style={{
+              fontSize: "10px",
+              color: "#ffd700",
+              fontWeight: "bold",
+              textTransform: "uppercase",
+            }}
+          >
+            {tournament.game}
+          </span>
+          <h2
+            className="cr-title"
+            style={{ fontSize: "1.2rem", textAlign: "left" }}
+          >
+            {tournament.title} - Playoffs
+          </h2>
+        </div>
+        <span
+          style={{
+            fontSize: "11px",
+            backgroundColor: "rgba(234, 179, 8, 0.2)",
+            color: "#facc15",
+            border: "1px solid #eab308",
+            padding: "4px 8px",
+            borderRadius: "6px",
+            fontWeight: "bold",
+          }}
+        >
+          Llaves del Reino
+        </span>
+      </div>
+
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: "1.5rem",
+          marginBottom: "1.5rem",
+        }}
+      >
+        {rounds.map((round, rIdx) => (
+          <div key={rIdx}>
+            <h3
+              style={{
+                fontSize: "0.8rem",
+                fontWeight: "bold",
+                textTransform: "uppercase",
+                color: "#ffd700",
+                marginBottom: "0.5rem",
+                borderBottom: "1px solid #2d2b3b",
+                paddingBottom: "4px",
+              }}
+            >
+              {rounds.length === 1 ||
+              (rIdx === rounds.length - 1 && rounds.length > 2)
+                ? rounds.length > 2 && rIdx === rounds.length - 1
+                  ? "🏆 Gran Final"
+                  : "Eliminación Directa"
+                : rIdx === 0
+                ? "Cuartos de Final"
+                : rIdx === 1
+                ? "Semifinales"
+                : `Fase ${rIdx + 1}`}
+            </h3>
+
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "0.5rem",
+              }}
+            >
+              {round.map((match) => (
+                <div
+                  key={match.id}
+                  style={{
+                    padding: "0.6rem 0.75rem",
+                    backgroundColor: "#121019",
+                    border: "2px solid #2d2b3b",
+                    borderRadius: "10px",
+                  }}
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                    }}
+                  >
+                    <span
+                      style={{
+                        fontSize: "0.8rem",
+                        fontWeight: "bold",
+                        width: "38%",
+                        textAlign: "right",
+                        color:
+                          match.winner === match.team1 ? "#4ade80" : "#fff",
+                      }}
+                    >
+                      {match.winner === match.team1 && "👑 "} {match.team1}
+                    </span>
+
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "6px",
+                      }}
+                    >
+                      <input
+                        type="number"
+                        min="0"
+                        value={match.score1 !== null ? match.score1 : ""}
+                        onChange={(e) =>
+                          handleScoreChange(
+                            rIdx,
+                            match.id,
+                            "score1",
+                            e.target.value
+                          )
+                        }
+                        style={{
+                          width: "34px",
+                          textAlign: "center",
+                          backgroundColor: "#1e1b2e",
+                          border: "1px solid #1b5fa8",
+                          color: "#fff",
+                          borderRadius: "4px",
+                          padding: "4px",
+                        }}
+                      />
+                      <span>-</span>
+                      <input
+                        type="number"
+                        min="0"
+                        value={match.score2 !== null ? match.score2 : ""}
+                        onChange={(e) =>
+                          handleScoreChange(
+                            rIdx,
+                            match.id,
+                            "score2",
+                            e.target.value
+                          )
+                        }
+                        style={{
+                          width: "34px",
+                          textAlign: "center",
+                          backgroundColor: "#1e1b2e",
+                          border: "1px solid #1b5fa8",
+                          color: "#fff",
+                          borderRadius: "4px",
+                          padding: "4px",
+                        }}
+                      />
+                    </div>
+
+                    <span
+                      style={{
+                        fontSize: "0.8rem",
+                        fontWeight: "bold",
+                        width: "38%",
+                        textAlign: "left",
+                        color:
+                          match.winner === match.team2 ? "#4ade80" : "#fff",
+                      }}
+                    >
+                      {match.team2} {match.winner === match.team2 && "👑"}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {isTournamentComplete && (
+        <div
+          style={{
+            backgroundColor: "rgba(255, 215, 0, 0.15)",
+            border: "3px solid #ffd700",
+            borderRadius: "14px",
+            padding: "1.5rem",
+            textAlign: "center",
+            marginBottom: "1rem",
+            boxShadow: "0 0 20px rgba(255, 215, 0, 0.4)",
+          }}
+        >
+          <div style={{ fontSize: "40px", marginBottom: "6px" }}>👑🏆👑</div>
+          <h3
+            style={{
+              fontSize: "1.2rem",
+              fontWeight: 900,
+              color: "#ffd700",
+              textTransform: "uppercase",
+              margin: "0 0 6px 0",
+            }}
+          >
+            ¡Tenemos Campeón de la Arena!
+          </h3>
+          <p
+            style={{
+              fontSize: "1.1rem",
+              fontWeight: 900,
+              color: "#fff",
+              margin: 0,
+            }}
+          >
+            {champion} se corona como el rey indiscutible.
+          </p>
+        </div>
+      )}
+
+      {isTournamentComplete && (
+        <button onClick={onFinishTournament} className="cr-btn-gold">
+          Guardar y Salir al Lobby ⚔️
+        </button>
+      )}
+    </div>
+  );
+}

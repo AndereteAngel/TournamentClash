@@ -1,0 +1,137 @@
+@import url('https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Montserrat:ital,wght@0,400;0,700;0,900;1,900&display=swap');
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #0b0914;
+  background-image: 
+    radial-gradient(circle at 50% 20%, #1a153b 0%, #0b0914 70%),
+    linear-gradient(to bottom, rgba(27, 95, 168, 0.15), transparent);
+  font-family: 'Montserrat', sans-serif;
+  color: #fff;
+  min-height: 100vh;
+}
+
+/* Contenedor Principal de la App */
+.cr-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+
+/* Tarjeta Estilo Clash Royale (Bordes robustos, sombras doradas/azules y efecto relieve) */
+.cr-card {
+  position: relative;
+  background: linear-gradient(135deg, #171426 0%, #100e1a 100%);
+  border: 4px solid #2d2b4e;
+  border-radius: 16px;
+  padding: 1.75rem;
+  width: 100%;
+  max-width: 520px;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.7), inset 0 2px 0 rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+}
+
+/* Brillo superior en las tarjetas */
+.cr-card-glow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background: linear-gradient(90deg, #1b5fa8, #ffd700, #1b5fa8);
+}
+
+/* Estándar para títulos de tarjetas (compactos y limpios) */
+.cr-title {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 900;
+  font-size: 1.2rem;
+  text-transform: uppercase;
+  color: #fff;
+  text-shadow: 2px 2px 0px #000;
+  margin: 0;
+  letter-spacing: 0.5px;
+}
+
+/* Título Gigante Estilo Clash Royale (Solo para el logo/bienvenida principal) */
+.cr-logo-title {
+  font-family: 'Luckiest Guy', cursive;
+  font-weight: 400;
+  font-size: 2.2rem;
+  text-transform: uppercase;
+  color: #fff;
+  letter-spacing: 1.5px;
+  text-align: center;
+  margin: 0;
+  text-shadow: 
+    3px 3px 0px #000, 
+    -3px -3px 0px #000, 
+    3px -3px 0px #000, 
+    -3px 3px 0px #000,
+    0 6px 15px rgba(0, 0, 0, 0.8);
+}
+
+/* Botón Dorado Épico con relieve 3D */
+.cr-btn-gold {
+  width: 100%;
+  padding: 0.9rem 1.2rem;
+  background: linear-gradient(to bottom, #ffe600 0%, #ff9c00 100%);
+  border: 3px solid #7a4100;
+  border-bottom: 5px solid #522b00;
+  border-radius: 12px;
+  color: #2b1200;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 900;
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
+  box-shadow: 0 6px 0 #422200, 0 10px 20px rgba(255, 156, 0, 0.4);
+  transition: all 0.1s ease;
+}
+
+.cr-btn-gold:hover {
+  filter: brightness(1.08);
+}
+
+.cr-btn-gold:active {
+  transform: translateY(4px);
+  box-shadow: 0 2px 0 #422200, 0 5px 10px rgba(255, 156, 0, 0.3);
+  border-bottom: 3px solid #522b00;
+}
+
+/* Inputs mejorados con estilo de campo de batalla */
+.cr-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background-color: #0c0a12;
+  border: 3px solid #282442;
+  border-radius: 10px;
+  color: #fff;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color 0.2s;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.8);
+}
+
+.cr-input:focus {
+  border-color: #ffd700;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.8), 0 0 10px rgba(255, 215, 0, 0.2);
+}
+
+/* Animación de pulso para el campeón */
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+  100% { transform: scale(1); }
+}
