@@ -2,6 +2,7 @@ import React, { useState } from "react";
 
 export function Navbar({ onGoHome, currentTitle, tournamentCode }) {
   const [copied, setCopied] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const handleCopyCode = () => {
     if (!tournamentCode) return;
@@ -26,10 +27,10 @@ export function Navbar({ onGoHome, currentTitle, tournamentCode }) {
         boxShadow:
           "0 8px 25px rgba(0, 0, 0, 0.6), inset 0 2px 0 rgba(255, 255, 255, 0.1)",
         position: "relative",
-        overflow: "hidden",
+        overflow: "visible", // Permitir que el menú desplegable flote si es necesario
       }}
     >
-      {/* Brillo superior característico de tu design system */}
+      {/* Brillo superior característico */}
       <div
         style={{
           position: "absolute",
@@ -38,10 +39,12 @@ export function Navbar({ onGoHome, currentTitle, tournamentCode }) {
           right: 0,
           height: "4px",
           background: "linear-gradient(90deg, #1b5fa8, #ffd700, #1b5fa8)",
+          borderTopLeftRadius: "11px",
+          borderTopRightRadius: "11px",
         }}
       ></div>
 
-      {/* Izquierda: Logo / Título clickeable más compacto */}
+      {/* Izquierda: Logo / Título clickeable */}
       <div
         onClick={onGoHome}
         style={{
@@ -94,83 +97,169 @@ export function Navbar({ onGoHome, currentTitle, tournamentCode }) {
         </div>
       </div>
 
-      {/* Centro/Derecha: Código del torneo para copiar (si existe) */}
-      {tournamentCode && (
-        <button
-          onClick={handleCopyCode}
-          title="Copiar código para compartir"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "5px",
-            background: "#0c0a12",
-            border: "2px solid #282442",
-            borderRadius: "8px",
-            padding: "0.3rem 0.6rem",
-            color: "#ffd700",
-            fontSize: "10px",
-            fontWeight: "bold",
-            cursor: "pointer",
-            boxShadow: "inset 0 2px 4px rgba(0,0,0,0.8)",
-            transition: "border-color 0.2s",
-          }}
-        >
-          <span>🔑</span>
-          <span
+      {/* Versión Escritorio (Se oculta en pantallas chicas con clases CSS o media query inline simulada) */}
+      <div
+        className="desktop-nav-actions"
+        style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}
+      >
+        {tournamentCode && (
+          <button
+            onClick={handleCopyCode}
+            title="Copiar código para compartir"
             style={{
-              fontFamily: "monospace",
-              color: "#fff",
-              letterSpacing: "1px",
+              display: "flex",
+              alignItems: "center",
+              gap: "5px",
+              background: "#0c0a12",
+              border: "2px solid #282442",
+              borderRadius: "8px",
+              padding: "0.3rem 0.6rem",
+              color: "#ffd700",
+              fontSize: "10px",
+              fontWeight: "bold",
+              cursor: "pointer",
+              boxShadow: "inset 0 2px 4px rgba(0,0,0,0.8)",
             }}
           >
-            {tournamentCode}
-          </span>
-          <span style={{ color: "#9ca3af", marginLeft: "2px" }}>
-            {copied ? "✅" : "📋"}
-          </span>
-        </button>
-      )}
+            <span>🔑</span>
+            <span
+              style={{
+                fontFamily: "monospace",
+                color: "#fff",
+                letterSpacing: "1px",
+              }}
+            >
+              {tournamentCode}
+            </span>
+            <span style={{ color: "#9ca3af", marginLeft: "2px" }}>
+              {copied ? "✅" : "📋"}
+            </span>
+          </button>
+        )}
 
-      {/* Derecha: Botón compactado con tu design system 3D */}
+        <button
+          onClick={onGoHome}
+          style={{
+            padding: "0.4rem 0.75rem",
+            background: "linear-gradient(to bottom, #1b5fa8 0%, #0f3768 100%)",
+            border: "2px solid #3b82f6",
+            borderBottom: "4px solid #1e3a8a",
+            borderRadius: "8px",
+            color: "#fff",
+            fontFamily: "'Montserrat', sans-serif",
+            fontWeight: 900,
+            fontSize: "0.7rem",
+            textTransform: "uppercase",
+            cursor: "pointer",
+            textShadow: "0 1px 0 rgba(0, 0, 0, 0.6)",
+            boxShadow: "0 4px 0 #0f172a, 0 6px 12px rgba(27, 95, 168, 0.4)",
+          }}
+        >
+          🏠 Inicio
+        </button>
+      </div>
+
+      {/* Botón Hamburguesa para Celular (Visible solo en pantallas reducidas mediante CSS opcional o condicional) */}
       <button
-        onClick={onGoHome}
+        onClick={() => setMenuOpen(!menuOpen)}
+        className="mobile-menu-btn"
         style={{
-          padding: "0.4rem 0.75rem",
-          background: "linear-gradient(to bottom, #1b5fa8 0%, #0f3768 100%)",
-          border: "2px solid #3b82f6",
-          borderBottom: "4px solid #1e3a8a",
+          display: "none", // Por defecto oculto, lo activaremos con una clase o media query abajo
+          background: "#0c0a12",
+          border: "2px solid #282442",
           borderRadius: "8px",
+          padding: "0.4rem 0.6rem",
           color: "#fff",
-          fontFamily: "'Montserrat', sans-serif",
-          fontWeight: 900,
-          fontSize: "0.7rem",
-          textTransform: "uppercase",
-          letterSpacing: "0.5px",
+          fontSize: "1rem",
           cursor: "pointer",
-          textShadow: "0 1px 0 rgba(0, 0, 0, 0.6)",
-          boxShadow: "0 4px 0 #0f172a, 0 6px 12px rgba(27, 95, 168, 0.4)",
-          transition: "all 0.1s ease",
-          display: "flex",
-          alignItem: "center",
-          gap: "4px",
-        }}
-        onMouseEnter={(e) => (e.currentTarget.style.filter = "brightness(1.1)")}
-        onMouseLeave={(e) => (e.currentTarget.style.filter = "brightness(1)")}
-        onMouseDown={(e) => {
-          e.currentTarget.style.transform = "translateY(2px)";
-          e.currentTarget.style.boxShadow =
-            "0 2px 0 #0f172a, 0 3px 6px rgba(27, 95, 168, 0.3)";
-          e.currentTarget.style.borderBottom = "2px solid #1e3a8a";
-        }}
-        onMouseUp={(e) => {
-          e.currentTarget.style.transform = "translateY(0px)";
-          e.currentTarget.style.boxShadow =
-            "0 4px 0 #0f172a, 0 6px 12px rgba(27, 95, 168, 0.4)";
-          e.currentTarget.style.borderBottom = "4px solid #1e3a8a";
         }}
       >
-        <span>🏠</span> Inicio
+        {menuOpen ? "✕" : "☰"}
       </button>
+
+      {/* Menú desplegable móvil */}
+      {menuOpen && (
+        <div
+          style={{
+            position: "absolute",
+            top: "110%",
+            left: 0,
+            right: 0,
+            background: "#171426",
+            border: "3px solid #2d2b4e",
+            borderRadius: "12px",
+            padding: "1rem",
+            display: "flex",
+            flexDirection: "column",
+            gap: "0.75rem",
+            boxShadow: "0 10px 30px rgba(0,0,0,0.8)",
+            zIndex: 100,
+          }}
+        >
+          {tournamentCode && (
+            <button
+              onClick={() => {
+                handleCopyCode();
+              }}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "8px",
+                background: "#0c0a12",
+                border: "2px solid #282442",
+                borderRadius: "8px",
+                padding: "0.6rem",
+                color: "#ffd700",
+                fontSize: "0.8rem",
+                fontWeight: "bold",
+                cursor: "pointer",
+              }}
+            >
+              <span>🔑 Copiar Código:</span>
+              <span style={{ fontFamily: "monospace", color: "#fff" }}>
+                {tournamentCode}
+              </span>
+              <span>{copied ? "✅" : "📋"}</span>
+            </button>
+          )}
+
+          <button
+            onClick={() => {
+              setMenuOpen(false);
+              onGoHome();
+            }}
+            style={{
+              padding: "0.7rem",
+              background:
+                "linear-gradient(to bottom, #1b5fa8 0%, #0f3768 100%)",
+              border: "2px solid #3b82f6",
+              borderBottom: "4px solid #1e3a8a",
+              borderRadius: "8px",
+              color: "#fff",
+              fontFamily: "'Montserrat', sans-serif",
+              fontWeight: 900,
+              fontSize: "0.8rem",
+              textTransform: "uppercase",
+              cursor: "pointer",
+            }}
+          >
+            🏠 Volver al Inicio
+          </button>
+        </div>
+      )}
+
+      {/* Estilos CSS internos rápidos para alternar entre la vista de PC y Celular */}
+      <style>{`
+        @media (max-width: 640px) {
+          .desktop-nav-actions {
+            display: none !important;
+          }
+          .mobile-menu-btn {
+            display: flex !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }
