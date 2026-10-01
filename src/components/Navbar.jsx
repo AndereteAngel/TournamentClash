@@ -1,15 +1,24 @@
 import React, { useState } from "react";
 
-export function Navbar({ onGoHome, currentTitle, tournamentCode }) {
+export function Navbar({
+  onGoHome,
+  currentTitle,
+  tournamentCode,
+  currentUser,
+}) {
   const [copied, setCopied] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
   const handleCopyCode = () => {
     if (!tournamentCode) return;
+
     navigator.clipboard.writeText(tournamentCode);
     setCopied(true);
+
     setTimeout(() => setCopied(false), 2000);
   };
+
+  const username = currentUser?.username || "Jugador";
 
   return (
     <div
@@ -27,10 +36,10 @@ export function Navbar({ onGoHome, currentTitle, tournamentCode }) {
         boxShadow:
           "0 8px 25px rgba(0, 0, 0, 0.6), inset 0 2px 0 rgba(255, 255, 255, 0.1)",
         position: "relative",
-        overflow: "visible", // Permitir que el menú desplegable flote si es necesario
+        overflow: "visible",
       }}
     >
-      {/* Brillo superior característico */}
+      {/* Brillo superior */}
       <div
         style={{
           position: "absolute",
@@ -44,7 +53,7 @@ export function Navbar({ onGoHome, currentTitle, tournamentCode }) {
         }}
       ></div>
 
-      {/* Izquierda: Logo / Título clickeable */}
+      {/* IZQUIERDA */}
       <div
         onClick={onGoHome}
         style={{
@@ -70,6 +79,7 @@ export function Navbar({ onGoHome, currentTitle, tournamentCode }) {
         >
           👑
         </div>
+
         <div>
           <span
             style={{
@@ -84,6 +94,7 @@ export function Navbar({ onGoHome, currentTitle, tournamentCode }) {
           >
             {currentTitle || "TournamentClash"}
           </span>
+
           <span
             style={{
               fontSize: "9px",
@@ -92,15 +103,19 @@ export function Navbar({ onGoHome, currentTitle, tournamentCode }) {
               textTransform: "uppercase",
             }}
           >
-            Arena Activa
+            👤 {username}
           </span>
         </div>
       </div>
 
-      {/* Versión Escritorio (Se oculta en pantallas chicas con clases CSS o media query inline simulada) */}
+      {/* DESKTOP */}
       <div
         className="desktop-nav-actions"
-        style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "0.5rem",
+        }}
       >
         {tournamentCode && (
           <button
@@ -122,6 +137,7 @@ export function Navbar({ onGoHome, currentTitle, tournamentCode }) {
             }}
           >
             <span>🔑</span>
+
             <span
               style={{
                 fontFamily: "monospace",
@@ -131,11 +147,36 @@ export function Navbar({ onGoHome, currentTitle, tournamentCode }) {
             >
               {tournamentCode}
             </span>
-            <span style={{ color: "#9ca3af", marginLeft: "2px" }}>
+
+            <span
+              style={{
+                color: "#9ca3af",
+                marginLeft: "2px",
+              }}
+            >
               {copied ? "✅" : "📋"}
             </span>
           </button>
         )}
+
+        {/* USUARIO */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "5px",
+            padding: "0.35rem 0.6rem",
+            background: "#0c0a12",
+            border: "2px solid #282442",
+            borderRadius: "8px",
+            color: "#ffd700",
+            fontSize: "10px",
+            fontWeight: "bold",
+          }}
+          title="Usuario actual"
+        >
+          👤 {username}
+        </div>
 
         <button
           onClick={onGoHome}
@@ -159,12 +200,12 @@ export function Navbar({ onGoHome, currentTitle, tournamentCode }) {
         </button>
       </div>
 
-      {/* Botón Hamburguesa para Celular (Visible solo en pantallas reducidas mediante CSS opcional o condicional) */}
+      {/* HAMBURGUESA */}
       <button
         onClick={() => setMenuOpen(!menuOpen)}
         className="mobile-menu-btn"
         style={{
-          display: "none", // Por defecto oculto, lo activaremos con una clase o media query abajo
+          display: "none",
           background: "#0c0a12",
           border: "2px solid #282442",
           borderRadius: "8px",
@@ -177,7 +218,7 @@ export function Navbar({ onGoHome, currentTitle, tournamentCode }) {
         {menuOpen ? "✕" : "☰"}
       </button>
 
-      {/* Menú desplegable móvil */}
+      {/* MENU MOVIL */}
       {menuOpen && (
         <div
           style={{
@@ -196,11 +237,25 @@ export function Navbar({ onGoHome, currentTitle, tournamentCode }) {
             zIndex: 100,
           }}
         >
+          {/* ALIAS */}
+          <div
+            style={{
+              padding: "0.6rem",
+              textAlign: "center",
+              background: "#0c0a12",
+              border: "2px solid #282442",
+              borderRadius: "8px",
+              color: "#ffd700",
+              fontSize: "0.8rem",
+              fontWeight: "bold",
+            }}
+          >
+            👤 {username}
+          </div>
+
           {tournamentCode && (
             <button
-              onClick={() => {
-                handleCopyCode();
-              }}
+              onClick={handleCopyCode}
               style={{
                 display: "flex",
                 alignItems: "center",
@@ -217,9 +272,16 @@ export function Navbar({ onGoHome, currentTitle, tournamentCode }) {
               }}
             >
               <span>🔑 Copiar Código:</span>
-              <span style={{ fontFamily: "monospace", color: "#fff" }}>
+
+              <span
+                style={{
+                  fontFamily: "monospace",
+                  color: "#fff",
+                }}
+              >
                 {tournamentCode}
               </span>
+
               <span>{copied ? "✅" : "📋"}</span>
             </button>
           )}
@@ -249,12 +311,13 @@ export function Navbar({ onGoHome, currentTitle, tournamentCode }) {
         </div>
       )}
 
-      {/* Estilos CSS internos rápidos para alternar entre la vista de PC y Celular */}
+      {/* CSS RESPONSIVE */}
       <style>{`
         @media (max-width: 640px) {
           .desktop-nav-actions {
             display: none !important;
           }
+
           .mobile-menu-btn {
             display: flex !important;
           }

@@ -11,21 +11,47 @@ import { PlayoffBracket } from "./components/PlayoffBracket";
 import { supabase } from "./supabaseClient";
 
 export function TournamentClashApp() {
+  // =========================================================
+  // USUARIO ACTUAL
+  // =========================================================
+
   const [currentUser, setCurrentUser] = useState(() => {
     const saved = localStorage.getItem("cr_current_user");
     return saved ? JSON.parse(saved) : null;
   });
 
-  const [authMode, setAuthMode] = useState("login");
-  const [authInput, setAuthInput] = useState({ username: "", password: "" });
+  // =========================================================
+  // AUTENTICACIÓN
+  // =========================================================
 
-  const [activeView, setActiveView] = useState("home"); // 'home' | 'create' | 'groups' | 'playoffs' | 'join'
+  const [authMode, setAuthMode] = useState("login");
+
+  const [authInput, setAuthInput] = useState({
+    username: "",
+    email: "",
+    password: "",
+  });
+
+  // =========================================================
+  // ESTADO GENERAL
+  // =========================================================
+
+  const [activeView, setActiveView] = useState("home");
   const [activeTournament, setActiveTournament] = useState(null);
   const [joinCodeInput, setJoinCodeInput] = useState("");
   const [tournaments, setTournaments] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // Cargar torneos desde Supabase al iniciar sesión
+  // =========================================================
+  // EDICIÓN DE TORNEO
+  // =========================================================
+
+  const [editingTournament, setEditingTournament] = useState(false);
+
+  // =========================================================
+  // CARGAR TORNEOS
+  // =========================================================
+
   useEffect(() => {
     if (currentUser) {
       fetchTournaments();
@@ -34,6 +60,7 @@ export function TournamentClashApp() {
 
   const fetchTournaments = async () => {
     setLoading(true);
+
     const { data, error } = await supabase
       .from("tournaments")
       .select("*")
@@ -44,64 +71,135 @@ export function TournamentClashApp() {
     } else {
       setTournaments(data || []);
     }
+
     setLoading(false);
   };
 
+  // =========================================================
+  // REGISTRO / LOGIN
+  // =========================================================
+
   const handleAuthSubmit = (e) => {
     e.preventDefault();
-    const username = authInput.username.trim();
-    const password = authInput.password.trim();
 
-    if (!username || !password) return;
+    const username = authInput.username.trim();
+    const email = authInput.email.trim().toLowerCase();
+    const password = authInput.password.trim();
 
     const registeredUsers = JSON.parse(
       localStorage.getItem("cr_users") || "[]"
     );
 
+    // =======================================================
+    // REGISTRO
+    // =======================================================
+
     if (authMode === "register") {
-      const exists = registeredUsers.find(
-        (u) => u.username.toLowerCase() === username.toLowerCase()
-      );
-      if (exists) {
-        alert("❌ Este nombre de usuario ya está registrado.");
+      if (!username || !email || !password) {
         return;
       }
-      const newUser = { username, password };
+
+      // Verificar alias
+      const usernameExists = registeredUsers.find(
+        (u) => u.username?.toLowerCase() === username.toLowerCase()
+      );
+
+      if (usernameExists) {
+        alert("❌ Este alias ya está registrado.");
+        return;
+      }
+
+      // Verificar email
+      const emailExists = registeredUsers.find(
+        (u) => u.email?.toLowerCase() === email
+      );
+
+      if (emailExists) {
+        alert("❌ Este email ya está registrado.");
+        return;
+      }
+
+      // Crear usuario nuevo
+      const newUser = {
+        username,
+        email,
+        password,
+      };
+
       registeredUsers.push(newUser);
+
       localStorage.setItem("cr_users", JSON.stringify(registeredUsers));
+
+      localStorage.setItem("cr_current_user", JSON.stringify(newUser));
+
       setCurrentUser(newUser);
-    } else {
-      const user = registeredUsers.find(
-        (u) =>
-          u.username.toLowerCase() === username.toLowerCase() &&
-          u.password === password
-      );
+    }
+
+    // =======================================================
+    // LOGIN
+    // =======================================================
+    else {
+      const loginValue = username.toLowerCase();
+
+      const user = registeredUsers.find((u) => {
+        const matchesUsername = u.username?.toLowerCase() === loginValue;
+
+        const matchesEmail = u.email?.toLowerCase() === loginValue;
+
+        return (matchesUsername || matchesEmail) && u.password === password;
+      });
+
       if (!user) {
-        alert("❌ Usuario o contraseña incorrectos.");
+        alert("❌ Alias/email o contraseña incorrectos.");
         return;
       }
+
+      localStorage.setItem("cr_current_user", JSON.stringify(user));
+
       setCurrentUser(user);
     }
 
-    localStorage.setItem("cr_current_user", JSON.stringify(authInput));
-    setAuthInput({ username: "", password: "" });
+    // Limpiar formulario
+    setAuthInput({
+      username: "",
+      email: "",
+      password: "",
+    });
   };
+
+  // =========================================================
+  // CERRAR SESIÓN
+  // =========================================================
 
   const handleLogout = () => {
     setCurrentUser(null);
+
     localStorage.removeItem("cr_current_user");
+
     setActiveView("home");
     setActiveTournament(null);
+    setEditingTournament(false);
   };
+
+  // =========================================================
+  // VOLVER AL INICIO
+  // =========================================================
 
   const handleGoHome = () => {
     setActiveTournament(null);
     setActiveView("home");
+    setEditingTournament(false);
   };
+
+  // =========================================================
+  // CREAR TORNEO
+  // =========================================================
 
   const handleCreateTournamentSubmit = async (config) => {
     const shuffled = [...config.teams].sort(() => 0.5 - Math.random());
+
     const groups = [];
+
     const numGroups = config.format === "groups_playoff" ? config.numGroups : 1;
 
     for (let i = 0; i < numGroups; i++) {
@@ -120,6 +218,7 @@ export function TournamentClashApp() {
     groups.forEach((group) => {
       const groupMatches = [];
       const t = group.teams;
+
       for (let i = 0; i < t.length; i++) {
         for (let j = i + 1; j < t.length; j++) {
           groupMatches.push({
@@ -131,6 +230,7 @@ export function TournamentClashApp() {
           });
         }
       }
+
       group.matches = groupMatches;
     });
 
@@ -143,7 +243,10 @@ export function TournamentClashApp() {
       format: config.format,
       qualifiers_per_group: config.qualifiersPerGroup,
       is_public: config.isPublic,
+
+      // El alias es la identidad visible del creador
       created_by: currentUser.username,
+
       groups,
       playoffs: null,
       status: "En curso",
@@ -167,6 +270,136 @@ export function TournamentClashApp() {
     }
   };
 
+  // =========================================================
+  // VERIFICAR SI HAY RESULTADOS
+  // =========================================================
+
+  const tournamentHasResults = (tournament) => {
+    if (!tournament?.groups) return false;
+
+    return tournament.groups.some((group) =>
+      (group.matches || []).some(
+        (match) =>
+          match.score1 !== null &&
+          match.score1 !== undefined &&
+          match.score2 !== null &&
+          match.score2 !== undefined
+      )
+    );
+  };
+
+  // =========================================================
+  // ADMINISTRADOR
+  // =========================================================
+
+  const isTournamentAdmin =
+    currentUser &&
+    activeTournament &&
+    currentUser.username === activeTournament.created_by;
+
+  // =========================================================
+  // EDITAR TORNEO
+  // =========================================================
+
+  const handleEditTournamentSubmit = async (config) => {
+    if (!activeTournament) return;
+
+    if (!isTournamentAdmin) {
+      alert("❌ Solo el administrador puede modificar este torneo.");
+      return;
+    }
+
+    if (tournamentHasResults(activeTournament)) {
+      alert(
+        "🔒 Este torneo ya tiene resultados cargados. No se puede modificar su organización para proteger los partidos existentes."
+      );
+      return;
+    }
+
+    const shuffled = [...config.teams].sort(() => 0.5 - Math.random());
+
+    const numGroups = config.format === "groups_playoff" ? config.numGroups : 1;
+
+    const groups = [];
+
+    for (let i = 0; i < numGroups; i++) {
+      groups.push({
+        id: i + 1,
+        name: `Grupo ${String.fromCharCode(65 + i)}`,
+        teams: [],
+        matches: [],
+      });
+    }
+
+    shuffled.forEach((team, idx) => {
+      groups[idx % numGroups].teams.push(team);
+    });
+
+    groups.forEach((group) => {
+      const groupMatches = [];
+      const t = group.teams;
+
+      for (let i = 0; i < t.length; i++) {
+        for (let j = i + 1; j < t.length; j++) {
+          groupMatches.push({
+            id: `${t[i]}-${t[j]}`,
+            team1: t[i],
+            team2: t[j],
+            score1: null,
+            score2: null,
+          });
+        }
+      }
+
+      group.matches = groupMatches;
+    });
+
+    const updatedTournament = {
+      ...activeTournament,
+      title: config.title,
+      game: config.game,
+      format: config.format,
+      qualifiers_per_group: config.qualifiersPerGroup,
+      is_public: config.isPublic,
+      groups,
+    };
+
+    const { data, error } = await supabase
+      .from("tournaments")
+      .update({
+        title: updatedTournament.title,
+        game: updatedTournament.game,
+        format: updatedTournament.format,
+        qualifiers_per_group: updatedTournament.qualifiers_per_group,
+        is_public: updatedTournament.is_public,
+        groups: updatedTournament.groups,
+      })
+      .eq("id", updatedTournament.id)
+      .select();
+
+    if (error) {
+      console.error("Error al modificar torneo:", error);
+      alert("❌ No se pudieron guardar los cambios.");
+      return;
+    }
+
+    if (data && data.length > 0) {
+      setActiveTournament(data[0]);
+
+      setTournaments((prev) =>
+        prev.map((t) => (t.id === data[0].id ? data[0] : t))
+      );
+
+      setEditingTournament(false);
+
+      alert("✅ Torneo modificado correctamente.");
+    }
+  };
+
+  // =========================================================
+  // ACTUALIZAR TORNEO
+  // =========================================================
+
   const handleUpdateTournamentInSupabase = async (updatedTournament) => {
     setActiveTournament(updatedTournament);
 
@@ -182,17 +415,21 @@ export function TournamentClashApp() {
     if (error) {
       console.error("Error al actualizar la tabla en Supabase:", error);
     } else {
-      setTournaments(
-        tournaments.map((t) =>
-          t.id === updatedTournament.id ? updatedTournament : t
-        )
+      setTournaments((prev) =>
+        prev.map((t) => (t.id === updatedTournament.id ? updatedTournament : t))
       );
     }
   };
 
+  // =========================================================
+  // UNIRSE A TORNEO
+  // =========================================================
+
   const handleJoinTournamentSubmit = (e) => {
     e.preventDefault();
+
     const cleanCode = joinCodeInput.trim().toUpperCase();
+
     const found = tournaments.find((t) => t.code === cleanCode);
 
     if (!found) {
@@ -201,6 +438,7 @@ export function TournamentClashApp() {
     }
 
     setActiveTournament(found);
+
     if (found.playoffs && found.playoffs.length > 0) {
       setActiveView("playoffs");
     } else {
@@ -208,14 +446,20 @@ export function TournamentClashApp() {
     }
   };
 
+  // =========================================================
+  // PLAYOFFS
+  // =========================================================
+
   const handleProceedToPlayoffs = () => {
     let qualifiedTeams = [];
 
     activeTournament.groups.forEach((group) => {
       const standings = calculateGroupStandings(group.teams, group.matches);
+
       const topTeams = standings
         .slice(0, activeTournament.qualifiers_per_group)
         .map((s) => s.name);
+
       qualifiedTeams.push(...topTeams);
     });
 
@@ -227,32 +471,66 @@ export function TournamentClashApp() {
     };
 
     handleUpdateTournamentInSupabase(updated);
+
     setActiveView("playoffs");
   };
 
+  // =========================================================
+  // FINALIZAR TORNEO
+  // =========================================================
+
   const handleFinishTournament = () => {
     alert("¡Torneo finalizado con éxito! El campeón ha sido coronado.");
-    const finishedObj = { ...activeTournament, status: "Finalizado" };
+
+    const finishedObj = {
+      ...activeTournament,
+      status: "Finalizado",
+    };
+
     handleUpdateTournamentInSupabase(finishedObj);
+
     setActiveView("home");
     setActiveTournament(null);
   };
 
+  // =========================================================
+  // RENDER
+  // =========================================================
+
   return (
     <div className="cr-container">
-      {/* 🔹 NAVBAR ARRIBA (Solo se muestra si hay un usuario logueado) */}
+      {/* =====================================================
+          NAVBAR
+          ===================================================== */}
+
       {currentUser && (
         <Navbar
           onGoHome={handleGoHome}
           currentTitle={activeTournament?.title}
           tournamentCode={activeTournament?.code}
+          currentUser={currentUser}
         />
       )}
 
+      {/* =====================================================
+          LOGIN / REGISTRO
+          ===================================================== */}
+
       {!currentUser ? (
-        <div className="cr-card" style={{ margin: "auto" }}>
+        <div
+          className="cr-card"
+          style={{
+            margin: "auto",
+          }}
+        >
           <div className="cr-card-glow"></div>
-          <div style={{ textAlign: "center", marginBottom: "1.5rem" }}>
+
+          <div
+            style={{
+              textAlign: "center",
+              marginBottom: "1.5rem",
+            }}
+          >
             <div
               style={{
                 width: "64px",
@@ -269,7 +547,9 @@ export function TournamentClashApp() {
             >
               🏆
             </div>
+
             <h1 className="cr-logo-title">TournamentClash</h1>
+
             <p
               style={{
                 color: "#9ca3af",
@@ -283,8 +563,16 @@ export function TournamentClashApp() {
 
           <form
             onSubmit={handleAuthSubmit}
-            style={{ display: "flex", flexDirection: "column", gap: "1rem" }}
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "1rem",
+            }}
           >
+            {/* =================================================
+                ALIAS
+                ================================================= */}
+
             <div>
               <label
                 style={{
@@ -296,19 +584,66 @@ export function TournamentClashApp() {
                   marginBottom: "4px",
                 }}
               >
-                Usuario
+                {authMode === "login" ? "Alias o Email" : "Alias"}
               </label>
+
               <input
                 type="text"
-                placeholder="Ej: ReyAzul99"
+                placeholder={
+                  authMode === "login"
+                    ? "Ej: ReyAzul99 o jugador@gmail.com"
+                    : "Ej: ReyAzul99"
+                }
                 value={authInput.username}
                 onChange={(e) =>
-                  setAuthInput({ ...authInput, username: e.target.value })
+                  setAuthInput({
+                    ...authInput,
+                    username: e.target.value,
+                  })
                 }
                 required
                 className="cr-input"
               />
             </div>
+
+            {/* =================================================
+                EMAIL - SOLO REGISTRO
+                ================================================= */}
+
+            {authMode === "register" && (
+              <div>
+                <label
+                  style={{
+                    display: "block",
+                    fontSize: "0.75rem",
+                    fontWeight: "bold",
+                    textTransform: "uppercase",
+                    color: "#d1d5db",
+                    marginBottom: "4px",
+                  }}
+                >
+                  Email
+                </label>
+
+                <input
+                  type="email"
+                  placeholder="Ej: jugador@gmail.com"
+                  value={authInput.email}
+                  onChange={(e) =>
+                    setAuthInput({
+                      ...authInput,
+                      email: e.target.value,
+                    })
+                  }
+                  required
+                  className="cr-input"
+                />
+              </div>
+            )}
+
+            {/* =================================================
+                CONTRASEÑA
+                ================================================= */}
 
             <div>
               <label
@@ -323,27 +658,46 @@ export function TournamentClashApp() {
               >
                 Contraseña
               </label>
+
               <input
                 type="password"
                 placeholder="••••••••"
                 value={authInput.password}
                 onChange={(e) =>
-                  setAuthInput({ ...authInput, password: e.target.value })
+                  setAuthInput({
+                    ...authInput,
+                    password: e.target.value,
+                  })
                 }
                 required
                 className="cr-input"
               />
             </div>
 
+            {/* =================================================
+                BOTÓN
+                ================================================= */}
+
             <button
               type="submit"
               className="cr-btn-gold"
-              style={{ marginTop: "0.5rem" }}
+              style={{
+                marginTop: "0.5rem",
+              }}
             >
               {authMode === "login" ? "Entrar a la Arena ⚔️" : "Registrarse 🛡️"}
             </button>
 
-            <div style={{ textAlign: "center", marginTop: "0.5rem" }}>
+            {/* =================================================
+                CAMBIAR LOGIN / REGISTRO
+                ================================================= */}
+
+            <div
+              style={{
+                textAlign: "center",
+                marginTop: "0.5rem",
+              }}
+            >
               <button
                 type="button"
                 onClick={() =>
@@ -366,7 +720,17 @@ export function TournamentClashApp() {
           </form>
         </div>
       ) : activeView === "home" ? (
-        <div className="cr-card" style={{ maxWidth: "480px", margin: "auto" }}>
+        // =====================================================
+        // HOME
+        // =====================================================
+
+        <div
+          className="cr-card"
+          style={{
+            maxWidth: "480px",
+            margin: "auto",
+          }}
+        >
           <div
             style={{
               display: "flex",
@@ -378,7 +742,11 @@ export function TournamentClashApp() {
             }}
           >
             <div
-              style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "0.75rem",
+              }}
             >
               <div
                 style={{
@@ -395,6 +763,7 @@ export function TournamentClashApp() {
               >
                 👑
               </div>
+
               <div>
                 <span
                   style={{
@@ -407,6 +776,7 @@ export function TournamentClashApp() {
                 >
                   Competidor Online
                 </span>
+
                 <h2
                   style={{
                     fontSize: "1.1rem",
@@ -419,6 +789,7 @@ export function TournamentClashApp() {
                 </h2>
               </div>
             </div>
+
             <button
               onClick={handleLogout}
               style={{
@@ -435,6 +806,10 @@ export function TournamentClashApp() {
               Cerrar Sesión
             </button>
           </div>
+
+          {/* =================================================
+              BOTONES PRINCIPALES
+              ================================================= */}
 
           <div
             style={{
@@ -456,7 +831,15 @@ export function TournamentClashApp() {
                 color: "#fff",
               }}
             >
-              <div style={{ fontSize: "20px", marginBottom: "4px" }}>⚔️</div>
+              <div
+                style={{
+                  fontSize: "20px",
+                  marginBottom: "4px",
+                }}
+              >
+                ⚔️
+              </div>
+
               <h3
                 style={{
                   fontWeight: 900,
@@ -466,7 +849,14 @@ export function TournamentClashApp() {
               >
                 Armar Torneo
               </h3>
-              <p style={{ fontSize: "10px", color: "#bfdbfe", margin: 0 }}>
+
+              <p
+                style={{
+                  fontSize: "10px",
+                  color: "#bfdbfe",
+                  margin: 0,
+                }}
+              >
                 Sincronizado en la nube
               </p>
             </button>
@@ -483,7 +873,15 @@ export function TournamentClashApp() {
                 color: "#fff",
               }}
             >
-              <div style={{ fontSize: "20px", marginBottom: "4px" }}>🔍</div>
+              <div
+                style={{
+                  fontSize: "20px",
+                  marginBottom: "4px",
+                }}
+              >
+                🔍
+              </div>
+
               <h3
                 style={{
                   fontWeight: 900,
@@ -493,11 +891,22 @@ export function TournamentClashApp() {
               >
                 Unirme
               </h3>
-              <p style={{ fontSize: "10px", color: "#e9d5ff", margin: 0 }}>
+
+              <p
+                style={{
+                  fontSize: "10px",
+                  color: "#e9d5ff",
+                  margin: 0,
+                }}
+              >
                 Entra con código
               </p>
             </button>
           </div>
+
+          {/* =================================================
+              TORNEOS EN LA NUBE
+              ================================================= */}
 
           <div>
             <div
@@ -509,9 +918,14 @@ export function TournamentClashApp() {
               }}
             >
               <div
-                style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.5rem",
+                }}
               >
                 <span>⚡</span>
+
                 <h3
                   style={{
                     fontWeight: 900,
@@ -524,6 +938,7 @@ export function TournamentClashApp() {
                   Torneos en la Nube
                 </h3>
               </div>
+
               <button
                 onClick={fetchTournaments}
                 style={{
@@ -573,6 +988,7 @@ export function TournamentClashApp() {
                     key={t.id}
                     onClick={() => {
                       setActiveTournament(t);
+
                       setActiveView(
                         t.playoffs && t.playoffs.length > 0
                           ? "playoffs"
@@ -628,6 +1044,7 @@ export function TournamentClashApp() {
                             🔒 Privado
                           </span>
                         )}
+
                         <span
                           style={{
                             fontSize: "10px",
@@ -638,6 +1055,7 @@ export function TournamentClashApp() {
                           👑 {t.created_by}
                         </span>
                       </div>
+
                       <h4
                         style={{
                           fontWeight: 900,
@@ -649,7 +1067,12 @@ export function TournamentClashApp() {
                         {t.title}
                       </h4>
                     </div>
-                    <div style={{ textAlign: "right" }}>
+
+                    <div
+                      style={{
+                        textAlign: "right",
+                      }}
+                    >
                       <span
                         style={{
                           fontSize: "0.75rem",
@@ -661,6 +1084,7 @@ export function TournamentClashApp() {
                       >
                         {t.status}
                       </span>
+
                       <span
                         style={{
                           fontSize: "9px",
@@ -678,13 +1102,42 @@ export function TournamentClashApp() {
           </div>
         </div>
       ) : activeView === "create" ? (
+        // =====================================================
+        // CREAR TORNEO
+        // =====================================================
+
         <CreateTournament
           onSave={handleCreateTournamentSubmit}
           onCancel={() => setActiveView("home")}
         />
+      ) : activeView === "edit" ? (
+        // =====================================================
+        // EDITAR TORNEO
+        // =====================================================
+
+        <CreateTournament
+          isEditing={true}
+          initialData={activeTournament}
+          onSave={handleEditTournamentSubmit}
+          onCancel={() => {
+            setEditingTournament(false);
+            setActiveView("groups");
+          }}
+        />
       ) : activeView === "join" ? (
-        <div className="cr-card" style={{ maxWidth: "420px", margin: "auto" }}>
+        // =====================================================
+        // UNIRSE
+        // =====================================================
+
+        <div
+          className="cr-card"
+          style={{
+            maxWidth: "420px",
+            margin: "auto",
+          }}
+        >
           <div className="cr-card-glow"></div>
+
           <div
             style={{
               display: "flex",
@@ -693,9 +1146,15 @@ export function TournamentClashApp() {
               marginBottom: "1.5rem",
             }}
           >
-            <h2 className="cr-title" style={{ fontSize: "1.1rem" }}>
+            <h2
+              className="cr-title"
+              style={{
+                fontSize: "1.1rem",
+              }}
+            >
               🔑 Unirse a Torneo
             </h2>
+
             <button
               onClick={() => setActiveView("home")}
               style={{
@@ -713,7 +1172,11 @@ export function TournamentClashApp() {
 
           <form
             onSubmit={handleJoinTournamentSubmit}
-            style={{ display: "flex", flexDirection: "column", gap: "1rem" }}
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "1rem",
+            }}
           >
             <div>
               <label
@@ -728,6 +1191,7 @@ export function TournamentClashApp() {
               >
                 Código de Invitación
               </label>
+
               <input
                 type="text"
                 placeholder="Ej: CR-4829"
@@ -747,19 +1211,74 @@ export function TournamentClashApp() {
             <button
               type="submit"
               className="cr-btn-gold"
-              style={{ marginTop: "0.5rem" }}
+              style={{
+                marginTop: "0.5rem",
+              }}
             >
               Ingresar a la Batalla ⚔️
             </button>
           </form>
         </div>
       ) : activeView === "groups" ? (
-        <GroupStageView
-          tournament={activeTournament}
-          onUpdateTournament={handleUpdateTournamentInSupabase}
-          onProceedToPlayoffs={handleProceedToPlayoffs}
-        />
+        // =====================================================
+        // GRUPOS
+        // =====================================================
+
+        <div
+          style={{
+            width: "100%",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: "1rem",
+          }}
+        >
+          {/* BOTÓN EXCLUSIVO DEL ADMINISTRADOR */}
+
+          {isTournamentAdmin && (
+            <div
+              style={{
+                width: "100%",
+                maxWidth: "900px",
+                display: "flex",
+                justifyContent: "flex-end",
+              }}
+            >
+              <button
+                onClick={() => {
+                  if (tournamentHasResults(activeTournament)) {
+                    alert(
+                      "🔒 Este torneo ya tiene resultados cargados. No se puede modificar su organización."
+                    );
+                    return;
+                  }
+
+                  setEditingTournament(true);
+
+                  setActiveView("edit");
+                }}
+                className="cr-btn-gold"
+                style={{
+                  maxWidth: "240px",
+                  fontSize: "0.8rem",
+                }}
+              >
+                ⚙️ Modificar torneo
+              </button>
+            </div>
+          )}
+
+          <GroupStageView
+            tournament={activeTournament}
+            onUpdateTournament={handleUpdateTournamentInSupabase}
+            onProceedToPlayoffs={handleProceedToPlayoffs}
+          />
+        </div>
       ) : (
+        // =====================================================
+        // PLAYOFFS
+        // =====================================================
+
         <PlayoffBracket
           tournament={activeTournament}
           onUpdateTournament={handleUpdateTournamentInSupabase}
@@ -770,3 +1289,4 @@ export function TournamentClashApp() {
   );
 }
 
+export default TournamentClashApp;
