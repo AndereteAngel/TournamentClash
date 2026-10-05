@@ -10,52 +10,921 @@ import { Navbar } from "./components/Navbar";
 import { PlayoffBracket } from "./components/PlayoffBracket";
 import { supabase } from "./supabaseClient";
 
-export function TournamentClashApp() {
+const ADMIN_UID = "c2089fce-5fb1-430a-8abc-89f5b762b69a";
+
+function AdminStats({ onBack }) {
+  const [visitas, setVisitas] = useState([]);
+  const [loadingStats, setLoadingStats] = useState(true);
+  const [errorStats, setErrorStats] = useState("");
+
+  const cargarEstadisticas = async () => {
+    setLoadingStats(true);
+    setErrorStats("");
+
+    const { data, error } = await supabase
+      .from("visitas")
+      .select(
+        "id, created_at, user_id, username, device, started_at, last_seen_at, duration_seconds"
+      )
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error("Error al obtener estadísticas:", error);
+      setErrorStats("No se pudieron cargar las estadísticas.");
+      setLoadingStats(false);
+      return;
+    }
+
+    setVisitas(data || []);
+    setLoadingStats(false);
+  };
+
+  useEffect(() => {
+    cargarEstadisticas();
+  }, []);
+
+  const formatearFecha = (fecha) => {
+    if (!fecha) return "-";
+
+    return new Date(fecha).toLocaleString("es-AR", {
+      dateStyle: "short",
+      timeStyle: "short",
+    });
+  };
+
+  const formatearDuracion = (segundos) => {
+    const total = Number(segundos || 0);
+
+    if (total < 60) {
+      return `${total}s`;
+    }
+
+    const minutos = Math.floor(total / 60);
+    const segundosRestantes = total % 60;
+
+    if (minutos < 60) {
+      return `${minutos}m ${segundosRestantes}s`;
+    }
+
+    const horas = Math.floor(minutos / 60);
+    const minutosRestantes = minutos % 60;
+
+    return `${horas}h ${minutosRestantes}m`;
+  };
+
+  const visitasHoy = visitas.filter((visita) => {
+    const fecha = new Date(visita.created_at);
+    const ahora = new Date();
+
+    return (
+      fecha.getDate() === ahora.getDate() &&
+      fecha.getMonth() === ahora.getMonth() &&
+      fecha.getFullYear() === ahora.getFullYear()
+    );
+  }).length;
+
+  const usuariosRegistrados = new Set(
+    visitas.filter((visita) => visita.user_id).map((visita) => visita.user_id)
+  ).size;
+
+  const visitasAnonimas = visitas.filter((visita) => !visita.user_id).length;
+
+  const visitasMobile = visitas.filter(
+    (visita) => visita.device === "mobile"
+  ).length;
+
+  const visitasDesktop = visitas.filter(
+    (visita) => visita.device === "desktop"
+  ).length;
+
+  const tiempoTotal = visitas.reduce(
+    (total, visita) => total + Number(visita.duration_seconds || 0),
+    0
+  );
+
+  const tiempoPromedio =
+    visitas.length > 0 ? Math.round(tiempoTotal / visitas.length) : 0;
+
+  const usuariosActivos = visitas.filter((visita) => {
+    if (!visita.last_seen_at) return false;
+
+    const diferencia = Date.now() - new Date(visita.last_seen_at).getTime();
+
+    return diferencia <= 5 * 60 * 1000;
+  }).length;
+
   // =========================================================
-  // USUARIO ACTUAL
+  // VISITAS POR DÍA
   // =========================================================
 
-  const [currentUser, setCurrentUser] = useState(() => {
-    const saved = localStorage.getItem("cr_current_user");
-    return saved ? JSON.parse(saved) : null;
+  const visitasPorDia = {};
+
+  visitas.forEach((visita) => {
+    const fecha = new Date(visita.created_at);
+
+    const dia = fecha.toLocaleDateString("es-AR", {
+      day: "2-digit",
+      month: "2-digit",
+    });
+
+    visitasPorDia[dia] = (visitasPorDia[dia] || 0) + 1;
+  });
+
+  const diasOrdenados = Object.entries(visitasPorDia).slice(0, 14);
+
+  // =========================================================
+  // VISITAS POR HORA
+  // =========================================================
+
+  const visitasPorHora = Array.from({ length: 24 }, () => 0);
+
+  visitas.forEach((visita) => {
+    const hora = new Date(visita.created_at).getHours();
+
+    visitasPorHora[hora]++;
   });
 
   // =========================================================
-  // AUTENTICACIÓN
+  // JUGADORES
   // =========================================================
 
-  const [authMode, setAuthMode] = useState("login");
+  const jugadoresMap = {};
 
+  visitas
+    .filter((visita) => visita.user_id)
+    .forEach((visita) => {
+      if (!jugadoresMap[visita.user_id]) {
+        jugadoresMap[visita.user_id] = {
+          id: visita.user_id,
+          username: visita.username || "Jugador",
+          visitas: 0,
+          tiempo: 0,
+          ultimaVisita: visita.created_at,
+        };
+      }
+
+      jugadoresMap[visita.user_id].visitas++;
+
+      jugadoresMap[visita.user_id].tiempo += Number(
+        visita.duration_seconds || 0
+      );
+
+      if (
+        new Date(visita.created_at) >
+        new Date(jugadoresMap[visita.user_id].ultimaVisita)
+      ) {
+        jugadoresMap[visita.user_id].ultimaVisita = visita.created_at;
+      }
+    });
+
+  const jugadores = Object.values(jugadoresMap).sort(
+    (a, b) => b.visitas - a.visitas
+  );
+
+  if (loadingStats) {
+    return (
+      <div
+        className="cr-card"
+        style={{
+          maxWidth: "1000px",
+          margin: "auto",
+          textAlign: "center",
+        }}
+      >
+        <h2 className="cr-title">📊 Estadísticas</h2>
+
+        <p style={{ color: "#9ca3af" }}>Cargando estadísticas...</p>
+      </div>
+    );
+  }
+
+  if (errorStats) {
+    return (
+      <div
+        className="cr-card"
+        style={{
+          maxWidth: "1000px",
+          margin: "auto",
+          textAlign: "center",
+        }}
+      >
+        <h2 className="cr-title">📊 Estadísticas</h2>
+
+        <p style={{ color: "#f87171" }}>{errorStats}</p>
+
+        <button
+          onClick={onBack}
+          className="cr-btn-gold"
+          style={{ marginTop: "1rem" }}
+        >
+          ← Volver
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div
+      style={{
+        width: "100%",
+        maxWidth: "1100px",
+        margin: "0 auto",
+        paddingBottom: "2rem",
+      }}
+    >
+      {/* HEADER */}
+
+      <div
+        className="cr-card"
+        style={{
+          marginBottom: "1rem",
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            gap: "1rem",
+            flexWrap: "wrap",
+          }}
+        >
+          <div>
+            <h2 className="cr-title" style={{ marginBottom: "4px" }}>
+              📊 Estadísticas
+            </h2>
+
+            <p
+              style={{
+                color: "#9ca3af",
+                margin: 0,
+                fontSize: "0.8rem",
+              }}
+            >
+              Panel privado de TournamentClash
+            </p>
+          </div>
+
+          <div
+            style={{
+              display: "flex",
+              gap: "0.5rem",
+            }}
+          >
+            <button
+              onClick={cargarEstadisticas}
+              style={{
+                padding: "0.5rem 0.8rem",
+                background: "#1b5fa8",
+                border: "1px solid #3b82f6",
+                color: "#fff",
+                borderRadius: "7px",
+                cursor: "pointer",
+                fontWeight: "bold",
+              }}
+            >
+              🔄 Actualizar
+            </button>
+
+            <button
+              onClick={onBack}
+              style={{
+                padding: "0.5rem 0.8rem",
+                background: "transparent",
+                border: "1px solid #4b5563",
+                color: "#d1d5db",
+                borderRadius: "7px",
+                cursor: "pointer",
+                fontWeight: "bold",
+              }}
+            >
+              ← Volver
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* RESUMEN */}
+
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))",
+          gap: "0.75rem",
+          marginBottom: "1rem",
+        }}
+      >
+        {[
+          ["👁️", "Visitas totales", visitas.length],
+          ["📅", "Visitas hoy", visitasHoy],
+          ["👥", "Jugadores", usuariosRegistrados],
+          ["🕵️", "Anónimas", visitasAnonimas],
+          ["🟢", "Activos", usuariosActivos],
+          ["⏱️", "Tiempo promedio", formatearDuracion(tiempoPromedio)],
+        ].map(([icono, titulo, valor]) => (
+          <div
+            key={titulo}
+            className="cr-card"
+            style={{
+              padding: "1rem",
+              textAlign: "center",
+            }}
+          >
+            <div style={{ fontSize: "1.4rem" }}>{icono}</div>
+
+            <div
+              style={{
+                color: "#9ca3af",
+                fontSize: "0.7rem",
+                textTransform: "uppercase",
+                fontWeight: "bold",
+                marginTop: "4px",
+              }}
+            >
+              {titulo}
+            </div>
+
+            <div
+              style={{
+                color: "#ffd700",
+                fontSize: "1.4rem",
+                fontWeight: 900,
+                marginTop: "4px",
+              }}
+            >
+              {valor}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* DISPOSITIVOS */}
+
+      <div
+        className="cr-card"
+        style={{
+          marginBottom: "1rem",
+        }}
+      >
+        <h3
+          style={{
+            color: "#fff",
+            marginTop: 0,
+            marginBottom: "1rem",
+          }}
+        >
+          📱 Dispositivos
+        </h3>
+
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: "1rem",
+          }}
+        >
+          <div
+            style={{
+              padding: "1rem",
+              background: "#121019",
+              borderRadius: "8px",
+              textAlign: "center",
+            }}
+          >
+            <div style={{ fontSize: "1.5rem" }}>📱</div>
+
+            <strong
+              style={{
+                color: "#fff",
+                display: "block",
+                marginTop: "5px",
+              }}
+            >
+              Mobile
+            </strong>
+
+            <span style={{ color: "#9ca3af" }}>{visitasMobile} visitas</span>
+          </div>
+
+          <div
+            style={{
+              padding: "1rem",
+              background: "#121019",
+              borderRadius: "8px",
+              textAlign: "center",
+            }}
+          >
+            <div style={{ fontSize: "1.5rem" }}>💻</div>
+
+            <strong
+              style={{
+                color: "#fff",
+                display: "block",
+                marginTop: "5px",
+              }}
+            >
+              Desktop
+            </strong>
+
+            <span style={{ color: "#9ca3af" }}>{visitasDesktop} visitas</span>
+          </div>
+        </div>
+      </div>
+
+      {/* VISITAS POR DÍA */}
+
+      <div
+        className="cr-card"
+        style={{
+          marginBottom: "1rem",
+        }}
+      >
+        <h3
+          style={{
+            color: "#fff",
+            marginTop: 0,
+            marginBottom: "1rem",
+          }}
+        >
+          📅 Visitas por día
+        </h3>
+
+        {diasOrdenados.length === 0 ? (
+          <p style={{ color: "#9ca3af" }}>Todavía no hay datos.</p>
+        ) : (
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "0.45rem",
+            }}
+          >
+            {diasOrdenados.map(([dia, cantidad]) => (
+              <div
+                key={dia}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.75rem",
+                }}
+              >
+                <span
+                  style={{
+                    width: "55px",
+                    color: "#d1d5db",
+                    fontSize: "0.8rem",
+                  }}
+                >
+                  {dia}
+                </span>
+
+                <div
+                  style={{
+                    flex: 1,
+                    height: "22px",
+                    background: "#121019",
+                    borderRadius: "5px",
+                    overflow: "hidden",
+                  }}
+                >
+                  <div
+                    style={{
+                      width: `${Math.min(
+                        100,
+                        (cantidad /
+                          Math.max(
+                            1,
+                            Math.max(...Object.values(visitasPorDia))
+                          )) *
+                          100
+                      )}%`,
+                      height: "100%",
+                      background: "linear-gradient(90deg, #1b5fa8, #60a5fa)",
+                    }}
+                  />
+                </div>
+
+                <strong
+                  style={{
+                    width: "30px",
+                    textAlign: "right",
+                    color: "#ffd700",
+                  }}
+                >
+                  {cantidad}
+                </strong>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* VISITAS POR HORA */}
+
+      <div
+        className="cr-card"
+        style={{
+          marginBottom: "1rem",
+        }}
+      >
+        <h3
+          style={{
+            color: "#fff",
+            marginTop: 0,
+            marginBottom: "1rem",
+          }}
+        >
+          🕐 Visitas por horario
+        </h3>
+
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(55px, 1fr))",
+            gap: "0.4rem",
+          }}
+        >
+          {visitasPorHora.map((cantidad, hora) => (
+            <div
+              key={hora}
+              style={{
+                background: "#121019",
+                borderRadius: "6px",
+                padding: "0.5rem 0.2rem",
+                textAlign: "center",
+              }}
+            >
+              <div
+                style={{
+                  color: "#9ca3af",
+                  fontSize: "0.65rem",
+                }}
+              >
+                {String(hora).padStart(2, "0")}h
+              </div>
+
+              <strong
+                style={{
+                  color: cantidad > 0 ? "#ffd700" : "#4b5563",
+                  fontSize: "0.9rem",
+                }}
+              >
+                {cantidad}
+              </strong>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* JUGADORES */}
+
+      <div className="cr-card">
+        <h3
+          style={{
+            color: "#fff",
+            marginTop: 0,
+            marginBottom: "1rem",
+          }}
+        >
+          👑 Jugadores
+        </h3>
+
+        {jugadores.length === 0 ? (
+          <p style={{ color: "#9ca3af" }}>
+            Todavía no ingresaron jugadores registrados.
+          </p>
+        ) : (
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "0.5rem",
+            }}
+          >
+            {jugadores.map((jugador, index) => (
+              <div
+                key={jugador.id}
+                style={{
+                  background: "#121019",
+                  border: "1px solid #2d2b3b",
+                  borderRadius: "8px",
+                  padding: "0.75rem",
+                  display: "grid",
+                  gridTemplateColumns:
+                    "30px minmax(120px, 1fr) repeat(3, auto)",
+                  gap: "0.75rem",
+                  alignItems: "center",
+                }}
+              >
+                <strong
+                  style={{
+                    color: "#ffd700",
+                  }}
+                >
+                  #{index + 1}
+                </strong>
+
+                <div>
+                  <strong
+                    style={{
+                      color: "#fff",
+                      display: "block",
+                    }}
+                  >
+                    {jugador.username}
+                  </strong>
+
+                  <span
+                    style={{
+                      color: "#6b7280",
+                      fontSize: "0.65rem",
+                    }}
+                  >
+                    Última visita: {formatearFecha(jugador.ultimaVisita)}
+                  </span>
+                </div>
+
+                <div
+                  style={{
+                    textAlign: "center",
+                  }}
+                >
+                  <span
+                    style={{
+                      color: "#9ca3af",
+                      fontSize: "0.65rem",
+                      display: "block",
+                    }}
+                  >
+                    Visitas
+                  </span>
+
+                  <strong style={{ color: "#60a5fa" }}>
+                    {jugador.visitas}
+                  </strong>
+                </div>
+
+                <div
+                  style={{
+                    textAlign: "center",
+                  }}
+                >
+                  <span
+                    style={{
+                      color: "#9ca3af",
+                      fontSize: "0.65rem",
+                      display: "block",
+                    }}
+                  >
+                    Tiempo
+                  </span>
+
+                  <strong style={{ color: "#34d399" }}>
+                    {formatearDuracion(jugador.tiempo)}
+                  </strong>
+                </div>
+
+                <div
+                  style={{
+                    textAlign: "center",
+                  }}
+                >
+                  <span
+                    style={{
+                      color: "#9ca3af",
+                      fontSize: "0.65rem",
+                      display: "block",
+                    }}
+                  >
+                    Dispositivo
+                  </span>
+
+                  <span>
+                    {visitas.find((v) => v.user_id === jugador.id)?.device ===
+                    "mobile"
+                      ? "📱"
+                      : "💻"}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+export function TournamentClashApp() {
+  const [currentUser, setCurrentUser] = useState(null);
+  const [authMode, setAuthMode] = useState("login");
   const [authInput, setAuthInput] = useState({
     username: "",
     email: "",
     password: "",
   });
-
-  // =========================================================
-  // ESTADO GENERAL
-  // =========================================================
-
   const [activeView, setActiveView] = useState("home");
   const [activeTournament, setActiveTournament] = useState(null);
   const [joinCodeInput, setJoinCodeInput] = useState("");
   const [tournaments, setTournaments] = useState([]);
   const [loading, setLoading] = useState(false);
-
-  // =========================================================
-  // EDICIÓN DE TORNEO
-  // =========================================================
-
   const [editingTournament, setEditingTournament] = useState(false);
+  const [deletingTournamentId, setDeletingTournamentId] = useState(null);
 
   // =========================================================
-  // CARGAR TORNEOS
+  // REGISTRAR VISITA Y MEDIR INTERACCIÓN
   // =========================================================
 
   useEffect(() => {
-    if (currentUser) {
-      fetchTournaments();
-    }
+    let mounted = true;
+
+    const registrarVisita = async () => {
+      const device = window.innerWidth <= 768 ? "mobile" : "desktop";
+
+      let visitaId = sessionStorage.getItem("tournamentclash_visita_id");
+
+      const esNuevaVisita = !visitaId;
+
+      if (!visitaId) {
+        visitaId = crypto.randomUUID();
+
+        sessionStorage.setItem("tournamentclash_visita_id", visitaId);
+      }
+
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      if (esNuevaVisita) {
+        const ahora = new Date().toISOString();
+
+        const visita = {
+          id: visitaId,
+          user_id: session?.user?.id || null,
+          username: session?.user?.user_metadata?.username || null,
+          device,
+          started_at: ahora,
+          last_seen_at: ahora,
+          duration_seconds: 0,
+        };
+
+        const { error } = await supabase.from("visitas").insert(visita);
+
+        if (error) {
+          console.error("Error al registrar visita:", error);
+        }
+      }
+    };
+
+    const actualizarTiempo = async () => {
+      const visitaId = sessionStorage.getItem("tournamentclash_visita_id");
+
+      if (!visitaId) return;
+
+      const { data, error } = await supabase
+        .from("visitas")
+        .select("started_at")
+        .eq("id", visitaId)
+        .maybeSingle();
+
+      if (error || !data?.started_at) return;
+
+      const inicio = new Date(data.started_at);
+      const ahora = new Date();
+
+      const segundos = Math.max(0, Math.floor((ahora - inicio) / 1000));
+
+      await supabase
+        .from("visitas")
+        .update({
+          last_seen_at: ahora.toISOString(),
+          duration_seconds: segundos,
+        })
+        .eq("id", visitaId);
+    };
+
+    registrarVisita();
+
+    const intervalo = setInterval(() => {
+      actualizarTiempo();
+    }, 30000);
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "hidden") {
+        actualizarTiempo();
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      mounted = false;
+
+      clearInterval(intervalo);
+
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, []);
+
+  // =========================================================
+  // ASOCIAR LA VISITA AL JUGADOR CUANDO INICIA SESIÓN
+  // =========================================================
+
+  useEffect(() => {
+    const asociarVisitaAlUsuario = async () => {
+      if (!currentUser) return;
+
+      const visitaId = sessionStorage.getItem("tournamentclash_visita_id");
+
+      if (!visitaId) return;
+
+      const { error } = await supabase
+        .from("visitas")
+        .update({
+          user_id: currentUser.id,
+          username: currentUser.username,
+        })
+        .eq("id", visitaId);
+
+      if (error) {
+        console.error("Error al asociar visita al usuario:", error);
+      }
+    };
+
+    asociarVisitaAlUsuario();
+  }, [currentUser]);
+
+  // =========================================================
+  // RECUPERAR SESIÓN
+  // =========================================================
+
+  useEffect(() => {
+    let mounted = true;
+
+    const loadCurrentUser = async () => {
+      const {
+        data: { session },
+        error,
+      } = await supabase.auth.getSession();
+
+      if (error) {
+        console.error("Error al recuperar sesión:", error);
+        return;
+      }
+
+      if (!session?.user) {
+        if (mounted) setCurrentUser(null);
+        return;
+      }
+
+      const user = await buildCurrentUser(session.user);
+
+      if (mounted) setCurrentUser(user);
+    };
+
+    loadCurrentUser();
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      if (!session?.user) {
+        if (mounted) setCurrentUser(null);
+        return;
+      }
+
+      const user = await buildCurrentUser(session.user);
+
+      if (mounted) setCurrentUser(user);
+    });
+
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
+  }, []);
+
+  const buildCurrentUser = async (authUser) => {
+    if (!authUser) return null;
+
+    const { data: profile, error } = await supabase
+      .from("profiles")
+      .select("id, username, email")
+      .eq("id", authUser.id)
+      .maybeSingle();
+
+    if (error) console.error("Error al obtener perfil:", error);
+
+    return {
+      id: authUser.id,
+      username:
+        profile?.username || authUser.user_metadata?.username || "Jugador",
+      email: authUser.email || profile?.email || "",
+    };
+  };
+
+  useEffect(() => {
+    if (currentUser) fetchTournaments();
+    else setTournaments([]);
   }, [currentUser]);
 
   const fetchTournaments = async () => {
@@ -64,102 +933,189 @@ export function TournamentClashApp() {
     const { data, error } = await supabase
       .from("tournaments")
       .select("*")
-      .order("created_at", { ascending: false });
+      .order("created_at", {
+        ascending: false,
+      });
 
-    if (error) {
-      console.error("Error al obtener torneos:", error);
-    } else {
-      setTournaments(data || []);
-    }
+    if (error) console.error("Error al obtener torneos:", error);
+    else setTournaments(data || []);
 
     setLoading(false);
   };
 
   // =========================================================
-  // REGISTRO / LOGIN
+  // ELIMINAR TORNEO - SOLO ADMIN
   // =========================================================
 
-  const handleAuthSubmit = (e) => {
+  const handleDeleteTournament = async (tournament) => {
+    if (!currentUser || currentUser.id !== ADMIN_UID) {
+      alert("❌ No tenés permisos para eliminar torneos.");
+      return;
+    }
+
+    if (!tournament?.id) {
+      alert("❌ No se pudo identificar el torneo.");
+      return;
+    }
+
+    const confirmar = window.confirm(
+      `⚠️ ELIMINAR TORNEO\n\n` +
+        `"${tournament.title}"\n\n` +
+        `Esta acción eliminará el torneo de TournamentClash.\n\n` +
+        `¿Estás seguro de que querés continuar?`
+    );
+
+    if (!confirmar) return;
+
+    setDeletingTournamentId(tournament.id);
+
+    try {
+      const { error } = await supabase
+        .from("tournaments")
+        .delete()
+        .eq("id", tournament.id);
+
+      if (error) {
+        console.error("Error al eliminar torneo:", error);
+
+        alert(
+          `❌ No se pudo eliminar el torneo.\n\n${
+            error.message || "Error desconocido."
+          }`
+        );
+
+        return;
+      }
+
+      setTournaments((prev) => prev.filter((t) => t.id !== tournament.id));
+
+      if (activeTournament?.id === tournament.id) {
+        setActiveTournament(null);
+        setActiveView("home");
+        setEditingTournament(false);
+      }
+
+      alert("✅ Torneo eliminado correctamente.");
+    } catch (error) {
+      console.error("Error inesperado al eliminar torneo:", error);
+
+      alert("❌ Ocurrió un error al intentar eliminar el torneo.");
+    } finally {
+      setDeletingTournamentId(null);
+    }
+  };
+
+  // =========================================================
+  // AUTENTICACIÓN
+  // =========================================================
+
+  const handleAuthSubmit = async (e) => {
     e.preventDefault();
 
     const username = authInput.username.trim();
     const email = authInput.email.trim().toLowerCase();
     const password = authInput.password.trim();
 
-    const registeredUsers = JSON.parse(
-      localStorage.getItem("cr_users") || "[]"
-    );
-
-    // =======================================================
-    // REGISTRO
-    // =======================================================
-
     if (authMode === "register") {
       if (!username || !email || !password) {
+        alert("❌ Completá todos los campos.");
         return;
       }
 
-      // Verificar alias
-      const usernameExists = registeredUsers.find(
-        (u) => u.username?.toLowerCase() === username.toLowerCase()
-      );
+      if (username.length < 3) {
+        alert("❌ El alias debe tener al menos 3 caracteres.");
+        return;
+      }
 
-      if (usernameExists) {
+      if (password.length < 6) {
+        alert("❌ La contraseña debe tener al menos 6 caracteres.");
+        return;
+      }
+
+      const { data: existingProfile, error: profileError } = await supabase
+        .from("profiles")
+        .select("id")
+        .ilike("username", username)
+        .maybeSingle();
+
+      if (profileError)
+        console.error("Error al verificar alias:", profileError);
+
+      if (existingProfile) {
         alert("❌ Este alias ya está registrado.");
         return;
       }
 
-      // Verificar email
-      const emailExists = registeredUsers.find(
-        (u) => u.email?.toLowerCase() === email
-      );
-
-      if (emailExists) {
-        alert("❌ Este email ya está registrado.");
-        return;
-      }
-
-      // Crear usuario nuevo
-      const newUser = {
-        username,
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
-      };
-
-      registeredUsers.push(newUser);
-
-      localStorage.setItem("cr_users", JSON.stringify(registeredUsers));
-
-      localStorage.setItem("cr_current_user", JSON.stringify(newUser));
-
-      setCurrentUser(newUser);
-    }
-
-    // =======================================================
-    // LOGIN
-    // =======================================================
-    else {
-      const loginValue = username.toLowerCase();
-
-      const user = registeredUsers.find((u) => {
-        const matchesUsername = u.username?.toLowerCase() === loginValue;
-
-        const matchesEmail = u.email?.toLowerCase() === loginValue;
-
-        return (matchesUsername || matchesEmail) && u.password === password;
+        options: {
+          data: { username },
+        },
       });
 
-      if (!user) {
-        alert("❌ Alias/email o contraseña incorrectos.");
+      if (error) {
+        console.error("Error al registrar usuario:", error);
+
+        if (error.message?.toLowerCase().includes("already registered")) {
+          alert("❌ Este email ya está registrado.");
+        } else {
+          alert(`❌ No se pudo registrar el usuario: ${error.message}`);
+        }
+
         return;
       }
 
-      localStorage.setItem("cr_current_user", JSON.stringify(user));
+      if (!data.session) {
+        alert(
+          "✅ Registro realizado.\n\nRevisá tu correo electrónico para confirmar la cuenta y luego iniciá sesión."
+        );
+
+        setAuthInput({
+          username: "",
+          email: "",
+          password: "",
+        });
+
+        setAuthMode("login");
+        return;
+      }
+
+      const user = await buildCurrentUser(data.user);
 
       setCurrentUser(user);
+
+      setAuthInput({
+        username: "",
+        email: "",
+        password: "",
+      });
+
+      return;
     }
 
-    // Limpiar formulario
+    if (!email || !password) {
+      alert("❌ Ingresá tu email y contraseña.");
+      return;
+    }
+
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) {
+      console.error("Error al iniciar sesión:", error);
+
+      alert("❌ Email o contraseña incorrectos.");
+
+      return;
+    }
+
+    const user = await buildCurrentUser(data.user);
+
+    setCurrentUser(user);
+
     setAuthInput({
       username: "",
       email: "",
@@ -167,23 +1123,20 @@ export function TournamentClashApp() {
     });
   };
 
-  // =========================================================
-  // CERRAR SESIÓN
-  // =========================================================
+  const handleLogout = async () => {
+    const { error } = await supabase.auth.signOut();
 
-  const handleLogout = () => {
+    if (error) {
+      console.error("Error al cerrar sesión:", error);
+      return;
+    }
+
     setCurrentUser(null);
-
-    localStorage.removeItem("cr_current_user");
-
     setActiveView("home");
     setActiveTournament(null);
     setEditingTournament(false);
+    setJoinCodeInput("");
   };
-
-  // =========================================================
-  // VOLVER AL INICIO
-  // =========================================================
 
   const handleGoHome = () => {
     setActiveTournament(null);
@@ -196,6 +1149,11 @@ export function TournamentClashApp() {
   // =========================================================
 
   const handleCreateTournamentSubmit = async (config) => {
+    if (!currentUser) {
+      alert("❌ Tenés que iniciar sesión para crear un torneo.");
+      return;
+    }
+
     const shuffled = [...config.teams].sort(() => 0.5 - Math.random());
 
     const groups = [];
@@ -243,10 +1201,8 @@ export function TournamentClashApp() {
       format: config.format,
       qualifiers_per_group: config.qualifiersPerGroup,
       is_public: config.isPublic,
-
-      // El alias es la identidad visible del creador
+      created_by_user_id: currentUser.id,
       created_by: currentUser.username,
-
       groups,
       playoffs: null,
       status: "En curso",
@@ -259,19 +1215,20 @@ export function TournamentClashApp() {
 
     if (error) {
       alert("❌ Error al guardar el torneo en Supabase.");
+
       console.error(error);
       return;
     }
 
     if (data && data.length > 0) {
       setActiveTournament(data[0]);
-      setTournaments([data[0], ...tournaments]);
+      setTournaments((prev) => [data[0], ...prev]);
       setActiveView("groups");
     }
   };
 
   // =========================================================
-  // VERIFICAR SI HAY RESULTADOS
+  // EDITAR TORNEO
   // =========================================================
 
   const tournamentHasResults = (tournament) => {
@@ -288,18 +1245,12 @@ export function TournamentClashApp() {
     );
   };
 
-  // =========================================================
-  // ADMINISTRADOR
-  // =========================================================
-
   const isTournamentAdmin =
     currentUser &&
     activeTournament &&
-    currentUser.username === activeTournament.created_by;
-
-  // =========================================================
-  // EDITAR TORNEO
-  // =========================================================
+    (activeTournament.created_by_user_id === currentUser.id ||
+      (!activeTournament.created_by_user_id &&
+        currentUser.username === activeTournament.created_by));
 
   const handleEditTournamentSubmit = async (config) => {
     if (!activeTournament) return;
@@ -379,7 +1330,9 @@ export function TournamentClashApp() {
 
     if (error) {
       console.error("Error al modificar torneo:", error);
+
       alert("❌ No se pudieron guardar los cambios.");
+
       return;
     }
 
@@ -395,10 +1348,6 @@ export function TournamentClashApp() {
       alert("✅ Torneo modificado correctamente.");
     }
   };
-
-  // =========================================================
-  // ACTUALIZAR TORNEO
-  // =========================================================
 
   const handleUpdateTournamentInSupabase = async (updatedTournament) => {
     setActiveTournament(updatedTournament);
@@ -475,10 +1424,6 @@ export function TournamentClashApp() {
     setActiveView("playoffs");
   };
 
-  // =========================================================
-  // FINALIZAR TORNEO
-  // =========================================================
-
   const handleFinishTournament = () => {
     alert("¡Torneo finalizado con éxito! El campeón ha sido coronado.");
 
@@ -493,16 +1438,10 @@ export function TournamentClashApp() {
     setActiveTournament(null);
   };
 
-  // =========================================================
-  // RENDER
-  // =========================================================
+  const isAdmin = currentUser?.id === ADMIN_UID;
 
   return (
     <div className="cr-container">
-      {/* =====================================================
-          NAVBAR
-          ===================================================== */}
-
       {currentUser && (
         <Navbar
           onGoHome={handleGoHome}
@@ -512,17 +1451,8 @@ export function TournamentClashApp() {
         />
       )}
 
-      {/* =====================================================
-          LOGIN / REGISTRO
-          ===================================================== */}
-
       {!currentUser ? (
-        <div
-          className="cr-card"
-          style={{
-            margin: "auto",
-          }}
-        >
+        <div className="cr-card" style={{ margin: "auto" }}>
           <div className="cr-card-glow"></div>
 
           <div
@@ -569,47 +1499,6 @@ export function TournamentClashApp() {
               gap: "1rem",
             }}
           >
-            {/* =================================================
-                ALIAS
-                ================================================= */}
-
-            <div>
-              <label
-                style={{
-                  display: "block",
-                  fontSize: "0.75rem",
-                  fontWeight: "bold",
-                  textTransform: "uppercase",
-                  color: "#d1d5db",
-                  marginBottom: "4px",
-                }}
-              >
-                {authMode === "login" ? "Alias o Email" : "Alias"}
-              </label>
-
-              <input
-                type="text"
-                placeholder={
-                  authMode === "login"
-                    ? "Ej: ReyAzul99 o jugador@gmail.com"
-                    : "Ej: ReyAzul99"
-                }
-                value={authInput.username}
-                onChange={(e) =>
-                  setAuthInput({
-                    ...authInput,
-                    username: e.target.value,
-                  })
-                }
-                required
-                className="cr-input"
-              />
-            </div>
-
-            {/* =================================================
-                EMAIL - SOLO REGISTRO
-                ================================================= */}
-
             {authMode === "register" && (
               <div>
                 <label
@@ -622,17 +1511,17 @@ export function TournamentClashApp() {
                     marginBottom: "4px",
                   }}
                 >
-                  Email
+                  Alias
                 </label>
 
                 <input
-                  type="email"
-                  placeholder="Ej: jugador@gmail.com"
-                  value={authInput.email}
+                  type="text"
+                  placeholder="Ej: ReyAzul99"
+                  value={authInput.username}
                   onChange={(e) =>
                     setAuthInput({
                       ...authInput,
-                      email: e.target.value,
+                      username: e.target.value,
                     })
                   }
                   required
@@ -641,9 +1530,34 @@ export function TournamentClashApp() {
               </div>
             )}
 
-            {/* =================================================
-                CONTRASEÑA
-                ================================================= */}
+            <div>
+              <label
+                style={{
+                  display: "block",
+                  fontSize: "0.75rem",
+                  fontWeight: "bold",
+                  textTransform: "uppercase",
+                  color: "#d1d5db",
+                  marginBottom: "4px",
+                }}
+              >
+                Email
+              </label>
+
+              <input
+                type="email"
+                placeholder="Ej: jugador@gmail.com"
+                value={authInput.email}
+                onChange={(e) =>
+                  setAuthInput({
+                    ...authInput,
+                    email: e.target.value,
+                  })
+                }
+                required
+                className="cr-input"
+              />
+            </div>
 
             <div>
               <label
@@ -674,10 +1588,6 @@ export function TournamentClashApp() {
               />
             </div>
 
-            {/* =================================================
-                BOTÓN
-                ================================================= */}
-
             <button
               type="submit"
               className="cr-btn-gold"
@@ -687,10 +1597,6 @@ export function TournamentClashApp() {
             >
               {authMode === "login" ? "Entrar a la Arena ⚔️" : "Registrarse 🛡️"}
             </button>
-
-            {/* =================================================
-                CAMBIAR LOGIN / REGISTRO
-                ================================================= */}
 
             <div
               style={{
@@ -719,11 +1625,9 @@ export function TournamentClashApp() {
             </div>
           </form>
         </div>
+      ) : activeView === "stats" && isAdmin ? (
+        <AdminStats onBack={() => setActiveView("home")} />
       ) : activeView === "home" ? (
-        // =====================================================
-        // HOME
-        // =====================================================
-
         <div
           className="cr-card"
           style={{
@@ -807,9 +1711,26 @@ export function TournamentClashApp() {
             </button>
           </div>
 
-          {/* =================================================
-              BOTONES PRINCIPALES
-              ================================================= */}
+          {/* BOTÓN ADMIN */}
+
+          {isAdmin && (
+            <button
+              onClick={() => setActiveView("stats")}
+              style={{
+                width: "100%",
+                marginBottom: "1rem",
+                padding: "0.75rem",
+                background: "linear-gradient(to right, #111827, #1e3a5f)",
+                border: "1px solid #60a5fa",
+                color: "#fff",
+                borderRadius: "8px",
+                cursor: "pointer",
+                fontWeight: "bold",
+              }}
+            >
+              📊 Ver estadísticas
+            </button>
+          )}
 
           <div
             style={{
@@ -903,10 +1824,6 @@ export function TournamentClashApp() {
               </p>
             </button>
           </div>
-
-          {/* =================================================
-              TORNEOS EN LA NUBE
-              ================================================= */}
 
           <div>
             <div
@@ -1003,16 +1920,23 @@ export function TournamentClashApp() {
                       display: "flex",
                       justifyContent: "space-between",
                       alignItems: "center",
+                      gap: "0.75rem",
                       cursor: "pointer",
                     }}
                   >
-                    <div>
+                    <div
+                      style={{
+                        minWidth: 0,
+                        flex: 1,
+                      }}
+                    >
                       <div
                         style={{
                           display: "flex",
                           alignItems: "center",
                           gap: "0.5rem",
                           marginBottom: "2px",
+                          flexWrap: "wrap",
                         }}
                       >
                         {t.is_public ? (
@@ -1062,6 +1986,9 @@ export function TournamentClashApp() {
                           fontSize: "0.85rem",
                           margin: 0,
                           color: "#fff",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          whiteSpace: "nowrap",
                         }}
                       >
                         {t.title}
@@ -1070,30 +1997,81 @@ export function TournamentClashApp() {
 
                     <div
                       style={{
-                        textAlign: "right",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "0.6rem",
+                        flexShrink: 0,
                       }}
                     >
-                      <span
+                      <div
                         style={{
-                          fontSize: "0.75rem",
-                          fontWeight: 900,
-                          color:
-                            t.status === "En curso" ? "#34d399" : "#60a5fa",
-                          display: "block",
+                          textAlign: "right",
                         }}
                       >
-                        {t.status}
-                      </span>
+                        <span
+                          style={{
+                            fontSize: "0.75rem",
+                            fontWeight: 900,
+                            color:
+                              t.status === "En curso" ? "#34d399" : "#60a5fa",
+                            display: "block",
+                          }}
+                        >
+                          {t.status}
+                        </span>
 
-                      <span
-                        style={{
-                          fontSize: "9px",
-                          color: "#9ca3af",
-                          fontWeight: 500,
-                        }}
-                      >
-                        Entrar ➔
-                      </span>
+                        <span
+                          style={{
+                            fontSize: "9px",
+                            color: "#9ca3af",
+                            fontWeight: 500,
+                          }}
+                        >
+                          Entrar ➔
+                        </span>
+                      </div>
+
+                      {/* BOTÓN ELIMINAR - SOLO ADMIN */}
+
+                      {isAdmin && (
+                        <button
+                          type="button"
+                          title="Eliminar torneo"
+                          disabled={deletingTournamentId === t.id}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteTournament(t);
+                          }}
+                          style={{
+                            width: "34px",
+                            height: "34px",
+                            flexShrink: 0,
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            background:
+                              deletingTournamentId === t.id
+                                ? "#374151"
+                                : "rgba(127, 29, 29, 0.35)",
+                            border:
+                              deletingTournamentId === t.id
+                                ? "1px solid #4b5563"
+                                : "1px solid rgba(239, 68, 68, 0.45)",
+                            borderRadius: "6px",
+                            color:
+                              deletingTournamentId === t.id
+                                ? "#9ca3af"
+                                : "#f87171",
+                            cursor:
+                              deletingTournamentId === t.id
+                                ? "not-allowed"
+                                : "pointer",
+                            fontSize: "15px",
+                          }}
+                        >
+                          {deletingTournamentId === t.id ? "…" : "🗑️"}
+                        </button>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -1102,19 +2080,11 @@ export function TournamentClashApp() {
           </div>
         </div>
       ) : activeView === "create" ? (
-        // =====================================================
-        // CREAR TORNEO
-        // =====================================================
-
         <CreateTournament
           onSave={handleCreateTournamentSubmit}
           onCancel={() => setActiveView("home")}
         />
       ) : activeView === "edit" ? (
-        // =====================================================
-        // EDITAR TORNEO
-        // =====================================================
-
         <CreateTournament
           isEditing={true}
           initialData={activeTournament}
@@ -1125,10 +2095,6 @@ export function TournamentClashApp() {
           }}
         />
       ) : activeView === "join" ? (
-        // =====================================================
-        // UNIRSE
-        // =====================================================
-
         <div
           className="cr-card"
           style={{
@@ -1203,7 +2169,7 @@ export function TournamentClashApp() {
                   textAlign: "center",
                   fontSize: "1.1rem",
                   letterSpacing: "2px",
-                  fontWeight: "900",
+                  fontWeight: 900,
                 }}
               />
             </div>
@@ -1220,10 +2186,6 @@ export function TournamentClashApp() {
           </form>
         </div>
       ) : activeView === "groups" ? (
-        // =====================================================
-        // GRUPOS
-        // =====================================================
-
         <div
           style={{
             width: "100%",
@@ -1233,8 +2195,6 @@ export function TournamentClashApp() {
             gap: "1rem",
           }}
         >
-          {/* BOTÓN EXCLUSIVO DEL ADMINISTRADOR */}
-
           {isTournamentAdmin && (
             <div
               style={{
@@ -1272,13 +2232,10 @@ export function TournamentClashApp() {
             tournament={activeTournament}
             onUpdateTournament={handleUpdateTournamentInSupabase}
             onProceedToPlayoffs={handleProceedToPlayoffs}
+            currentUser={currentUser}
           />
         </div>
       ) : (
-        // =====================================================
-        // PLAYOFFS
-        // =====================================================
-
         <PlayoffBracket
           tournament={activeTournament}
           onUpdateTournament={handleUpdateTournamentInSupabase}
