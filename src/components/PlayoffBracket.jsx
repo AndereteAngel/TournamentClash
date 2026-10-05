@@ -68,43 +68,63 @@ export function PlayoffBracket({
 
       <div
         style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: "1rem",
+          marginBottom: "1.25rem",
+          paddingBottom: "0.9rem",
+          borderBottom: "1px solid rgba(255,255,255,0.08)",
         }}
       >
-        <div>
+        {/* ETIQUETA DEL JUEGO */}
+        <div
+          style={{
+            fontSize: "10px",
+            color: "#ffd700",
+            fontWeight: "bold",
+            textTransform: "uppercase",
+            marginBottom: "4px",
+            textAlign: "center",
+          }}
+        >
+          {tournament.game}
+        </div>
+
+        {/* TÍTULO */}
+        <h2
+          className="cr-title"
+          style={{
+            fontSize: "1.2rem",
+            textAlign: "center",
+            margin: "0",
+            width: "100%",
+          }}
+        >
+          {tournament.title} - Playoffs
+        </h2>
+
+        {/* FASE */}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            marginTop: "10px",
+          }}
+        >
           <span
             style={{
               fontSize: "10px",
-              color: "#ffd700",
+              backgroundColor: "rgba(234, 179, 8, 0.12)",
+              color: "#facc15",
+              border: "1px solid rgba(234, 179, 8, 0.6)",
+              padding: "5px 10px",
+              borderRadius: "6px",
               fontWeight: "bold",
               textTransform: "uppercase",
+              letterSpacing: "0.5px",
+              whiteSpace: "nowrap",
             }}
           >
-            {tournament.game}
+            LLAVES DE ELIMINACIÓN
           </span>
-          <h2
-            className="cr-title"
-            style={{ fontSize: "1.2rem", textAlign: "left" }}
-          >
-            {tournament.title} - Playoffs
-          </h2>
         </div>
-        <span
-          style={{
-            fontSize: "11px",
-            backgroundColor: "rgba(234, 179, 8, 0.2)",
-            color: "#facc15",
-            border: "1px solid #eab308",
-            padding: "4px 8px",
-            borderRadius: "6px",
-            fontWeight: "bold",
-          }}
-        >
-          Llaves del Reino
-        </span>
       </div>
 
       <div

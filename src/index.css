@@ -1,162 +1,62 @@
 @import url('https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Montserrat:ital,wght@0,400;0,700;0,900;1,900&display=swap');
 
-* {
+/* =========================================================
+   RESET GENERAL
+========================================================= */
+
+*,
+*::before,
+*::after {
   box-sizing: border-box;
+}
+
+html {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: hidden;
 }
 
 body {
   margin: 0;
   padding: 0;
-  background-color: #0b0914;
-  background-image: 
-    radial-gradient(circle at 50% 20%, #1a153b 0%, #0b0914 70%),
-    linear-gradient(to bottom, rgba(27, 95, 168, 0.15), transparent);
-  font-family: 'Montserrat', sans-serif;
-  color: #fff;
-  min-height: 100vh;
-}
-
-/* Contenedor Principal de la App (Modificado a column para que la Navbar quede arriba y el contenido centrado abajo) */
-.cr-container {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  padding: 1.5rem;
-  gap: 1.5rem;
-}
-
-/* Tarjeta Estilo Clash Royale (Bordes robustos, sombras doradas/azules y efecto relieve) */
-.cr-card {
-  position: relative;
-  background: linear-gradient(135deg, #171426 0%, #100e1a 100%);
-  border: 4px solid #2d2b4e;
-  border-radius: 16px;
-  padding: 1.75rem;
-  width: 100%;
-  max-width: 520px;
-  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.7), inset 0 2px 0 rgba(255, 255, 255, 0.1);
-  overflow: hidden;
-}
-
-/* Brillo superior en las tarjetas */
-.cr-card-glow {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 6px;
-  background: linear-gradient(90deg, #1b5fa8, #ffd700, #1b5fa8);
-}
-
-/* Estándar para títulos de tarjetas (compactos y limpios) */
-.cr-title {
-  font-family: 'Montserrat', sans-serif;
-  font-weight: 900;
-  font-size: 1.2rem;
-  text-transform: uppercase;
-  color: #fff;
-  text-shadow: 2px 2px 0px #000;
-  margin: 0;
-  letter-spacing: 0.5px;
-}
-
-/* Título Gigante Estilo Clash Royale (Solo para el logo/bienvenida principal) */
-.cr-logo-title {
-  font-family: 'Luckiest Guy', cursive;
-  font-weight: 400;
-  font-size: 2.2rem;
-  text-transform: uppercase;
-  color: #fff;
-  letter-spacing: 1.5px;
-  text-align: center;
-  margin: 0;
-  text-shadow: 
-    3px 3px 0px #000, 
-    -3px -3px 0px #000, 
-    3px -3px 0px #000, 
-    -3px 3px 0px #000,
-    0 6px 15px rgba(0, 0, 0, 0.8);
-}
-
-/* Botón Dorado Épico con relieve 3D */
-.cr-btn-gold {
-  width: 100%;
-  padding: 0.9rem 1.2rem;
-  background: linear-gradient(to bottom, #ffe600 0%, #ff9c00 100%);
-  border: 3px solid #7a4100;
-  border-bottom: 5px solid #522b00;
-  border-radius: 12px;
-  color: #2b1200;
-  font-family: 'Montserrat', sans-serif;
-  font-weight: 900;
-  font-size: 1rem;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  cursor: pointer;
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
-  box-shadow: 0 6px 0 #422200, 0 10px 20px rgba(255, 156, 0, 0.4);
-  transition: all 0.1s ease;
-}
-
-.cr-btn-gold:hover {
-  filter: brightness(1.08);
-}
-
-.cr-btn-gold:active {
-  transform: translateY(4px);
-  box-shadow: 0 2px 0 #422200, 0 5px 10px rgba(255, 156, 0, 0.3);
-  border-bottom: 3px solid #522b00;
-}
-
-/* Inputs mejorados con estilo de campo de batalla */
-.cr-input {
-  width: 100%;
-  padding: 0.75rem 1rem;
-  background-color: #0c0a12;
-  border: 3px solid #282442;
-  border-radius: 10px;
-  color: #fff;
-  font-family: 'Montserrat', sans-serif;
-  font-weight: 700;
-  font-size: 0.9rem;
-  outline: none;
-  transition: border-color 0.2s;
-  box-shadow: inset 0 2px 4px rgba(0,0,0,0.8);
-}
-
-.cr-input:focus {
-  border-color: #ffd700;
-  box-shadow: inset 0 2px 4px rgba(0,0,0,0.8), 0 0 10px rgba(255, 215, 0, 0.2);
-}
-
-/* Animación de pulso para el campeón (Corregida sintaxis vacía previa) */
-@keyframes pulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.02); }
-  100% { transform: scale(1); }
-}
-/* =========================================================
-   MOBILE - EVITAR SCROLL HORIZONTAL
-   ========================================================= */
-
-html,
-body {
   width: 100%;
   max-width: 100%;
+  min-width: 0;
+  min-height: 100vh;
+
+  background-color: #0b0914;
+  background-image:
+    radial-gradient(
+      circle at 50% 20%,
+      #1a153b 0%,
+      #0b0914 70%
+    ),
+    linear-gradient(
+      to bottom,
+      rgba(27, 95, 168, 0.15),
+      transparent
+    );
+
+  font-family: 'Montserrat', sans-serif;
+  color: #fff;
+
   overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
 }
 
 #root {
   width: 100%;
   max-width: 100%;
+  min-width: 0;
+  min-height: 100vh;
   overflow-x: hidden;
 }
 
-* {
-  box-sizing: border-box;
-}
+
+/* =========================================================
+   ELEMENTOS GENERALES
+========================================================= */
 
 img,
 video,
@@ -170,15 +70,864 @@ input,
 select,
 textarea {
   max-width: 100%;
+  min-width: 0;
+  font-family: 'Montserrat', sans-serif;
 }
 
-@media (max-width: 640px) {
-  body {
-    overflow-x: hidden;
+button {
+  min-width: 0;
+}
+
+input,
+select,
+textarea {
+  min-width: 0;
+}
+
+
+/* =========================================================
+   CONTENEDOR PRINCIPAL
+========================================================= */
+
+.cr-container {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  min-height: 100vh;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+
+  padding: 1.5rem;
+  gap: 1.5rem;
+
+  overflow-x: hidden;
+}
+
+
+/* =========================================================
+   TARJETAS
+========================================================= */
+
+.cr-card {
+  position: relative;
+
+  width: 100%;
+  max-width: 520px;
+  min-width: 0;
+
+  background: linear-gradient(
+    135deg,
+    #171426 0%,
+    #100e1a 100%
+  );
+
+  border: 4px solid #2d2b4e;
+  border-radius: 16px;
+
+  padding: 1.75rem;
+
+  box-shadow:
+    0 12px 35px rgba(0, 0, 0, 0.7),
+    inset 0 2px 0 rgba(255, 255, 255, 0.1);
+
+  overflow: hidden;
+}
+
+
+/* =========================================================
+   BRILLO SUPERIOR
+========================================================= */
+
+.cr-card-glow {
+  position: absolute;
+
+  top: 0;
+  left: 0;
+  right: 0;
+
+  height: 6px;
+
+  background: linear-gradient(
+    90deg,
+    #1b5fa8,
+    #ffd700,
+    #1b5fa8
+  );
+}
+
+
+/* =========================================================
+   TÍTULOS NORMALES
+========================================================= */
+
+.cr-title {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+
+  margin: 0;
+
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 900;
+
+  /*
+    Se adapta al ancho disponible.
+    Nunca baja de 0.78rem.
+  */
+  font-size: clamp(0.78rem, 5vw, 1.2rem);
+
+  line-height: 1.1;
+
+  text-transform: uppercase;
+  text-align: center;
+
+  color: #fff;
+
+  text-shadow: 2px 2px 0 #000;
+
+  letter-spacing: 0.3px;
+
+  /*
+    IMPORTANTE:
+    no permitimos cortar palabras ni hacer
+    saltos de línea.
+  */
+  white-space: nowrap;
+  overflow: visible;
+  text-overflow: clip;
+}
+
+
+/* =========================================================
+   TÍTULO PRINCIPAL / LOGO
+========================================================= */
+
+.cr-logo-title {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+
+  margin: 0;
+
+  font-family: 'Luckiest Guy', cursive;
+  font-weight: 400;
+
+  font-size: clamp(1.8rem, 9vw, 3.5rem);
+
+  line-height: 1;
+
+  text-transform: uppercase;
+  text-align: center;
+
+  color: #fff;
+
+  letter-spacing: 0.5px;
+
+  text-shadow:
+    3px 3px 0 #000,
+    -3px -3px 0 #000,
+    3px -3px 0 #000,
+    -3px 3px 0 #000,
+    0 6px 15px rgba(0, 0, 0, 0.8);
+
+  white-space: nowrap;
+  overflow: visible;
+}
+
+
+/* =========================================================
+   BOTÓN DORADO
+========================================================= */
+
+.cr-btn-gold {
+  width: 100%;
+  max-width: 100%;
+
+  padding: 0.9rem 1.2rem;
+
+  background: linear-gradient(
+    to bottom,
+    #ffe600 0%,
+    #ff9c00 100%
+  );
+
+  border: 3px solid #7a4100;
+  border-bottom: 5px solid #522b00;
+  border-radius: 12px;
+
+  color: #2b1200;
+
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 900;
+  font-size: 1rem;
+
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+
+  cursor: pointer;
+
+  text-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.6);
+
+  box-shadow:
+    0 6px 0 #422200,
+    0 10px 20px rgba(255, 156, 0, 0.4);
+
+  transition: all 0.1s ease;
+}
+
+.cr-btn-gold:hover {
+  filter: brightness(1.08);
+}
+
+.cr-btn-gold:active {
+  transform: translateY(4px);
+
+  box-shadow:
+    0 2px 0 #422200,
+    0 5px 10px rgba(255, 156, 0, 0.3);
+
+  border-bottom: 3px solid #522b00;
+}
+
+
+/* =========================================================
+   INPUTS
+========================================================= */
+
+.cr-input {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+
+  padding: 0.75rem 1rem;
+
+  background-color: #0c0a12;
+
+  border: 3px solid #282442;
+  border-radius: 10px;
+
+  color: #fff;
+
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 0.9rem;
+
+  outline: none;
+
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+.cr-input:focus {
+  border-color: #ffd700;
+
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.8),
+    0 0 10px rgba(255, 215, 0, 0.2);
+}
+
+
+/* =========================================================
+   ANIMACIÓN
+========================================================= */
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
   }
 
+  50% {
+    transform: scale(1.02);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+
+/* =========================================================
+   HEADER DEL TORNEO
+========================================================= */
+
+.tournament-header {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+
+  display: flex;
+  flex-wrap: wrap;
+
+  align-items: flex-start;
+
+  gap: 1rem;
+
+  overflow: visible;
+}
+
+.tournament-header > div {
+  min-width: 0;
+  max-width: 100%;
+}
+
+
+/* =========================================================
+   BADGE DE FASE
+========================================================= */
+
+.tournament-phase-badge {
+  flex-shrink: 0;
+
+  white-space: nowrap;
+
+  transition: all 0.2s ease;
+}
+
+
+/* =========================================================
+   TABLAS
+========================================================= */
+
+table {
+  max-width: 100%;
+}
+
+th,
+td {
+  max-width: 100%;
+}
+
+
+/* =========================================================
+   SCROLLBARS
+========================================================= */
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #3a3655 transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: #3a3655;
+  border-radius: 3px;
+}
+
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media (max-width: 900px) {
+  .cr-container {
+    padding: 1.25rem;
+  }
+
+  .cr-card {
+    max-width: 100%;
+  }
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 600px) {
+
+  html,
+  body,
   #root {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
     overflow-x: hidden;
+  }
+
+  .cr-container {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+
+    padding: 12px;
+
+    gap: 1rem;
+
+    overflow-x: hidden;
+  }
+
+
+  /* -----------------------------------------
+     TARJETA
+  ----------------------------------------- */
+
+  .cr-card {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+
+    padding: 1.25rem 1rem;
+
+    border-width: 3px;
+    border-radius: 12px;
+  }
+
+
+  /* -----------------------------------------
+     TÍTULOS
+  ----------------------------------------- */
+
+  .cr-title {
+    width: 100%;
+    max-width: 100%;
+
+    /*
+      Más pequeño en celular para garantizar
+      que entre en una sola línea.
+    */
+    font-size: clamp(0.76rem, 4.6vw, 1.15rem);
+
+    line-height: 1.1;
+
+    letter-spacing: 0;
+
+    text-align: center;
+
+    white-space: nowrap;
+    overflow: visible;
+  }
+
+
+  /* -----------------------------------------
+     LOGO / TÍTULO GRANDE
+  ----------------------------------------- */
+
+  .cr-logo-title {
+    width: 100%;
+    max-width: 100%;
+
+    font-size: clamp(
+      1.7rem,
+      9vw,
+      3rem
+    );
+
+    line-height: 1;
+
+    letter-spacing: 0;
+
+    text-align: center;
+
+    white-space: nowrap;
+    overflow: visible;
+  }
+
+
+  /* -----------------------------------------
+     HEADER DEL TORNEO
+  ----------------------------------------- */
+
+  .tournament-header {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+
+    display: flex !important;
+
+    flex-direction: column !important;
+
+    align-items: center !important;
+
+    justify-content: center !important;
+
+    gap: 0.75rem !important;
+
+    text-align: center;
+
+    padding-bottom: 1rem !important;
+
+    overflow: visible;
+  }
+
+
+  /* Contenedor del título */
+
+  .tournament-header > div {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+
+    text-align: center;
+  }
+
+
+  /* Títulos dentro del header */
+
+  .tournament-header h1,
+  .tournament-header h2,
+  .tournament-header h3 {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+
+    margin-left: auto !important;
+    margin-right: auto !important;
+
+    text-align: center !important;
+
+    line-height: 1.05 !important;
+
+    /*
+      UNA SOLA LÍNEA
+    */
+    white-space: nowrap !important;
+
+    /*
+      El tamaño baja automáticamente
+      para que entre.
+    */
+    font-size: clamp(
+      0.72rem,
+      5vw,
+      1.4rem
+    ) !important;
+
+    overflow: visible !important;
+  }
+
+
+  /* -----------------------------------------
+     BADGE
+     QUEDA DEBAJO DEL TÍTULO
+  ----------------------------------------- */
+
+  .tournament-phase-badge {
+    order: 2;
+
+    align-self: center !important;
+
+    margin: 0.15rem auto 0 !important;
+
+    font-size: 9px !important;
+
+    padding: 5px 10px !important;
+
+    white-space: nowrap;
+
+    line-height: 1.2;
+  }
+
+
+  /* -----------------------------------------
+     BOTONES
+  ----------------------------------------- */
+
+  button {
+    max-width: 100%;
+  }
+
+
+  /* -----------------------------------------
+     INPUTS
+  ----------------------------------------- */
+
+  .cr-input {
+    width: 100%;
+    max-width: 100%;
+
+    /*
+      Evita zoom automático en iPhone.
+    */
+    font-size: 16px;
+  }
+
+
+  /* -----------------------------------------
+     IMÁGENES
+  ----------------------------------------- */
+
+  img,
+  video,
+  canvas,
+  svg {
+    max-width: 100%;
+  }
+
+
+  /* -----------------------------------------
+     TABLAS
+  ----------------------------------------- */
+
+  .cr-card table {
+    max-width: 100%;
   }
 }
 
+
+/* =========================================================
+   CELULARES MUY PEQUEÑOS
+========================================================= */
+
+@media (max-width: 380px) {
+
+  .cr-container {
+    padding: 8px;
+  }
+
+  .cr-card {
+    padding: 1rem 0.75rem;
+  }
+
+  .cr-title {
+    font-size: clamp(
+      0.68rem,
+      4.3vw,
+      1rem
+    );
+
+    white-space: nowrap;
+  }
+
+  .cr-logo-title {
+    font-size: clamp(
+      1.55rem,
+      8.5vw,
+      2.4rem
+    );
+
+    white-space: nowrap;
+  }
+
+  .tournament-header h1,
+  .tournament-header h2,
+  .tournament-header h3 {
+    font-size: clamp(
+      0.68rem,
+      4.5vw,
+      1.15rem
+    ) !important;
+
+    white-space: nowrap !important;
+  }
+
+  .tournament-phase-badge {
+    font-size: 8px !important;
+    padding: 4px 8px !important;
+  }
+}
+
+/* =========================================================
+   AJUSTE FINAL DE TÍTULOS MOBILE
+========================================================= */
+
+@media (max-width: 600px) {
+
+  .cr-title {
+    width: 100% !important;
+    max-width: 100% !important;
+
+    font-size: 16px !important;
+    line-height: 1 !important;
+
+    white-space: nowrap !important;
+    word-break: keep-all !important;
+    overflow-wrap: normal !important;
+
+    text-align: center !important;
+
+    overflow: visible !important;
+    text-overflow: clip !important;
+
+    letter-spacing: 0 !important;
+  }
+
+  .cr-logo-title {
+    width: 100% !important;
+    max-width: 100% !important;
+
+    font-size: 30px !important;
+    line-height: 1 !important;
+
+    white-space: nowrap !important;
+    word-break: keep-all !important;
+    overflow-wrap: normal !important;
+
+    text-align: center !important;
+
+    overflow: visible !important;
+  }
+
+  .tournament-header {
+    width: 100% !important;
+    max-width: 100% !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+
+    align-items: center !important;
+    justify-content: center !important;
+
+    gap: 10px !important;
+
+    overflow: visible !important;
+  }
+
+  .tournament-header > div {
+    width: 100% !important;
+    max-width: 100% !important;
+
+    min-width: 0 !important;
+
+    text-align: center !important;
+  }
+
+  .tournament-header h1,
+  .tournament-header h2,
+  .tournament-header h3 {
+    width: 100% !important;
+    max-width: 100% !important;
+
+    margin: 0 auto !important;
+
+    text-align: center !important;
+
+    white-space: nowrap !important;
+    word-break: keep-all !important;
+    overflow-wrap: normal !important;
+
+    overflow: visible !important;
+    text-overflow: clip !important;
+
+    /*
+      El título se adapta al ancho del celular
+      sin pasar a otra línea.
+    */
+    font-size: min(6vw, 22px) !important;
+
+    line-height: 1 !important;
+  }
+
+  .tournament-phase-badge {
+    position: relative !important;
+
+    order: 2 !important;
+
+    align-self: center !important;
+
+    margin: 4px auto 0 !important;
+
+    flex-shrink: 0 !important;
+
+    white-space: nowrap !important;
+
+    font-size: 9px !important;
+  }
+}
+
+
+/* =========================================================
+   CELULARES MUY CHICOS
+========================================================= */
+
+@media (max-width: 380px) {
+
+  .cr-title {
+    font-size: 15px !important;
+  }
+
+  .cr-logo-title {
+    font-size: 26px !important;
+  }
+
+  .tournament-header h1,
+  .tournament-header h2,
+  .tournament-header h3 {
+    font-size: 5.2vw !important;
+  }
+
+  .tournament-phase-badge {
+    font-size: 8px !important;
+    padding: 4px 8px !important;
+  }
+}
+
+/* =========================================================
+   PLAYOFF - MOBILE
+========================================================= */
+
+@media (max-width: 600px) {
+
+  /* El encabezado se apila */
+  .tournament-header {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    gap: 8px !important;
+
+    width: 100% !important;
+    overflow: visible !important;
+  }
+
+  /* PLAYOFF / título principal */
+  .tournament-header h1,
+  .tournament-header h2,
+  .tournament-header h3 {
+    width: 100% !important;
+    max-width: 100% !important;
+
+    margin: 0 !important;
+
+    text-align: center !important;
+
+    white-space: nowrap !important;
+    overflow: visible !important;
+
+    font-size: 20px !important;
+    line-height: 1 !important;
+  }
+
+  /* LLAVES DE ELIMINACIÓN / información secundaria */
+  .tournament-header p {
+    width: 100% !important;
+    max-width: 100% !important;
+
+    margin: 4px 0 0 !important;
+
+    text-align: center !important;
+
+    font-size: 12px !important;
+    line-height: 1.2 !important;
+
+    white-space: nowrap !important;
+    overflow: visible !important;
+  }
+
+  /* Badge de fase */
+  .tournament-phase-badge {
+    order: 3 !important;
+
+    margin: 4px auto 0 !important;
+
+    white-space: nowrap !important;
+
+    font-size: 8px !important;
+  }
+}
