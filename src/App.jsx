@@ -24,7 +24,7 @@ function AdminStats({ onBack }) {
     const { data, error } = await supabase
       .from("visitas")
       .select(
-        "id, created_at, user_id, username, device, started_at, last_seen_at, duration_seconds"
+        "id, created_at, user_id, username, email, device, started_at, last_seen_at, duration_seconds"
       )
       .order("created_at", { ascending: false });
 
@@ -157,6 +157,7 @@ function AdminStats({ onBack }) {
         jugadoresMap[visita.user_id] = {
           id: visita.user_id,
           username: visita.username || "Jugador",
+          email: visita.email || "",
           visitas: 0,
           tiempo: 0,
           ultimaVisita: visita.created_at,
@@ -174,6 +175,10 @@ function AdminStats({ onBack }) {
         new Date(jugadoresMap[visita.user_id].ultimaVisita)
       ) {
         jugadoresMap[visita.user_id].ultimaVisita = visita.created_at;
+      }
+
+      if (visita.email) {
+        jugadoresMap[visita.user_id].email = visita.email;
       }
     });
 
@@ -636,8 +641,22 @@ function AdminStats({ onBack }) {
 
                   <span
                     style={{
+                      color: "#60a5fa",
+                      fontSize: "0.7rem",
+                      display: "block",
+                      marginTop: "2px",
+                      wordBreak: "break-word",
+                    }}
+                  >
+                    📧 {jugador.email || "Email no registrado"}
+                  </span>
+
+                  <span
+                    style={{
                       color: "#6b7280",
                       fontSize: "0.65rem",
+                      display: "block",
+                      marginTop: "2px",
                     }}
                   >
                     Última visita: {formatearFecha(jugador.ultimaVisita)}
@@ -732,129 +751,6 @@ export function TournamentClashApp() {
   const [deletingTournamentId, setDeletingTournamentId] = useState(null);
 
   // =========================================================
-  // REGISTRAR VISITA Y MEDIR INTERACCIÓN
-  // =========================================================
-
-  useEffect(() => {
-    let mounted = true;
-
-    const registrarVisita = async () => {
-      const device = window.innerWidth <= 768 ? "mobile" : "desktop";
-
-      let visitaId = sessionStorage.getItem("tournamentclash_visita_id");
-
-      const esNuevaVisita = !visitaId;
-
-      if (!visitaId) {
-        visitaId = crypto.randomUUID();
-
-        sessionStorage.setItem("tournamentclash_visita_id", visitaId);
-      }
-
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-
-      if (esNuevaVisita) {
-        const ahora = new Date().toISOString();
-
-        const visita = {
-          id: visitaId,
-          user_id: session?.user?.id || null,
-          username: session?.user?.user_metadata?.username || null,
-          device,
-          started_at: ahora,
-          last_seen_at: ahora,
-          duration_seconds: 0,
-        };
-
-        const { error } = await supabase.from("visitas").insert(visita);
-
-        if (error) {
-          console.error("Error al registrar visita:", error);
-        }
-      }
-    };
-
-    const actualizarTiempo = async () => {
-      const visitaId = sessionStorage.getItem("tournamentclash_visita_id");
-
-      if (!visitaId) return;
-
-      const { data, error } = await supabase
-        .from("visitas")
-        .select("started_at")
-        .eq("id", visitaId)
-        .maybeSingle();
-
-      if (error || !data?.started_at) return;
-
-      const inicio = new Date(data.started_at);
-      const ahora = new Date();
-
-      const segundos = Math.max(0, Math.floor((ahora - inicio) / 1000));
-
-      await supabase
-        .from("visitas")
-        .update({
-          last_seen_at: ahora.toISOString(),
-          duration_seconds: segundos,
-        })
-        .eq("id", visitaId);
-    };
-
-    registrarVisita();
-
-    const intervalo = setInterval(() => {
-      actualizarTiempo();
-    }, 30000);
-
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === "hidden") {
-        actualizarTiempo();
-      }
-    };
-
-    document.addEventListener("visibilitychange", handleVisibilityChange);
-
-    return () => {
-      mounted = false;
-
-      clearInterval(intervalo);
-
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
-    };
-  }, []);
-
-  // =========================================================
-  // ASOCIAR LA VISITA AL JUGADOR CUANDO INICIA SESIÓN
-  // =========================================================
-
-  useEffect(() => {
-    const asociarVisitaAlUsuario = async () => {
-      if (!currentUser) return;
-
-      const visitaId = sessionStorage.getItem("tournamentclash_visita_id");
-
-      if (!visitaId) return;
-
-      const { error } = await supabase
-        .from("visitas")
-        .update({
-          user_id: currentUser.id,
-          username: currentUser.username,
-        })
-        .eq("id", visitaId);
-
-      if (error) {
-        console.error("Error al asociar visita al usuario:", error);
-      }
-    };
-
-    asociarVisitaAlUsuario();
-  }, [currentUser]);
-
-  // =========================================================
   // RECUPERAR SESIÓN
   // =========================================================
 
@@ -921,6 +817,127 @@ export function TournamentClashApp() {
       email: authUser.email || profile?.email || "",
     };
   };
+
+  // =========================================================
+  // REGISTRAR VISITA Y MEDIR INTERACCIÓN
+  // =========================================================
+
+  useEffect(() => {
+    if (!currentUser) return;
+
+    const registrarOAsociarVisita = async () => {
+      const device = window.innerWidth <= 768 ? "mobile" : "desktop";
+
+      let visitaId = sessionStorage.getItem("tournamentclash_visita_id");
+
+      if (!visitaId) {
+        visitaId = crypto.randomUUID();
+
+        sessionStorage.setItem("tournamentclash_visita_id", visitaId);
+      }
+
+      const ahora = new Date().toISOString();
+
+      // Primero buscamos si ya existe esta visita.
+      const { data: visitaExistente, error: errorBusqueda } = await supabase
+        .from("visitas")
+        .select("id, user_id, username, email, started_at")
+        .eq("id", visitaId)
+        .maybeSingle();
+
+      if (errorBusqueda) {
+        console.error("Error al buscar la visita actual:", errorBusqueda);
+        return;
+      }
+
+      // Si no existe, la creamos directamente asociada al usuario.
+      if (!visitaExistente) {
+        const visita = {
+          id: visitaId,
+          user_id: currentUser.id,
+          username: currentUser.username,
+          email: currentUser.email || null,
+          device,
+          started_at: ahora,
+          last_seen_at: ahora,
+          duration_seconds: 0,
+        };
+
+        const { error } = await supabase.from("visitas").insert(visita);
+
+        if (error) {
+          console.error("Error al registrar visita:", error);
+        }
+
+        return;
+      }
+
+      // Si ya existía como anónima o tenía datos antiguos,
+      // la asociamos al usuario actual.
+      const { error: errorActualizacion } = await supabase
+        .from("visitas")
+        .update({
+          user_id: currentUser.id,
+          username: currentUser.username,
+          email: currentUser.email || null,
+        })
+        .eq("id", visitaId);
+
+      if (errorActualizacion) {
+        console.error(
+          "Error al asociar visita al usuario:",
+          errorActualizacion
+        );
+      }
+    };
+
+    const actualizarTiempo = async () => {
+      const visitaId = sessionStorage.getItem("tournamentclash_visita_id");
+
+      if (!visitaId) return;
+
+      const { data, error } = await supabase
+        .from("visitas")
+        .select("started_at")
+        .eq("id", visitaId)
+        .maybeSingle();
+
+      if (error || !data?.started_at) return;
+
+      const inicio = new Date(data.started_at);
+      const ahora = new Date();
+
+      const segundos = Math.max(0, Math.floor((ahora - inicio) / 1000));
+
+      await supabase
+        .from("visitas")
+        .update({
+          last_seen_at: ahora.toISOString(),
+          duration_seconds: segundos,
+        })
+        .eq("id", visitaId);
+    };
+
+    registrarOAsociarVisita();
+
+    const intervalo = setInterval(() => {
+      actualizarTiempo();
+    }, 30000);
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "hidden") {
+        actualizarTiempo();
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      clearInterval(intervalo);
+
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [currentUser]);
 
   useEffect(() => {
     if (currentUser) fetchTournaments();
@@ -1130,6 +1147,10 @@ export function TournamentClashApp() {
       console.error("Error al cerrar sesión:", error);
       return;
     }
+
+    // La próxima persona que inicie sesión tendrá
+    // una visita completamente nueva.
+    sessionStorage.removeItem("tournamentclash_visita_id");
 
     setCurrentUser(null);
     setActiveView("home");
