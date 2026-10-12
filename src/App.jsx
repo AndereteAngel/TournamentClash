@@ -17,6 +17,12 @@ function AdminStats({ onBack }) {
   const [perfiles, setPerfiles] = useState([]);
   const [loadingStats, setLoadingStats] = useState(true);
   const [errorStats, setErrorStats] = useState("");
+  const [busquedaJugador, setBusquedaJugador] = useState("");
+  const [jugadorExpandido, setJugadorExpandido] = useState(null);
+  const [fechaFiltroVisitas, setFechaFiltroVisitas] = useState(() => {
+    const hoy = new Date();
+    return `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, "0")}-${String(hoy.getDate()).padStart(2, "0")}`;
+  });
 
   const cargarEstadisticas = async () => {
     setLoadingStats(true);
@@ -110,6 +116,19 @@ function AdminStats({ onBack }) {
     );
 
   const visitasHoy = visitasDeHoy.length;
+
+  const visitasFechaSeleccionada = visitas
+    .filter((visita) => {
+      const fecha = new Date(visita.started_at || visita.created_at);
+      if (Number.isNaN(fecha.getTime())) return false;
+      const fechaLocal = `${fecha.getFullYear()}-${String(fecha.getMonth() + 1).padStart(2, "0")}-${String(fecha.getDate()).padStart(2, "0")}`;
+      return fechaLocal === fechaFiltroVisitas;
+    })
+    .sort(
+      (a, b) =>
+        new Date(b.started_at || b.created_at) -
+        new Date(a.started_at || a.created_at)
+    );
 
   const usuariosRegistrados = perfiles.length;
 
@@ -232,6 +251,15 @@ function AdminStats({ onBack }) {
     .sort((a, b) =>
       a.username.localeCompare(b.username, "es", { sensitivity: "base" })
     );
+
+  const jugadoresFiltrados = jugadores.filter((jugador) => {
+    const busqueda = busquedaJugador.trim().toLocaleLowerCase("es");
+    if (!busqueda) return true;
+    return (
+      jugador.username.toLocaleLowerCase("es").includes(busqueda) ||
+      jugador.email.toLocaleLowerCase("es").includes(busqueda)
+    );
+  });
 
   if (loadingStats) {
     return (
@@ -647,11 +675,34 @@ function AdminStats({ onBack }) {
           </span>
         </div>
 
-        {jugadores.length === 0 ? (
-          <p style={{ color: "#9ca3af" }}>No hay jugadores registrados.</p>
+        <input
+          type="search"
+          value={busquedaJugador}
+          onChange={(e) => setBusquedaJugador(e.target.value)}
+          placeholder="🔎 Buscar por alias o correo..."
+          aria-label="Buscar jugador por alias o correo"
+          style={{
+            width: "100%",
+            boxSizing: "border-box",
+            padding: "0.75rem",
+            marginBottom: "1rem",
+            borderRadius: "8px",
+            border: "1px solid #3b82f6",
+            background: "#121019",
+            color: "#fff",
+            outline: "none",
+          }}
+        />
+
+        {jugadoresFiltrados.length === 0 ? (
+          <p style={{ color: "#9ca3af" }}>
+            {jugadores.length === 0
+              ? "No hay jugadores registrados."
+              : "No hay jugadores que coincidan con la búsqueda."}
+          </p>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-            {jugadores.map((jugador, index) => (
+            {jugadoresFiltrados.map((jugador, index) => (
               <div
                 key={jugador.id}
                 style={{
@@ -688,6 +739,112 @@ function AdminStats({ onBack }) {
                   <span style={{ color: "#9ca3af", fontSize: "0.65rem", display: "block" }}>Dispositivo</span>
                   <span>{jugador.device === "mobile" ? "📱" : jugador.device === "desktop" ? "💻" : "—"}</span>
                 </div>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setJugadorExpandido(
+                      jugadorExpandido === jugador.id ? null : jugador.id
+                    )
+                  }
+                  aria-expanded={jugadorExpandido === jugador.id}
+                  style={{
+                    gridColumn: "2 / -1",
+                    justifySelf: "start",
+                    padding: "0.45rem 0.7rem",
+                    borderRadius: "6px",
+                    border: "1px solid #3b82f6",
+                    background: "rgba(27, 95, 168, 0.25)",
+                    color: "#bfdbfe",
+                    cursor: "pointer",
+                    fontWeight: "bold",
+                    fontSize: "0.75rem",
+                  }}
+                >
+                  {jugadorExpandido === jugador.id
+                    ? "▲ Ocultar actividad"
+                    : "📋 Ver actividad"}
+                </button>
+                {jugadorExpandido === jugador.id && (
+                  <div
+                    style={{
+                      gridColumn: "1 / -1",
+                      borderTop: "1px solid #2d2b3b",
+                      paddingTop: "0.75rem",
+                      marginTop: "0.25rem",
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: "grid",
+                        gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))",
+                        gap: "0.5rem",
+                        marginBottom: "0.75rem",
+                      }}
+                    >
+                      <div style={{ background: "#1b1a25", borderRadius: "6px", padding: "0.6rem" }}>
+                        <span style={{ color: "#9ca3af", fontSize: "0.7rem", display: "block" }}>Tiempo acumulado</span>
+                        <strong style={{ color: "#ffd700" }}>{formatearDuracion(jugador.tiempo)}</strong>
+                      </div>
+                      <div style={{ background: "#1b1a25", borderRadius: "6px", padding: "0.6rem" }}>
+                        <span style={{ color: "#9ca3af", fontSize: "0.7rem", display: "block" }}>Sesiones registradas</span>
+                        <strong style={{ color: "#60a5fa" }}>{jugador.visitas}</strong>
+                      </div>
+                    </div>
+                    {visitas
+                      .filter((visita) => visita.user_id === jugador.id)
+                      .sort(
+                        (a, b) =>
+                          new Date(b.started_at || b.created_at) -
+                          new Date(a.started_at || a.created_at)
+                      ).length === 0 ? (
+                        <p style={{ color: "#9ca3af", fontSize: "0.8rem", marginBottom: 0 }}>
+                          Este jugador todavía no tiene visitas registradas.
+                        </p>
+                      ) : (
+                        <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
+                          {visitas
+                            .filter((visita) => visita.user_id === jugador.id)
+                            .sort(
+                              (a, b) =>
+                                new Date(b.started_at || b.created_at) -
+                                new Date(a.started_at || a.created_at)
+                            )
+                            .map((visita) => (
+                              <div
+                                key={visita.id}
+                                style={{
+                                  display: "flex",
+                                  justifyContent: "space-between",
+                                  alignItems: "center",
+                                  flexWrap: "wrap",
+                                  gap: "0.5rem",
+                                  padding: "0.6rem",
+                                  borderRadius: "6px",
+                                  background: "#121019",
+                                }}
+                              >
+                                <div>
+                                  <span style={{ color: "#d1d5db", display: "block", fontSize: "0.78rem" }}>
+                                    📅 {formatearFecha(visita.started_at || visita.created_at)}
+                                  </span>
+                                  <span style={{ color: "#9ca3af", fontSize: "0.7rem" }}>
+                                    Última actividad: {formatearFecha(visita.last_seen_at)}
+                                  </span>
+                                </div>
+                                <div style={{ textAlign: "right" }}>
+                                  <span style={{ color: "#60a5fa", display: "block", fontSize: "0.75rem" }}>
+                                    {visita.device === "mobile" ? "📱 Móvil" : visita.device === "desktop" ? "💻 PC" : "Dispositivo —"}
+                                  </span>
+                                  <span style={{ color: "#9ca3af", fontSize: "0.7rem" }}>
+                                    Duración: {formatearDuracion(visita.duration_seconds)}
+                                  </span>
+                                </div>
+                              </div>
+                            ))}
+                        </div>
+                      )}
+                  </div>
+                )}
               </div>
             ))}
           </div>
@@ -740,18 +897,46 @@ function AdminStats({ onBack }) {
         )}
       </div>
 
-      {/* VISITAS DE HOY */}
+      {/* HISTORIAL DE VISITAS POR FECHA */}
 
       <div className="cr-card">
-        <h3 style={{ color: "#fff", marginTop: 0, marginBottom: "1rem" }}>
-          📅 Quiénes visitaron hoy ({visitasDeHoy.length})
-        </h3>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: "0.75rem",
+            flexWrap: "wrap",
+            marginBottom: "1rem",
+          }}
+        >
+          <h3 style={{ color: "#fff", margin: 0 }}>
+            📅 Historial de visitas ({visitasFechaSeleccionada.length})
+          </h3>
+          <label style={{ color: "#d1d5db", fontSize: "0.8rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+            Fecha:
+            <input
+              type="date"
+              value={fechaFiltroVisitas}
+              onChange={(e) => setFechaFiltroVisitas(e.target.value)}
+              aria-label="Filtrar historial por fecha"
+              style={{
+                padding: "0.5rem",
+                borderRadius: "6px",
+                border: "1px solid #3b82f6",
+                background: "#121019",
+                color: "#fff",
+                colorScheme: "dark",
+              }}
+            />
+          </label>
+        </div>
 
-        {visitasDeHoy.length === 0 ? (
-          <p style={{ color: "#9ca3af" }}>Todavía no hay visitas registradas hoy.</p>
+        {visitasFechaSeleccionada.length === 0 ? (
+          <p style={{ color: "#9ca3af" }}>No hay visitas registradas para esta fecha.</p>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-            {visitasDeHoy.map((visita) => (
+            {visitasFechaSeleccionada.map((visita) => (
               <div
                 key={visita.id}
                 style={{
