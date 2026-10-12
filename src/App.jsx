@@ -14,6 +14,7 @@ const ADMIN_UID = "c2089fce-5fb1-430a-8abc-89f5b762b69a";
 
 function AdminStats({ onBack }) {
   const [visitas, setVisitas] = useState([]);
+  const [perfiles, setPerfiles] = useState([]);
   const [loadingStats, setLoadingStats] = useState(true);
   const [errorStats, setErrorStats] = useState("");
 
@@ -21,21 +22,38 @@ function AdminStats({ onBack }) {
     setLoadingStats(true);
     setErrorStats("");
 
-    const { data, error } = await supabase
-      .from("visitas")
-      .select(
-        "id, created_at, user_id, username, email, device, started_at, last_seen_at, duration_seconds"
-      )
-      .order("created_at", { ascending: false });
+    const [
+      { data: visitasData, error: visitasError },
+      { data: perfilesData, error: perfilesError },
+    ] = await Promise.all([
+      supabase
+        .from("visitas")
+        .select(
+          "id, created_at, user_id, username, email, device, started_at, last_seen_at, duration_seconds"
+        )
+        .order("created_at", { ascending: false }),
+      supabase
+        .from("profiles")
+        .select("id, username, email, created_at")
+        .order("created_at", { ascending: false }),
+    ]);
 
-    if (error) {
-      console.error("Error al obtener estadísticas:", error);
-      setErrorStats("No se pudieron cargar las estadísticas.");
+    if (visitasError || perfilesError) {
+      console.error("Error al obtener estadísticas:", {
+        visitasError,
+        perfilesError,
+      });
+      setErrorStats(
+        perfilesError
+          ? "No se pudo cargar la lista de jugadores registrados. Revisá los permisos de lectura de profiles en Supabase."
+          : "No se pudieron cargar las estadísticas de visitas."
+      );
       setLoadingStats(false);
       return;
     }
 
-    setVisitas(data || []);
+    setVisitas(visitasData || []);
+    setPerfiles(perfilesData || []);
     setLoadingStats(false);
   };
 
@@ -72,7 +90,7 @@ function AdminStats({ onBack }) {
     return `${horas}h ${minutosRestantes}m`;
   };
 
-  const visitasHoy = visitas.filter((visita) => {
+  const esVisitaDeHoy = (visita) => {
     const fecha = new Date(visita.created_at);
     const ahora = new Date();
 
@@ -81,11 +99,19 @@ function AdminStats({ onBack }) {
       fecha.getMonth() === ahora.getMonth() &&
       fecha.getFullYear() === ahora.getFullYear()
     );
-  }).length;
+  };
 
-  const usuariosRegistrados = new Set(
-    visitas.filter((visita) => visita.user_id).map((visita) => visita.user_id)
-  ).size;
+  const visitasDeHoy = visitas
+    .filter(esVisitaDeHoy)
+    .sort(
+      (a, b) =>
+        new Date(b.started_at || b.created_at) -
+        new Date(a.started_at || a.created_at)
+    );
+
+  const visitasHoy = visitasDeHoy.length;
+
+  const usuariosRegistrados = perfiles.length;
 
   const visitasAnonimas = visitas.filter((visita) => !visita.user_id).length;
 
@@ -105,13 +131,23 @@ function AdminStats({ onBack }) {
   const tiempoPromedio =
     visitas.length > 0 ? Math.round(tiempoTotal / visitas.length) : 0;
 
-  const usuariosActivos = visitas.filter((visita) => {
-    if (!visita.last_seen_at) return false;
+  const sesionesActivas = visitas
+    .filter((visita) => {
+      if (!visita.last_seen_at) return false;
+      const diferencia = Date.now() - new Date(visita.last_seen_at).getTime();
+      return diferencia >= 0 && diferencia <= 5 * 60 * 1000;
+    })
+    .sort(
+      (a, b) =>
+        new Date(b.last_seen_at).getTime() -
+        new Date(a.last_seen_at).getTime()
+    )
+    .filter((visita, index, lista) => {
+      const clave = visita.user_id || visita.id;
+      return lista.findIndex((otra) => (otra.user_id || otra.id) === clave) === index;
+    });
 
-    const diferencia = Date.now() - new Date(visita.last_seen_at).getTime();
-
-    return diferencia <= 5 * 60 * 1000;
-  }).length;
+  const usuariosActivos = sesionesActivas.length;
 
   // =========================================================
   // VISITAS POR DÍA
@@ -145,46 +181,57 @@ function AdminStats({ onBack }) {
   });
 
   // =========================================================
-  // JUGADORES
+  // JUGADORES REGISTRADOS: salen de profiles, no de visitas.
+  // Así aparecen también quienes todavía nunca entraron.
   // =========================================================
 
-  const jugadoresMap = {};
+  const actividadPorUsuario = {};
 
   visitas
     .filter((visita) => visita.user_id)
     .forEach((visita) => {
-      if (!jugadoresMap[visita.user_id]) {
-        jugadoresMap[visita.user_id] = {
-          id: visita.user_id,
-          username: visita.username || "Jugador",
-          email: visita.email || "",
+      const id = visita.user_id;
+
+      if (!actividadPorUsuario[id]) {
+        actividadPorUsuario[id] = {
           visitas: 0,
           tiempo: 0,
-          ultimaVisita: visita.created_at,
+          ultimaVisita: null,
+          device: visita.device || "",
         };
       }
 
-      jugadoresMap[visita.user_id].visitas++;
-
-      jugadoresMap[visita.user_id].tiempo += Number(
-        visita.duration_seconds || 0
-      );
+      actividadPorUsuario[id].visitas += 1;
+      actividadPorUsuario[id].tiempo += Number(visita.duration_seconds || 0);
 
       if (
+        !actividadPorUsuario[id].ultimaVisita ||
         new Date(visita.created_at) >
-        new Date(jugadoresMap[visita.user_id].ultimaVisita)
+          new Date(actividadPorUsuario[id].ultimaVisita)
       ) {
-        jugadoresMap[visita.user_id].ultimaVisita = visita.created_at;
-      }
-
-      if (visita.email) {
-        jugadoresMap[visita.user_id].email = visita.email;
+        actividadPorUsuario[id].ultimaVisita = visita.last_seen_at || visita.created_at;
+        actividadPorUsuario[id].device = visita.device || actividadPorUsuario[id].device;
       }
     });
 
-  const jugadores = Object.values(jugadoresMap).sort(
-    (a, b) => b.visitas - a.visitas
-  );
+  const jugadores = [...perfiles]
+    .map((perfil) => {
+      const actividad = actividadPorUsuario[perfil.id] || {};
+
+      return {
+        id: perfil.id,
+        username: perfil.username || "Jugador",
+        email: perfil.email || "",
+        creadoEn: perfil.created_at || null,
+        visitas: actividad.visitas || 0,
+        tiempo: actividad.tiempo || 0,
+        ultimaVisita: actividad.ultimaVisita || null,
+        device: actividad.device || "",
+      };
+    })
+    .sort((a, b) =>
+      a.username.localeCompare(b.username, "es", { sensitivity: "base" })
+    );
 
   if (loadingStats) {
     return (
@@ -581,31 +628,29 @@ function AdminStats({ onBack }) {
         </div>
       </div>
 
-      {/* JUGADORES */}
+      {/* JUGADORES REGISTRADOS */}
 
-      <div className="cr-card">
-        <h3
+      <div className="cr-card" style={{ marginBottom: "1rem" }}>
+        <div
           style={{
-            color: "#fff",
-            marginTop: 0,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: "0.75rem",
+            flexWrap: "wrap",
             marginBottom: "1rem",
           }}
         >
-          👑 Jugadores
-        </h3>
+          <h3 style={{ color: "#fff", margin: 0 }}>👥 Jugadores registrados</h3>
+          <span style={{ color: "#9ca3af", fontSize: "0.8rem" }}>
+            {jugadores.length} cuentas
+          </span>
+        </div>
 
         {jugadores.length === 0 ? (
-          <p style={{ color: "#9ca3af" }}>
-            Todavía no ingresaron jugadores registrados.
-          </p>
+          <p style={{ color: "#9ca3af" }}>No hay jugadores registrados.</p>
         ) : (
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: "0.5rem",
-            }}
-          >
+          <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
             {jugadores.map((jugador, index) => (
               <div
                 key={jugador.id}
@@ -615,114 +660,126 @@ function AdminStats({ onBack }) {
                   borderRadius: "8px",
                   padding: "0.75rem",
                   display: "grid",
-                  gridTemplateColumns:
-                    "30px minmax(120px, 1fr) repeat(3, auto)",
+                  gridTemplateColumns: "30px minmax(0, 1fr) repeat(2, auto)",
                   gap: "0.75rem",
                   alignItems: "center",
                 }}
               >
-                <strong
-                  style={{
-                    color: "#ffd700",
-                  }}
-                >
-                  #{index + 1}
-                </strong>
-
-                <div>
-                  <strong
-                    style={{
-                      color: "#fff",
-                      display: "block",
-                    }}
-                  >
+                <strong style={{ color: "#ffd700" }}>#{index + 1}</strong>
+                <div style={{ minWidth: 0 }}>
+                  <strong style={{ color: "#fff", display: "block", overflowWrap: "anywhere" }}>
                     {jugador.username}
                   </strong>
-
-                  <span
-                    style={{
-                      color: "#60a5fa",
-                      fontSize: "0.7rem",
-                      display: "block",
-                      marginTop: "2px",
-                      wordBreak: "break-word",
-                    }}
-                  >
+                  <span style={{ color: "#60a5fa", fontSize: "0.75rem", display: "block", overflowWrap: "anywhere" }}>
                     📧 {jugador.email || "Email no registrado"}
                   </span>
-
-                  <span
-                    style={{
-                      color: "#6b7280",
-                      fontSize: "0.65rem",
-                      display: "block",
-                      marginTop: "2px",
-                    }}
-                  >
+                  <span style={{ color: "#9ca3af", fontSize: "0.7rem", display: "block", marginTop: "3px" }}>
+                    Registro: {formatearFecha(jugador.creadoEn)}
+                  </span>
+                  <span style={{ color: "#9ca3af", fontSize: "0.7rem", display: "block", marginTop: "2px" }}>
                     Última visita: {formatearFecha(jugador.ultimaVisita)}
                   </span>
                 </div>
-
-                <div
-                  style={{
-                    textAlign: "center",
-                  }}
-                >
-                  <span
-                    style={{
-                      color: "#9ca3af",
-                      fontSize: "0.65rem",
-                      display: "block",
-                    }}
-                  >
-                    Visitas
-                  </span>
-
-                  <strong style={{ color: "#60a5fa" }}>
-                    {jugador.visitas}
-                  </strong>
+                <div style={{ textAlign: "center" }}>
+                  <span style={{ color: "#9ca3af", fontSize: "0.65rem", display: "block" }}>Visitas</span>
+                  <strong style={{ color: "#60a5fa" }}>{jugador.visitas}</strong>
                 </div>
-
-                <div
-                  style={{
-                    textAlign: "center",
-                  }}
-                >
-                  <span
-                    style={{
-                      color: "#9ca3af",
-                      fontSize: "0.65rem",
-                      display: "block",
-                    }}
-                  >
-                    Tiempo
-                  </span>
-
-                  <strong style={{ color: "#34d399" }}>
-                    {formatearDuracion(jugador.tiempo)}
-                  </strong>
+                <div style={{ textAlign: "center" }}>
+                  <span style={{ color: "#9ca3af", fontSize: "0.65rem", display: "block" }}>Dispositivo</span>
+                  <span>{jugador.device === "mobile" ? "📱" : jugador.device === "desktop" ? "💻" : "—"}</span>
                 </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
 
-                <div
-                  style={{
-                    textAlign: "center",
-                  }}
-                >
-                  <span
-                    style={{
-                      color: "#9ca3af",
-                      fontSize: "0.65rem",
-                      display: "block",
-                    }}
-                  >
-                    Dispositivo
+      {/* ACTIVIDAD RECIENTE */}
+
+      <div className="cr-card" style={{ marginBottom: "1rem" }}>
+        <h3 style={{ color: "#fff", marginTop: 0, marginBottom: "1rem" }}>
+          🟢 Quiénes están conectados
+        </h3>
+        <p style={{ color: "#9ca3af", fontSize: "0.75rem", marginTop: "-0.5rem" }}>
+          Actividad registrada durante los últimos 5 minutos.
+        </p>
+
+        {sesionesActivas.length === 0 ? (
+          <p style={{ color: "#9ca3af" }}>No hay actividad reciente registrada.</p>
+        ) : (
+          <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+            {sesionesActivas.map((visita) => (
+              <div
+                key={visita.user_id || visita.id}
+                style={{
+                  background: "#121019",
+                  border: "1px solid #2d2b3b",
+                  borderRadius: "8px",
+                  padding: "0.75rem",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  gap: "0.75rem",
+                  flexWrap: "wrap",
+                }}
+              >
+                <div>
+                  <strong style={{ color: "#fff", display: "block" }}>
+                    {visita.username || "Visitante anónimo"}
+                  </strong>
+                  <span style={{ color: "#9ca3af", fontSize: "0.75rem" }}>
+                    {visita.email || (visita.user_id ? "Email no registrado" : "Sin iniciar sesión")}
                   </span>
+                </div>
+                <span style={{ color: "#34d399", fontSize: "0.75rem" }}>
+                  ● Activo · {formatearFecha(visita.last_seen_at)}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
 
-                  <span>
-                    {visitas.find((v) => v.user_id === jugador.id)?.device ===
-                    "mobile"
-                      ? "📱"
-                      : "💻"}
+      {/* VISITAS DE HOY */}
+
+      <div className="cr-card">
+        <h3 style={{ color: "#fff", marginTop: 0, marginBottom: "1rem" }}>
+          📅 Quiénes visitaron hoy ({visitasDeHoy.length})
+        </h3>
+
+        {visitasDeHoy.length === 0 ? (
+          <p style={{ color: "#9ca3af" }}>Todavía no hay visitas registradas hoy.</p>
+        ) : (
+          <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+            {visitasDeHoy.map((visita) => (
+              <div
+                key={visita.id}
+                style={{
+                  background: "#121019",
+                  border: "1px solid #2d2b3b",
+                  borderRadius: "8px",
+                  padding: "0.75rem",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  gap: "0.75rem",
+                  flexWrap: "wrap",
+                }}
+              >
+                <div>
+                  <strong style={{ color: "#fff", display: "block" }}>
+                    {visita.username || "Visitante anónimo"}
+                  </strong>
+                  <span style={{ color: "#9ca3af", fontSize: "0.75rem", overflowWrap: "anywhere" }}>
+                    {visita.email || (visita.user_id ? "Email no registrado" : "Sin iniciar sesión")}
+                  </span>
+                </div>
+                <div style={{ textAlign: "right" }}>
+                  <span style={{ color: "#60a5fa", fontSize: "0.75rem", display: "block" }}>
+                    {formatearFecha(visita.started_at || visita.created_at)}
+                  </span>
+                  <span style={{ color: "#9ca3af", fontSize: "0.7rem" }}>
+                    {visita.device === "mobile" ? "📱 Móvil" : visita.device === "desktop" ? "💻 PC" : "Dispositivo desconocido"}
                   </span>
                 </div>
               </div>
@@ -819,81 +876,80 @@ export function TournamentClashApp() {
   };
 
   // =========================================================
-  // REGISTRAR VISITA Y MEDIR INTERACCIÓN
+  // REGISTRAR VISITAS DE TODOS LOS VISITANTES
   // =========================================================
 
   useEffect(() => {
-    if (!currentUser) return;
+    let cancelado = false;
 
-    const registrarOAsociarVisita = async () => {
-      const device = window.innerWidth <= 768 ? "mobile" : "desktop";
-
+    const obtenerVisitaId = () => {
       let visitaId = sessionStorage.getItem("tournamentclash_visita_id");
 
       if (!visitaId) {
         visitaId = crypto.randomUUID();
-
         sessionStorage.setItem("tournamentclash_visita_id", visitaId);
       }
 
+      return visitaId;
+    };
+
+    const registrarOAsociarVisita = async () => {
+      const visitaId = obtenerVisitaId();
+      const device = window.innerWidth <= 768 ? "mobile" : "desktop";
       const ahora = new Date().toISOString();
 
-      // Primero buscamos si ya existe esta visita.
       const { data: visitaExistente, error: errorBusqueda } = await supabase
         .from("visitas")
-        .select("id, user_id, username, email, started_at")
+        .select("id, user_id, started_at")
         .eq("id", visitaId)
         .maybeSingle();
+
+      if (cancelado) return;
 
       if (errorBusqueda) {
         console.error("Error al buscar la visita actual:", errorBusqueda);
         return;
       }
 
-      // Si no existe, la creamos directamente asociada al usuario.
       if (!visitaExistente) {
-        const visita = {
+        const { error } = await supabase.from("visitas").insert({
           id: visitaId,
-          user_id: currentUser.id,
-          username: currentUser.username,
-          email: currentUser.email || null,
+          user_id: currentUser?.id || null,
+          username: currentUser?.username || null,
+          email: currentUser?.email || null,
           device,
           started_at: ahora,
           last_seen_at: ahora,
           duration_seconds: 0,
-        };
+        });
 
-        const { error } = await supabase.from("visitas").insert(visita);
-
-        if (error) {
-          console.error("Error al registrar visita:", error);
-        }
-
+        if (error) console.error("Error al registrar visita:", error);
         return;
       }
 
-      // Si ya existía como anónima o tenía datos antiguos,
-      // la asociamos al usuario actual.
+      const actualizacion = {
+        last_seen_at: ahora,
+        device,
+      };
+
+      if (currentUser) {
+        actualizacion.user_id = currentUser.id;
+        actualizacion.username = currentUser.username;
+        actualizacion.email = currentUser.email || null;
+      }
+
       const { error: errorActualizacion } = await supabase
         .from("visitas")
-        .update({
-          user_id: currentUser.id,
-          username: currentUser.username,
-          email: currentUser.email || null,
-        })
+        .update(actualizacion)
         .eq("id", visitaId);
 
       if (errorActualizacion) {
-        console.error(
-          "Error al asociar visita al usuario:",
-          errorActualizacion
-        );
+        console.error("Error al actualizar la visita:", errorActualizacion);
       }
     };
 
     const actualizarTiempo = async () => {
       const visitaId = sessionStorage.getItem("tournamentclash_visita_id");
-
       if (!visitaId) return;
 
       const { data, error } = await supabase
@@ -902,30 +958,33 @@ export function TournamentClashApp() {
         .eq("id", visitaId)
         .maybeSingle();
 
-      if (error || !data?.started_at) return;
+      if (error || !data?.started_at || cancelado) return;
 
       const inicio = new Date(data.started_at);
       const ahora = new Date();
-
       const segundos = Math.max(0, Math.floor((ahora - inicio) / 1000));
 
-      await supabase
+      const { error: errorActualizacion } = await supabase
         .from("visitas")
         .update({
           last_seen_at: ahora.toISOString(),
           duration_seconds: segundos,
         })
         .eq("id", visitaId);
+
+      if (errorActualizacion) {
+        console.error("Error al actualizar tiempo de visita:", errorActualizacion);
+      }
     };
 
     registrarOAsociarVisita();
 
-    const intervalo = setInterval(() => {
-      actualizarTiempo();
-    }, 30000);
+    const intervalo = setInterval(actualizarTiempo, 30000);
 
     const handleVisibilityChange = () => {
-      if (document.visibilityState === "hidden") {
+      if (document.visibilityState === "visible") {
+        registrarOAsociarVisita();
+      } else {
         actualizarTiempo();
       }
     };
@@ -933,8 +992,8 @@ export function TournamentClashApp() {
     document.addEventListener("visibilitychange", handleVisibilityChange);
 
     return () => {
+      cancelado = true;
       clearInterval(intervalo);
-
       document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
   }, [currentUser]);
