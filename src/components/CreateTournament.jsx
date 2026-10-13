@@ -91,6 +91,9 @@ export function CreateTournament({
   };
 
   return (
+    <div
+      className={`game-form-theme ${formData.game === "Fútbol" || formData.game === "EA Sports FC 26" ? "theme-futbol" : formData.game === "Ajedrez" ? "theme-ajedrez" : ["Brawl Stars", "Valorant"].includes(formData.game) ? "theme-esports" : "theme-clash"}`}
+    >
     <div className="cr-card" style={{ maxWidth: "520px" }}>
       <div className="cr-card-glow"></div>
 
@@ -200,18 +203,12 @@ export function CreateTournament({
         </div>
 
         {/* ===================================================
-            JUEGO + FORMATO
+            MODALIDAD VISUAL + FORMATO
+            La modalidad solo selecciona el tema visual existente.
+            Se conserva el campo game y toda la lógica del torneo.
             =================================================== */}
 
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr",
-            gap: "0.75rem",
-          }}
-        >
-          {/* JUEGO */}
-
+        <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
           <div>
             <label
               style={{
@@ -220,36 +217,81 @@ export function CreateTournament({
                 fontWeight: "bold",
                 textTransform: "uppercase",
                 color: "#d1d5db",
-                marginBottom: "4px",
+                marginBottom: "0.6rem",
               }}
             >
-              Videojuego
+              Elegí la modalidad del torneo
             </label>
 
-            <select
-              value={formData.game}
-              onChange={(e) =>
-                setFormData({
-                  ...formData,
-                  game: e.target.value,
-                })
-              }
-              className="cr-input"
-              style={{
-                cursor: "pointer",
-              }}
-            >
-              <option value="Clash Royale 1v1">Clash Royale 1v1</option>
-
-              <option value="Brawl Stars">Brawl Stars</option>
-
-              <option value="EA Sports FC 26">EA Sports FC 26</option>
-
-              <option value="Valorant">Valorant</option>
-            </select>
+            <div className="game-selector">
+              {[
+                {
+                  value: "Clash Royale 1v1",
+                  icon: "👑",
+                  title: "Clash Royale",
+                  description: "Fantasía y esports",
+                },
+                {
+                  value: "Fútbol",
+                  icon: "⚽",
+                  title: "Fútbol",
+                  description: "Pasión por la cancha",
+                },
+                {
+                  value: "Ajedrez",
+                  icon: "♟️",
+                  title: "Ajedrez",
+                  description: "Estrategia y precisión",
+                },
+                {
+                  value: "Brawl Stars",
+                  icon: "💥",
+                  title: "Brawl Stars",
+                  description: "Acción y color",
+                },
+                {
+                  value: "EA Sports FC 26",
+                  icon: "🏟️",
+                  title: "EA Sports FC 26",
+                  description: "Fútbol virtual",
+                },
+                {
+                  value: "Valorant",
+                  icon: "🎯",
+                  title: "Valorant",
+                  description: "Competición táctica",
+                },
+              ].map((option) => (
+                <button
+                  key={option.value}
+                  type="button"
+                  className={`game-option ${formData.game === option.value ? "is-selected" : ""}`}
+                  aria-pressed={formData.game === option.value}
+                  onClick={() =>
+                    setFormData({
+                      ...formData,
+                      game: option.value,
+                    })
+                  }
+                >
+                  <span className="game-option-icon" aria-hidden="true">
+                    {option.icon}
+                  </span>
+                  <span className="game-option-copy">
+                    <span className="game-option-title">{option.title}</span>
+                    <span className="game-option-description">
+                      {option.description}
+                    </span>
+                  </span>
+                  {formData.game === option.value && (
+                    <span aria-hidden="true" style={{ marginLeft: "auto" }}>
+                      ✓
+                    </span>
+                  )}
+                </button>
+              ))}
+            </div>
           </div>
-
-          {/* FORMATO */}
 
           <div>
             <label
@@ -274,12 +316,9 @@ export function CreateTournament({
                 })
               }
               className="cr-input"
-              style={{
-                cursor: "pointer",
-              }}
+              style={{ cursor: "pointer" }}
             >
               <option value="groups_playoff">Grupos + Playoffs</option>
-
               <option value="league">Todos contra Todos</option>
             </select>
           </div>
@@ -471,6 +510,7 @@ export function CreateTournament({
             : "Generar Torneo y Calendario 🏆"}
         </button>
       </form>
+    </div>
     </div>
   );
 }
