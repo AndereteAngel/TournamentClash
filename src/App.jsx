@@ -976,6 +976,13 @@ function AdminStats({ onBack }) {
   );
 }
 
+const getTournamentThemeClass = (game) => {
+  if (game === "Fútbol" || game === "EA Sports FC 26") return "theme-futbol";
+  if (game === "Ajedrez") return "theme-ajedrez";
+  if (game === "Brawl Stars" || game === "Valorant") return "theme-esports";
+  return "theme-clash";
+};
+
 export function TournamentClashApp() {
   const [currentUser, setCurrentUser] = useState(null);
   const [authMode, setAuthMode] = useState("login");
@@ -1706,7 +1713,7 @@ export function TournamentClashApp() {
   const isAdmin = currentUser?.id === ADMIN_UID;
 
   return (
-    <div className="cr-container">
+    <div className={`cr-container ${activeTournament ? getTournamentThemeClass(activeTournament.game) : "theme-clash"}`}>
       {currentUser && (
         <Navbar
           onGoHome={handleGoHome}
