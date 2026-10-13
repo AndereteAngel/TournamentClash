@@ -1196,3 +1196,234 @@ td {
   border-color: #c4b5fd;
   background: linear-gradient(135deg, rgba(124, 58, 237, 0.32), rgba(196, 181, 253, 0.08));
 }
+
+
+/* Selector de modalidad: primer paso antes de configurar el torneo */
+.game-mode-screen {
+  width: min(100%, 920px);
+  margin: 0 auto;
+  padding: clamp(0.5rem, 2vw, 1.25rem);
+}
+
+.game-mode-heading {
+  max-width: 650px;
+  margin: 0 auto 1.5rem;
+  text-align: center;
+}
+
+.game-mode-eyebrow {
+  display: inline-block;
+  margin-bottom: 0.45rem;
+  color: #93c5fd;
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0.2em;
+}
+
+.game-mode-heading h2 {
+  margin: 0 0 0.5rem;
+  font-size: clamp(1.5rem, 4vw, 2.2rem);
+}
+
+.game-mode-heading p {
+  margin: 0;
+  color: #a1a1aa;
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+
+.game-mode-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.85rem;
+}
+
+.game-mode-card {
+  --mode-accent: #ffd700;
+  --mode-deep: #0d2440;
+  --mode-border: #1b5fa8;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 0;
+  min-height: 170px;
+  padding: 1.05rem;
+  overflow: hidden;
+  border: 1px solid var(--mode-border);
+  border-radius: 16px;
+  background:
+    radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--mode-accent) 15%, transparent), transparent 55%),
+    linear-gradient(145deg, #171426, var(--mode-deep));
+  color: #f9fafb;
+  text-align: left;
+  cursor: pointer;
+  transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+}
+
+.game-mode-card:hover {
+  transform: translateY(-3px);
+}
+
+.game-mode-card.is-selected {
+  border-color: var(--mode-accent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--mode-accent) 25%, transparent), 0 12px 28px rgba(0, 0, 0, 0.28);
+}
+
+.game-mode-card.theme-futbol {
+  --mode-accent: #86efac;
+  --mode-deep: #07140e;
+  --mode-border: #166534;
+}
+
+.game-mode-card.theme-ajedrez {
+  --mode-accent: #f3f4f6;
+  --mode-deep: #111113;
+  --mode-border: #52525b;
+}
+
+.game-mode-card.theme-esports {
+  --mode-accent: #c4b5fd;
+  --mode-deep: #0d0718;
+  --mode-border: #5b21b6;
+}
+
+.game-mode-card-icon {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  margin-bottom: 0.85rem;
+  border: 1px solid color-mix(in srgb, var(--mode-accent) 45%, transparent);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--mode-accent) 10%, transparent);
+  font-size: 1.7rem;
+}
+
+.game-mode-card-title {
+  font-size: 1rem;
+  font-weight: 900;
+}
+
+.game-mode-card-description {
+  margin-top: 0.25rem;
+  color: #a1a1aa;
+  font-size: 0.75rem;
+}
+
+.game-mode-card-check {
+  margin-top: auto;
+  padding-top: 0.9rem;
+  color: var(--mode-accent);
+  font-size: 0.7rem;
+  font-weight: 800;
+}
+
+.game-mode-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+}
+
+.game-mode-back,
+.selected-game-change {
+  border: 1px solid #4b5563;
+  border-radius: 8px;
+  padding: 0.7rem 1rem;
+  background: rgba(255, 255, 255, 0.04);
+  color: #e5e7eb;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.game-mode-continue {
+  max-width: 360px;
+}
+
+.selected-game-summary {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border: 1px solid var(--theme-border, #2d2b4e);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--theme-accent-2, #1b5fa8) 12%, transparent);
+}
+
+.selected-game-summary-icon {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  flex: 0 0 40px;
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.07);
+  font-size: 1.35rem;
+}
+
+.selected-game-summary > div {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.selected-game-summary-label {
+  color: #a1a1aa;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.selected-game-summary strong {
+  color: var(--theme-accent, #ffd700);
+  overflow-wrap: anywhere;
+}
+
+.selected-game-change {
+  padding: 0.5rem 0.65rem;
+  font-size: 0.75rem;
+}
+
+@media (max-width: 680px) {
+  .game-mode-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.65rem;
+  }
+
+  .game-mode-card {
+    min-height: 155px;
+    padding: 0.8rem;
+  }
+
+  .game-mode-actions {
+    align-items: stretch;
+  }
+
+  .game-mode-continue {
+    flex: 1;
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 390px) {
+  .game-mode-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .game-mode-card {
+    min-height: 120px;
+  }
+
+  .game-mode-actions {
+    flex-direction: column-reverse;
+  }
+
+  .game-mode-continue {
+    max-width: none;
+    width: 100%;
+  }
+}
