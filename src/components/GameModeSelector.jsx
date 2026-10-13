@@ -54,7 +54,7 @@ export function GameModeSelector({
   description = "Elegí cómo querés competir. La plataforma adaptará su identidad visual a tu modalidad.",
 }) {
   return (
-    <section className="game-mode-screen">
+    <section className={`game-mode-screen ${selectedGame ? GAME_MODES.find((mode) => mode.value === selectedGame)?.theme || "theme-clash" : "theme-neutral"}`}>
       <header className="game-mode-heading">
         <div className="platform-mark" aria-hidden="true">🏆</div>
         <span className="game-mode-eyebrow">{eyebrow}</span>
@@ -72,10 +72,12 @@ export function GameModeSelector({
             aria-pressed={selectedGame === option.value}
             onClick={() => onSelect(option.value)}
           >
-            className={`game-mode-card ${option.theme} ${selectedGame === option.value ? "is-selected" : ""}`}
-            className={`game-mode-card ${option.theme} ${selectedGame === option.value ? "is-selected" : ""}`}
-            className={`game-mode-card ${option.theme} ${selectedGame === option.value ? "is-selected" : ""}`}
-            className={`game-mode-card ${option.theme} ${selectedGame === option.value ? "is-selected" : ""}`}
+            <span className="game-mode-card-icon" aria-hidden="true">
+              {option.icon}
+            </span>
+            <span className="game-mode-card-title">{option.title}</span>
+            <span className="game-mode-card-description">{option.description}</span>
+            <span className="game-mode-card-check">
               {selectedGame === option.value ? "✓ Seleccionado" : "Elegir modalidad"}
             </span>
           </button>
