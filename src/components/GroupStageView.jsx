@@ -82,7 +82,7 @@ export function GroupStageView({
             style={{
               display: "inline-block",
               fontSize: "10px",
-              color: "#ffd700",
+              color: "var(--theme-accent, #ffd700)",
               fontWeight: "bold",
               textTransform: "uppercase",
               letterSpacing: "1px",
@@ -208,11 +208,11 @@ export function GroupStageView({
                 padding: "0.65rem 1rem",
                 background:
                   idx === activeGroupIndex
-                    ? "linear-gradient(135deg, #1b5fa8, #123d70)"
+                    ? "linear-gradient(135deg, var(--theme-accent-2, #1b5fa8), #123d70)"
                     : "rgba(18,16,25,0.9)",
                 border:
                   idx === activeGroupIndex
-                    ? "1px solid #ffd700"
+                    ? "1px solid var(--theme-accent, #ffd700)"
                     : "1px solid #2d2b3b",
                 color: idx === activeGroupIndex ? "#fff" : "#9ca3af",
                 borderRadius: "9px",
@@ -265,7 +265,7 @@ export function GroupStageView({
           <span
             style={{
               fontSize: "0.7rem",
-              color: "#ffd700",
+              color: "var(--theme-accent, #ffd700)",
               fontWeight: "bold",
             }}
           >
@@ -292,7 +292,7 @@ export function GroupStageView({
               <tr
                 style={{
                   backgroundColor: "#121019",
-                  color: "#ffd700",
+                  color: "var(--theme-accent, #ffd700)",
                   borderBottom: "2px solid #2d2b3b",
                 }}
               >
@@ -342,7 +342,7 @@ export function GroupStageView({
                       style={{
                         padding: "9px 8px",
                         fontWeight: "900",
-                        color: "#ffd700",
+                        color: "var(--theme-accent, #ffd700)",
                         fontSize: "0.85rem",
                       }}
                     >
@@ -461,7 +461,7 @@ export function GroupStageView({
                     textAlign: "center",
                     backgroundColor: isCreator ? "#1e1b2e" : "#15141c",
                     border: isCreator
-                      ? "1px solid #1b5fa8"
+                      ? "1px solid var(--theme-accent-2, #1b5fa8)"
                       : "1px solid #272532",
                     color: "#fff",
                     borderRadius: "5px",
@@ -496,7 +496,7 @@ export function GroupStageView({
                     textAlign: "center",
                     backgroundColor: isCreator ? "#1e1b2e" : "#15141c",
                     border: isCreator
-                      ? "1px solid #1b5fa8"
+                      ? "1px solid var(--theme-accent-2, #1b5fa8)"
                       : "1px solid #272532",
                     color: "#fff",
                     borderRadius: "5px",
