@@ -5,7 +5,6 @@ export function CreateTournament({
   onCancel,
   isEditing = false,
   initialData = null,
-  initialGame = "Clash Royale 1v1",
 }) {
   // =========================================================
   // OBTENER PARTICIPANTES ACTUALES
@@ -35,7 +34,7 @@ export function CreateTournament({
     if (!isEditing || !initialData) {
       return {
         title: "",
-        game: initialGame,
+        game: "Clash Royale 1v1",
         format: "groups_playoff",
         numGroups: 2,
         qualifiersPerGroup: 2,
@@ -66,7 +65,7 @@ export function CreateTournament({
 
   useEffect(() => {
     setFormData(getInitialFormData());
-  }, [initialData, isEditing, initialGame]);
+  }, [initialData, isEditing]);
 
   // =========================================================
   // GUARDAR
@@ -92,9 +91,6 @@ export function CreateTournament({
   };
 
   return (
-    <div
-      className={`game-form-theme ${formData.game === "Fútbol" || formData.game === "EA Sports FC 26" ? "theme-futbol" : formData.game === "Ajedrez" ? "theme-ajedrez" : ["Brawl Stars", "Valorant"].includes(formData.game) ? "theme-esports" : "theme-clash"}`}
-    >
     <div className="cr-card" style={{ maxWidth: "520px" }}>
       <div className="cr-card-glow"></div>
 
@@ -203,53 +199,90 @@ export function CreateTournament({
           />
         </div>
 
-        {!isEditing && (
-          <div className="selected-game-summary">
-            <span className="selected-game-summary-icon" aria-hidden="true">
-              {formData.game === "Fútbol" ? "⚽" : formData.game === "Ajedrez" ? "♟️" : formData.game === "EA Sports FC 26" ? "🏟️" : formData.game === "Brawl Stars" ? "💥" : formData.game === "Valorant" ? "🎯" : "👑"}
-            </span>
-            <div>
-              <span className="selected-game-summary-label">Modalidad elegida</span>
-              <strong>{formData.game}</strong>
-            </div>
-            <button type="button" className="selected-game-change" onClick={onCancel}>
-              Cambiar
-            </button>
-          </div>
-        )}
-
         {/* ===================================================
-            FORMATO
+            JUEGO + FORMATO
             =================================================== */}
 
-        <div>
-          <label
-            style={{
-              display: "block",
-              fontSize: "0.75rem",
-              fontWeight: "bold",
-              textTransform: "uppercase",
-              color: "#d1d5db",
-              marginBottom: "4px",
-            }}
-          >
-            Formato
-          </label>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: "0.75rem",
+          }}
+        >
+          {/* JUEGO */}
 
-          <select
-            value={formData.format}
-            onChange={(e) =>
-              setFormData({
-                ...formData,
-                format: e.target.value,
-              })
-            }
-            className="cr-input"
-            style={{ cursor: "pointer" }}
-          >
-            <option value="groups_playoff">Grupos + Playoffs</option>
-            <option value="league">Todos contra Todos</option>
-          </select>
+          <div>
+            <label
+              style={{
+                display: "block",
+                fontSize: "0.75rem",
+                fontWeight: "bold",
+                textTransform: "uppercase",
+                color: "#d1d5db",
+                marginBottom: "4px",
+              }}
+            >
+              Videojuego
+            </label>
+
+            <select
+              value={formData.game}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  game: e.target.value,
+                })
+              }
+              className="cr-input"
+              style={{
+                cursor: "pointer",
+              }}
+            >
+              <option value="Clash Royale 1v1">Clash Royale 1v1</option>
+
+              <option value="Brawl Stars">Brawl Stars</option>
+
+              <option value="EA Sports FC 26">EA Sports FC 26</option>
+
+              <option value="Valorant">Valorant</option>
+            </select>
+          </div>
+
+          {/* FORMATO */}
+
+          <div>
+            <label
+              style={{
+                display: "block",
+                fontSize: "0.75rem",
+                fontWeight: "bold",
+                textTransform: "uppercase",
+                color: "#d1d5db",
+                marginBottom: "4px",
+              }}
+            >
+              Formato
+            </label>
+
+            <select
+              value={formData.format}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  format: e.target.value,
+                })
+              }
+              className="cr-input"
+              style={{
+                cursor: "pointer",
+              }}
+            >
+              <option value="groups_playoff">Grupos + Playoffs</option>
+
+              <option value="league">Todos contra Todos</option>
+            </select>
+          </div>
         </div>
 
         {/* ===================================================
@@ -438,7 +471,6 @@ export function CreateTournament({
             : "Generar Torneo y Calendario 🏆"}
         </button>
       </form>
-    </div>
     </div>
   );
 }
