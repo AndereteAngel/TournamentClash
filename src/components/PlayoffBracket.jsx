@@ -77,7 +77,7 @@ export function PlayoffBracket({
         <div
           style={{
             fontSize: "10px",
-            color: "#ffd700",
+            color: "var(--theme-accent, #ffd700)",
             fontWeight: "bold",
             textTransform: "uppercase",
             marginBottom: "4px",
@@ -142,7 +142,7 @@ export function PlayoffBracket({
                 fontSize: "0.8rem",
                 fontWeight: "bold",
                 textTransform: "uppercase",
-                color: "#ffd700",
+                color: "var(--theme-accent, #ffd700)",
                 marginBottom: "0.5rem",
                 borderBottom: "1px solid #2d2b3b",
                 paddingBottom: "4px",
@@ -220,7 +220,7 @@ export function PlayoffBracket({
                           width: "34px",
                           textAlign: "center",
                           backgroundColor: "#1e1b2e",
-                          border: "1px solid #1b5fa8",
+                          border: "1px solid var(--theme-accent-2, #1b5fa8)",
                           color: "#fff",
                           borderRadius: "4px",
                           padding: "4px",
@@ -243,7 +243,7 @@ export function PlayoffBracket({
                           width: "34px",
                           textAlign: "center",
                           backgroundColor: "#1e1b2e",
-                          border: "1px solid #1b5fa8",
+                          border: "1px solid var(--theme-accent-2, #1b5fa8)",
                           color: "#fff",
                           borderRadius: "4px",
                           padding: "4px",
@@ -275,7 +275,7 @@ export function PlayoffBracket({
         <div
           style={{
             backgroundColor: "rgba(255, 215, 0, 0.15)",
-            border: "3px solid #ffd700",
+            border: "3px solid var(--theme-accent, #ffd700)",
             borderRadius: "14px",
             padding: "1.5rem",
             textAlign: "center",
@@ -288,7 +288,7 @@ export function PlayoffBracket({
             style={{
               fontSize: "1.2rem",
               fontWeight: 900,
-              color: "#ffd700",
+              color: "var(--theme-accent, #ffd700)",
               textTransform: "uppercase",
               margin: "0 0 6px 0",
             }}
