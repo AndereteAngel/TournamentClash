@@ -931,3 +931,187 @@ td {
     font-size: 8px !important;
   }
 }
+
+/* =========================================================
+   TEMAS VISUALES POR MODALIDAD
+   Solo presentación: no modifica datos ni lógica del torneo.
+========================================================= */
+
+.cr-container.theme-clash {
+  --theme-accent: #ffd700;
+  --theme-accent-2: #1b5fa8;
+  --theme-border: #2d2b4e;
+  --theme-surface: #171426;
+  --theme-deep: #0b0914;
+  --theme-glow: rgba(255, 215, 0, 0.24);
+}
+
+.cr-container.theme-futbol {
+  --theme-accent: #86efac;
+  --theme-accent-2: #15803d;
+  --theme-border: #166534;
+  --theme-surface: #10251c;
+  --theme-deep: #07140e;
+  --theme-glow: rgba(34, 197, 94, 0.24);
+  background-image:
+    radial-gradient(circle at 50% 0%, rgba(22, 101, 52, 0.36), transparent 55%),
+    linear-gradient(180deg, #07140e, #0b1711);
+}
+
+.cr-container.theme-ajedrez {
+  --theme-accent: #f3f4f6;
+  --theme-accent-2: #6b7280;
+  --theme-border: #52525b;
+  --theme-surface: #202024;
+  --theme-deep: #111113;
+  --theme-glow: rgba(255, 255, 255, 0.12);
+  background-image:
+    radial-gradient(circle at 50% 0%, rgba(113, 113, 122, 0.24), transparent 55%),
+    linear-gradient(180deg, #111113, #19191d);
+}
+
+.cr-container.theme-esports {
+  --theme-accent: #c4b5fd;
+  --theme-accent-2: #7c3aed;
+  --theme-border: #5b21b6;
+  --theme-surface: #1b1230;
+  --theme-deep: #0d0718;
+  --theme-glow: rgba(139, 92, 246, 0.24);
+  background-image:
+    radial-gradient(circle at 50% 0%, rgba(91, 33, 182, 0.34), transparent 55%),
+    linear-gradient(180deg, #0d0718, #130b20);
+}
+
+.cr-container.theme-futbol .cr-card,
+.cr-container.theme-ajedrez .cr-card,
+.cr-container.theme-esports .cr-card {
+  background: linear-gradient(135deg, var(--theme-surface), var(--theme-deep));
+  border-color: var(--theme-border);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.42), 0 0 22px var(--theme-glow);
+}
+
+.cr-container.theme-futbol .cr-card-glow,
+.cr-container.theme-ajedrez .cr-card-glow,
+.cr-container.theme-esports .cr-card-glow {
+  background: linear-gradient(90deg, var(--theme-accent-2), var(--theme-accent), var(--theme-accent-2));
+}
+
+.cr-container.theme-futbol .cr-btn-gold,
+.cr-container.theme-ajedrez .cr-btn-gold,
+.cr-container.theme-esports .cr-btn-gold {
+  background: linear-gradient(180deg, var(--theme-accent), var(--theme-accent-2));
+  border-color: var(--theme-border);
+  border-bottom-color: var(--theme-deep);
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.55);
+  box-shadow: 0 6px 0 var(--theme-deep), 0 10px 20px var(--theme-glow);
+}
+
+.cr-container.theme-futbol .cr-input,
+.cr-container.theme-ajedrez .cr-input,
+.cr-container.theme-esports .cr-input {
+  border-color: var(--theme-border);
+}
+
+.cr-container.theme-futbol .cr-input:focus,
+.cr-container.theme-ajedrez .cr-input:focus,
+.cr-container.theme-esports .cr-input:focus {
+  border-color: var(--theme-accent);
+  box-shadow: 0 0 10px var(--theme-glow);
+}
+
+.cr-container.theme-futbol .cr-title,
+.cr-container.theme-ajedrez .cr-title,
+.cr-container.theme-esports .cr-title {
+  color: var(--theme-accent);
+}
+
+.cr-container.theme-futbol .tournament-phase-badge,
+.cr-container.theme-ajedrez .tournament-phase-badge,
+.cr-container.theme-esports .tournament-phase-badge {
+  filter: saturate(0.8);
+}
+
+/* Selector visual de modalidad en el formulario */
+.game-selector {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.65rem;
+}
+
+.game-option {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  min-width: 0;
+  padding: 0.8rem;
+  border: 2px solid #353149;
+  border-radius: 12px;
+  background: rgba(12, 10, 18, 0.72);
+  color: #f9fafb;
+  text-align: left;
+  cursor: pointer;
+  transition: transform 160ms ease, border-color 160ms ease, background 160ms ease, box-shadow 160ms ease;
+}
+
+.game-option:hover {
+  transform: translateY(-2px);
+  border-color: #7c7a91;
+}
+
+.game-option.is-selected {
+  border-color: #ffd700;
+  background: linear-gradient(135deg, rgba(27, 95, 168, 0.28), rgba(255, 215, 0, 0.09));
+  box-shadow: 0 0 0 1px rgba(255, 215, 0, 0.16), 0 8px 18px rgba(0, 0, 0, 0.22);
+}
+
+.game-option-icon {
+  display: grid;
+  place-items: center;
+  flex: 0 0 42px;
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.08);
+  font-size: 1.45rem;
+}
+
+.game-option-copy {
+  min-width: 0;
+}
+
+.game-option-title {
+  display: block;
+  font-size: 0.78rem;
+  line-height: 1.25;
+  font-weight: 900;
+}
+
+.game-option-description {
+  display: block;
+  margin-top: 0.2rem;
+  color: #a1a1aa;
+  font-size: 0.65rem;
+  line-height: 1.3;
+}
+
+.cr-container.theme-futbol .game-option.is-selected {
+  border-color: #86efac;
+  background: linear-gradient(135deg, rgba(21, 128, 61, 0.32), rgba(134, 239, 172, 0.08));
+}
+
+.cr-container.theme-ajedrez .game-option.is-selected {
+  border-color: #f3f4f6;
+  background: linear-gradient(135deg, rgba(113, 113, 122, 0.3), rgba(255, 255, 255, 0.06));
+}
+
+.cr-container.theme-esports .game-option.is-selected {
+  border-color: #c4b5fd;
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.32), rgba(196, 181, 253, 0.08));
+}
+
+@media (max-width: 420px) {
+  .game-selector {
+    grid-template-columns: 1fr;
+  }
+}
