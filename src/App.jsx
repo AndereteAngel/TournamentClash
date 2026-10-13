@@ -992,9 +992,10 @@ export function TournamentClashApp() {
     email: "",
     password: "",
   });
-  const [activeView, setActiveView] = useState("home");
+  const [activeView, setActiveView] = useState("chooseMode");
   const [selectedGame, setSelectedGame] = useState(null);
   const [entryStep, setEntryStep] = useState("mode");
+  const [modePurpose, setModePurpose] = useState("entry");
   const [activeTournament, setActiveTournament] = useState(null);
   const [joinCodeInput, setJoinCodeInput] = useState("");
   const [tournaments, setTournaments] = useState([]);
@@ -1355,6 +1356,7 @@ export function TournamentClashApp() {
       const user = await buildCurrentUser(data.user);
 
       setCurrentUser(user);
+      setActiveView("home");
 
       setAuthInput({
         username: "",
@@ -1386,6 +1388,7 @@ export function TournamentClashApp() {
     const user = await buildCurrentUser(data.user);
 
     setCurrentUser(user);
+    setActiveView("home");
 
     setAuthInput({
       username: "",
@@ -1407,7 +1410,10 @@ export function TournamentClashApp() {
     sessionStorage.removeItem("tournamentclash_visita_id");
 
     setCurrentUser(null);
-    setActiveView("home");
+    setSelectedGame(null);
+    setEntryStep("mode");
+    setModePurpose("entry");
+    setActiveView("chooseMode");
     setActiveTournament(null);
     setEditingTournament(false);
     setJoinCodeInput("");
@@ -2033,7 +2039,7 @@ export function TournamentClashApp() {
           >
             <button
               onClick={() => {
-                setSelectedGame(null);
+                setModePurpose("create");
                 setActiveView("chooseMode");
               }}
               style={{
@@ -2377,9 +2383,9 @@ export function TournamentClashApp() {
         <GameModeSelector
           selectedGame={selectedGame}
           onSelect={setSelectedGame}
-          onContinue={() => setActiveView("create")}
-          onCancel={() => setActiveView("home")}
-          continueLabel="Armar este torneo"
+          onContinue={() => setActiveView(modePurpose === "create" ? "create" : "home")}
+          onCancel={modePurpose === "create" ? () => setActiveView("home") : undefined}
+          continueLabel={modePurpose === "create" ? "Armar este torneo" : "Entrar a la plataforma"}
           eyebrow="NUEVA COMPETICIÓN"
           description="Primero elegí la modalidad. Después vas a configurar los detalles del torneo."
         />
