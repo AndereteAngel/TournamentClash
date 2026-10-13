@@ -68,14 +68,14 @@ export function GameModeSelector({
           <button
             key={option.value}
             type="button"
-            className={\`game-mode-card \${option.theme} \${selectedGame === option.value ? "is-selected" : ""}\`}
+            className={`game-mode-card ${option.theme} ${selectedGame === option.value ? "is-selected" : ""}`}
             aria-pressed={selectedGame === option.value}
             onClick={() => onSelect(option.value)}
           >
-            <span className="game-mode-card-icon" aria-hidden="true">{option.icon}</span>
-            <span className="game-mode-card-title">{option.title}</span>
-            <span className="game-mode-card-description">{option.description}</span>
-            <span className="game-mode-card-check">
+            className={`game-mode-card ${option.theme} ${selectedGame === option.value ? "is-selected" : ""}`}
+            className={`game-mode-card ${option.theme} ${selectedGame === option.value ? "is-selected" : ""}`}
+            className={`game-mode-card ${option.theme} ${selectedGame === option.value ? "is-selected" : ""}`}
+            className={`game-mode-card ${option.theme} ${selectedGame === option.value ? "is-selected" : ""}`}
               {selectedGame === option.value ? "✓ Seleccionado" : "Elegir modalidad"}
             </span>
           </button>
