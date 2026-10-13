@@ -1115,3 +1115,84 @@ td {
     grid-template-columns: 1fr;
   }
 }
+
+
+/* Vista previa del tema mientras se elige la modalidad */
+.game-form-theme {
+  width: 100%;
+  max-width: 520px;
+  margin: 0 auto;
+}
+
+.game-form-theme.theme-futbol {
+  --theme-accent: #86efac;
+  --theme-accent-2: #15803d;
+  --theme-border: #166534;
+  --theme-surface: #10251c;
+  --theme-deep: #07140e;
+  --theme-glow: rgba(34, 197, 94, 0.24);
+}
+
+.game-form-theme.theme-ajedrez {
+  --theme-accent: #f3f4f6;
+  --theme-accent-2: #6b7280;
+  --theme-border: #52525b;
+  --theme-surface: #202024;
+  --theme-deep: #111113;
+  --theme-glow: rgba(255, 255, 255, 0.12);
+}
+
+.game-form-theme.theme-esports {
+  --theme-accent: #c4b5fd;
+  --theme-accent-2: #7c3aed;
+  --theme-border: #5b21b6;
+  --theme-surface: #1b1230;
+  --theme-deep: #0d0718;
+  --theme-glow: rgba(139, 92, 246, 0.24);
+}
+
+.game-form-theme.theme-futbol .cr-card,
+.game-form-theme.theme-ajedrez .cr-card,
+.game-form-theme.theme-esports .cr-card {
+  background: linear-gradient(135deg, var(--theme-surface), var(--theme-deep));
+  border-color: var(--theme-border);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.42), 0 0 22px var(--theme-glow);
+}
+
+.game-form-theme.theme-futbol .cr-card-glow,
+.game-form-theme.theme-ajedrez .cr-card-glow,
+.game-form-theme.theme-esports .cr-card-glow {
+  background: linear-gradient(90deg, var(--theme-accent-2), var(--theme-accent), var(--theme-accent-2));
+}
+
+.game-form-theme.theme-futbol .cr-btn-gold,
+.game-form-theme.theme-ajedrez .cr-btn-gold,
+.game-form-theme.theme-esports .cr-btn-gold {
+  background: linear-gradient(180deg, var(--theme-accent), var(--theme-accent-2));
+  border-color: var(--theme-border);
+  border-bottom-color: var(--theme-deep);
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.55);
+  box-shadow: 0 6px 0 var(--theme-deep), 0 10px 20px var(--theme-glow);
+}
+
+.game-form-theme.theme-futbol .cr-title,
+.game-form-theme.theme-ajedrez .cr-title,
+.game-form-theme.theme-esports .cr-title {
+  color: var(--theme-accent);
+}
+
+.game-form-theme.theme-futbol .game-option.is-selected {
+  border-color: #86efac;
+  background: linear-gradient(135deg, rgba(21, 128, 61, 0.32), rgba(134, 239, 172, 0.08));
+}
+
+.game-form-theme.theme-ajedrez .game-option.is-selected {
+  border-color: #f3f4f6;
+  background: linear-gradient(135deg, rgba(113, 113, 122, 0.3), rgba(255, 255, 255, 0.06));
+}
+
+.game-form-theme.theme-esports .game-option.is-selected {
+  border-color: #c4b5fd;
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.32), rgba(196, 181, 253, 0.08));
+}
