@@ -296,7 +296,6 @@ export function GroupStageView({
                   borderBottom: "2px solid #2d2b3b",
                 }}
               >
-                <th style={{ padding: "8px" }}>Pts</th>
                 <th
                   style={{
                     padding: "8px",
@@ -305,6 +304,7 @@ export function GroupStageView({
                 >
                   Pos / Equipo
                 </th>
+                <th style={{ padding: "8px" }}>Pts</th>
                 <th style={{ padding: "8px" }}>PJ</th>
                 <th style={{ padding: "8px" }}>G</th>
                 <th style={{ padding: "8px" }}>E</th>
@@ -330,23 +330,23 @@ export function GroupStageView({
                     <td
                       style={{
                         padding: "9px 8px",
-                        fontWeight: "900",
-                        color: "#ffd700",
-                        fontSize: "0.85rem",
-                      }}
-                    >
-                      {team.points}
-                    </td>
-
-                    <td
-                      style={{
-                        padding: "9px 8px",
                         textAlign: "left",
                         fontWeight: "bold",
                         color: isQualified ? "#4ade80" : "#fff",
                       }}
                     >
                       {idx + 1}. {team.name} {isQualified && "⭐"}
+                    </td>
+
+                    <td
+                      style={{
+                        padding: "9px 8px",
+                        fontWeight: "900",
+                        color: "#ffd700",
+                        fontSize: "0.85rem",
+                      }}
+                    >
+                      {team.points}
                     </td>
 
                     <td>{team.played}</td>
