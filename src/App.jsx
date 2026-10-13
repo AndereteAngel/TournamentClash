@@ -356,8 +356,8 @@ function AdminStats({ onBack }) {
               onClick={cargarEstadisticas}
               style={{
                 padding: "0.5rem 0.8rem",
-                background: "#1b5fa8",
-                border: "1px solid #3b82f6",
+                background: "var(--theme-accent-2, #1b5fa8)",
+                border: "1px solid var(--theme-accent-2, #3b82f6)",
                 color: "#fff",
                 borderRadius: "7px",
                 cursor: "pointer",
@@ -427,7 +427,7 @@ function AdminStats({ onBack }) {
 
             <div
               style={{
-                color: "#ffd700",
+                color: "var(--theme-accent, #ffd700)",
                 fontSize: "1.4rem",
                 fontWeight: 900,
                 marginTop: "4px",
@@ -580,7 +580,7 @@ function AdminStats({ onBack }) {
                           100
                       )}%`,
                       height: "100%",
-                      background: "linear-gradient(90deg, #1b5fa8, #60a5fa)",
+                      background: "linear-gradient(90deg, var(--theme-accent-2, #1b5fa8), var(--theme-accent, #60a5fa))",
                     }}
                   />
                 </div>
@@ -589,7 +589,7 @@ function AdminStats({ onBack }) {
                   style={{
                     width: "30px",
                     textAlign: "right",
-                    color: "#ffd700",
+                    color: "var(--theme-accent, #ffd700)",
                   }}
                 >
                   {cantidad}
@@ -646,7 +646,7 @@ function AdminStats({ onBack }) {
 
               <strong
                 style={{
-                  color: cantidad > 0 ? "#ffd700" : "#4b5563",
+                  color: cantidad > 0 ? "var(--theme-accent, #ffd700)" : "#4b5563",
                   fontSize: "0.9rem",
                 }}
               >
@@ -688,7 +688,7 @@ function AdminStats({ onBack }) {
             padding: "0.75rem",
             marginBottom: "1rem",
             borderRadius: "8px",
-            border: "1px solid #3b82f6",
+            border: "1px solid var(--theme-accent-2, #3b82f6)",
             background: "#121019",
             color: "#fff",
             outline: "none",
@@ -717,12 +717,12 @@ function AdminStats({ onBack }) {
                   alignItems: "center",
                 }}
               >
-                <strong style={{ color: "#ffd700" }}>#{index + 1}</strong>
+                <strong style={{ color: "var(--theme-accent, #ffd700)" }}>#{index + 1}</strong>
                 <div style={{ minWidth: 0 }}>
                   <strong style={{ color: "#fff", display: "block", overflowWrap: "anywhere" }}>
                     {jugador.username}
                   </strong>
-                  <span style={{ color: "#60a5fa", fontSize: "0.75rem", display: "block", overflowWrap: "anywhere" }}>
+                  <span style={{ color: "var(--theme-accent, #60a5fa)", fontSize: "0.75rem", display: "block", overflowWrap: "anywhere" }}>
                     📧 {jugador.email || "Email no registrado"}
                   </span>
                   <span style={{ color: "#9ca3af", fontSize: "0.7rem", display: "block", marginTop: "3px" }}>
@@ -734,7 +734,7 @@ function AdminStats({ onBack }) {
                 </div>
                 <div style={{ textAlign: "center" }}>
                   <span style={{ color: "#9ca3af", fontSize: "0.65rem", display: "block" }}>Visitas</span>
-                  <strong style={{ color: "#60a5fa" }}>{jugador.visitas}</strong>
+                  <strong style={{ color: "var(--theme-accent, #60a5fa)" }}>{jugador.visitas}</strong>
                 </div>
                 <div style={{ textAlign: "center" }}>
                   <span style={{ color: "#9ca3af", fontSize: "0.65rem", display: "block" }}>Dispositivo</span>
@@ -753,7 +753,7 @@ function AdminStats({ onBack }) {
                     justifySelf: "start",
                     padding: "0.45rem 0.7rem",
                     borderRadius: "6px",
-                    border: "1px solid #3b82f6",
+                    border: "1px solid var(--theme-accent-2, #3b82f6)",
                     background: "rgba(27, 95, 168, 0.25)",
                     color: "#bfdbfe",
                     cursor: "pointer",
@@ -784,11 +784,11 @@ function AdminStats({ onBack }) {
                     >
                       <div style={{ background: "#1b1a25", borderRadius: "6px", padding: "0.6rem" }}>
                         <span style={{ color: "#9ca3af", fontSize: "0.7rem", display: "block" }}>Tiempo acumulado</span>
-                        <strong style={{ color: "#ffd700" }}>{formatearDuracion(jugador.tiempo)}</strong>
+                        <strong style={{ color: "var(--theme-accent, #ffd700)" }}>{formatearDuracion(jugador.tiempo)}</strong>
                       </div>
                       <div style={{ background: "#1b1a25", borderRadius: "6px", padding: "0.6rem" }}>
                         <span style={{ color: "#9ca3af", fontSize: "0.7rem", display: "block" }}>Sesiones registradas</span>
-                        <strong style={{ color: "#60a5fa" }}>{jugador.visitas}</strong>
+                        <strong style={{ color: "var(--theme-accent, #60a5fa)" }}>{jugador.visitas}</strong>
                       </div>
                     </div>
                     {visitas
@@ -833,7 +833,7 @@ function AdminStats({ onBack }) {
                                   </span>
                                 </div>
                                 <div style={{ textAlign: "right" }}>
-                                  <span style={{ color: "#60a5fa", display: "block", fontSize: "0.75rem" }}>
+                                  <span style={{ color: "var(--theme-accent, #60a5fa)", display: "block", fontSize: "0.75rem" }}>
                                     {visita.device === "mobile" ? "📱 Móvil" : visita.device === "desktop" ? "💻 PC" : "Dispositivo —"}
                                   </span>
                                   <span style={{ color: "#9ca3af", fontSize: "0.7rem" }}>
@@ -924,7 +924,7 @@ function AdminStats({ onBack }) {
               style={{
                 padding: "0.5rem",
                 borderRadius: "6px",
-                border: "1px solid #3b82f6",
+                border: "1px solid var(--theme-accent-2, #3b82f6)",
                 background: "#121019",
                 color: "#fff",
                 colorScheme: "dark",
@@ -961,7 +961,7 @@ function AdminStats({ onBack }) {
                   </span>
                 </div>
                 <div style={{ textAlign: "right" }}>
-                  <span style={{ color: "#60a5fa", fontSize: "0.75rem", display: "block" }}>
+                  <span style={{ color: "var(--theme-accent, #60a5fa)", fontSize: "0.75rem", display: "block" }}>
                     {formatearFecha(visita.started_at || visita.created_at)}
                   </span>
                   <span style={{ color: "#9ca3af", fontSize: "0.7rem" }}>
@@ -1750,7 +1750,7 @@ export function TournamentClashApp() {
                 width: "64px",
                 height: "64px",
                 backgroundColor: "rgba(27, 95, 168, 0.4)",
-                border: "2px solid #ffd700",
+                border: "2px solid var(--theme-accent, #ffd700)",
                 borderRadius: "12px",
                 display: "flex",
                 alignItems: "center",
@@ -1903,7 +1903,7 @@ export function TournamentClashApp() {
                 style={{
                   background: "transparent",
                   border: "none",
-                  color: "#60a5fa",
+                  color: "var(--theme-accent, #60a5fa)",
                   fontSize: "0.8rem",
                   cursor: "pointer",
                   fontWeight: "bold",
@@ -1947,9 +1947,9 @@ export function TournamentClashApp() {
                 style={{
                   width: "40px",
                   height: "40px",
-                  backgroundColor: "#1b5fa8",
+                  backgroundColor: "var(--theme-accent-2, #1b5fa8)",
                   borderRadius: "8px",
-                  border: "2px solid #ffd700",
+                  border: "2px solid var(--theme-accent, #ffd700)",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
@@ -1976,7 +1976,7 @@ export function TournamentClashApp() {
                   style={{
                     fontSize: "1.1rem",
                     fontWeight: 900,
-                    color: "#ffd700",
+                    color: "var(--theme-accent, #ffd700)",
                     margin: 0,
                   }}
                 >
@@ -2012,7 +2012,7 @@ export function TournamentClashApp() {
                 marginBottom: "1rem",
                 padding: "0.75rem",
                 background: "linear-gradient(to right, #111827, #1e3a5f)",
-                border: "1px solid #60a5fa",
+                border: "1px solid var(--theme-accent, #60a5fa)",
                 color: "#fff",
                 borderRadius: "8px",
                 cursor: "pointer",
@@ -2038,7 +2038,7 @@ export function TournamentClashApp() {
               }}
               style={{
                 padding: "1rem",
-                background: "linear-gradient(to bottom, #1b5fa8, #0f3768)",
+                background: "linear-gradient(to bottom, var(--theme-accent-2, #1b5fa8), var(--theme-deep, #0f3768))",
                 border: "2px solid rgba(96, 165, 250, 0.5)",
                 borderRadius: "10px",
                 textAlign: "left",
@@ -2155,7 +2155,7 @@ export function TournamentClashApp() {
                 style={{
                   background: "transparent",
                   border: "none",
-                  color: "#60a5fa",
+                  color: "var(--theme-accent, #60a5fa)",
                   fontSize: "0.75rem",
                   cursor: "pointer",
                 }}
@@ -2267,7 +2267,7 @@ export function TournamentClashApp() {
                           style={{
                             fontSize: "10px",
                             fontWeight: "bold",
-                            color: "#ffd700",
+                            color: "var(--theme-accent, #ffd700)",
                           }}
                         >
                           👑 {t.created_by}
@@ -2307,7 +2307,7 @@ export function TournamentClashApp() {
                             fontSize: "0.75rem",
                             fontWeight: 900,
                             color:
-                              t.status === "En curso" ? "#34d399" : "#60a5fa",
+                              t.status === "En curso" ? "#34d399" : "var(--theme-accent, #60a5fa)",
                             display: "block",
                           }}
                         >
