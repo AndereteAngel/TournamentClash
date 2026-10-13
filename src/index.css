@@ -1427,3 +1427,39 @@ td {
     width: 100%;
   }
 }
+
+
+/* Identidad neutra y temas visuales globales por modalidad */
+.cr-container.theme-neutral {
+  --theme-accent: #e5e7eb;
+  --theme-accent-2: #64748b;
+  --theme-border: #334155;
+  --theme-surface: #172033;
+  --theme-deep: #0b1220;
+  --theme-glow: rgba(148, 163, 184, 0.16);
+  background: radial-gradient(ellipse at 50% 0%, rgba(71,85,105,.25), transparent 55%), linear-gradient(180deg,#0b1220,#101827 55%,#080d17);
+}
+.cr-container.theme-neutral .cr-card { background: linear-gradient(145deg,#172033,#0e1523); border-color:#334155; box-shadow:0 18px 45px rgba(0,0,0,.32); }
+.cr-container.theme-neutral .cr-card-glow { background:linear-gradient(90deg,#475569,#cbd5e1,#475569); }
+.cr-container.theme-neutral .cr-title,.cr-container.theme-neutral .cr-logo-title { color:#f1f5f9; text-shadow:none; }
+.cr-container.theme-neutral .cr-btn-gold { background:linear-gradient(135deg,#64748b,#334155); border-color:#94a3b8; border-bottom-color:#1e293b; color:#fff; box-shadow:0 5px 0 #1e293b,0 8px 20px rgba(15,23,42,.35); }
+.cr-container.theme-neutral .cr-input { background:#0f172a; border-color:#334155; color:#f8fafc; }
+.cr-container.theme-neutral .platform-mark { background:linear-gradient(145deg,#334155,#0f172a); border:1px solid #64748b; }
+.cr-container.theme-clash,.cr-container.theme-futbol,.cr-container.theme-ajedrez,.cr-container.theme-esports { color:#f8fafc; }
+.cr-container.theme-clash .cr-card,.cr-container.theme-futbol .cr-card,.cr-container.theme-ajedrez .cr-card,.cr-container.theme-esports .cr-card { border-color:var(--theme-border); }
+.cr-container.theme-clash .cr-card-glow,.cr-container.theme-futbol .cr-card-glow,.cr-container.theme-ajedrez .cr-card-glow,.cr-container.theme-esports .cr-card-glow { background:linear-gradient(90deg,var(--theme-accent-2),var(--theme-accent),var(--theme-accent-2)); }
+.cr-container.theme-clash .cr-btn-gold,.cr-container.theme-futbol .cr-btn-gold,.cr-container.theme-ajedrez .cr-btn-gold,.cr-container.theme-esports .cr-btn-gold { background:linear-gradient(135deg,var(--theme-accent-2),var(--theme-accent)); border-color:var(--theme-border); border-bottom-color:var(--theme-deep); color:#fff; box-shadow:0 5px 0 var(--theme-deep),0 8px 20px var(--theme-glow); }
+.cr-container.theme-clash .cr-input,.cr-container.theme-futbol .cr-input,.cr-container.theme-ajedrez .cr-input,.cr-container.theme-esports .cr-input { border-color:var(--theme-border); }
+.cr-container.theme-clash .cr-input:focus,.cr-container.theme-futbol .cr-input:focus,.cr-container.theme-ajedrez .cr-input:focus,.cr-container.theme-esports .cr-input:focus { border-color:var(--theme-accent); box-shadow:0 0 0 3px var(--theme-glow); }
+.cr-container.theme-clash .cr-title,.cr-container.theme-futbol .cr-title,.cr-container.theme-ajedrez .cr-title,.cr-container.theme-esports .cr-title { color:var(--theme-accent); }
+.auth-change-mode { margin-top:.65rem; padding:.45rem .7rem; border:1px solid var(--theme-border,#475569); border-radius:999px; background:rgba(255,255,255,.035); color:var(--theme-accent,#cbd5e1); font-size:.72rem; font-weight:800; cursor:pointer; }
+.platform-mark { display:grid; place-items:center; width:58px; height:58px; margin:0 auto .9rem; border-radius:17px; font-size:1.8rem; box-shadow:0 10px 28px rgba(0,0,0,.25); }
+.platform-title { margin:0; color:#f8fafc; font-size:clamp(1.8rem,7vw,2.8rem); font-weight:950; letter-spacing:-.055em; }
+.platform-title span { color:#94a3b8; }
+.game-mode-question { margin:1.2rem 0 .45rem; color:#f8fafc; font-size:clamp(1.35rem,4vw,1.8rem); font-weight:900; letter-spacing:-.025em; }
+.game-mode-footnote { margin:1.3rem 0 0; color:#64748b; font-size:.72rem; text-align:center; letter-spacing:.02em; }
+.game-mode-continue { border:1px solid #64748b; border-bottom:4px solid #1e293b; border-radius:10px; padding:.85rem 1.1rem; background:linear-gradient(135deg,#64748b,#334155); color:#fff; font-weight:900; cursor:pointer; box-shadow:0 5px 0 #1e293b,0 8px 20px rgba(15,23,42,.35); transition:transform 160ms ease,opacity 160ms ease; }
+.game-mode-continue:hover:not(:disabled) { transform:translateY(-2px); }
+.game-mode-continue:disabled { opacity:.35; cursor:not-allowed; }
+.cr-container.theme-clash .game-mode-continue,.cr-container.theme-futbol .game-mode-continue,.cr-container.theme-ajedrez .game-mode-continue,.cr-container.theme-esports .game-mode-continue { background:linear-gradient(135deg,var(--theme-accent-2),var(--theme-accent)); border-color:var(--theme-border); border-bottom-color:var(--theme-deep); box-shadow:0 5px 0 var(--theme-deep),0 8px 20px var(--theme-glow); }
+@media (max-width:600px) { .cr-container { padding:.75rem; gap:.9rem; } .game-mode-screen { padding:.35rem; } .game-mode-heading { margin-bottom:1rem; } }
