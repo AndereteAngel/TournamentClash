@@ -992,6 +992,7 @@ export function TournamentClashApp() {
     password: "",
   });
   const [activeView, setActiveView] = useState("home");
+  const [selectedGame, setSelectedGame] = useState("Clash Royale 1v1");
   const [activeTournament, setActiveTournament] = useState(null);
   const [joinCodeInput, setJoinCodeInput] = useState("");
   const [tournaments, setTournaments] = useState([]);
@@ -2013,7 +2014,10 @@ export function TournamentClashApp() {
             }}
           >
             <button
-              onClick={() => setActiveView("create")}
+              onClick={() => {
+                setSelectedGame("Clash Royale 1v1");
+                setActiveView("chooseMode");
+              }}
               style={{
                 padding: "1rem",
                 background: "linear-gradient(to bottom, #1b5fa8, #0f3768)",
@@ -2351,10 +2355,48 @@ export function TournamentClashApp() {
             )}
           </div>
         </div>
+      ) : activeView === "chooseMode" ? (
+        <div className="game-mode-screen">
+          <div className="game-mode-heading">
+            <span className="game-mode-eyebrow">TOURNAMENTCLASH</span>
+            <h2 className="cr-title">¿Qué querés jugar?</h2>
+            <p>Elegí una modalidad para personalizar la experiencia. Después vas a configurar tu torneo como siempre.</p>
+          </div>
+
+          <div className="game-mode-grid">
+            {[
+              { value: "Clash Royale 1v1", icon: "👑", title: "Clash Royale", description: "Fantasía y estrategia", theme: "theme-clash" },
+              { value: "Fútbol", icon: "⚽", title: "Fútbol", description: "Pasión por la cancha", theme: "theme-futbol" },
+              { value: "Ajedrez", icon: "♟️", title: "Ajedrez", description: "Estrategia y precisión", theme: "theme-ajedrez" },
+              { value: "Brawl Stars", icon: "💥", title: "Brawl Stars", description: "Acción y competencia", theme: "theme-esports" },
+              { value: "EA Sports FC 26", icon: "🏟️", title: "EA Sports FC 26", description: "Fútbol virtual", theme: "theme-futbol" },
+              { value: "Valorant", icon: "🎯", title: "Valorant", description: "Competencia táctica", theme: "theme-esports" },
+            ].map((option) => (
+              <button
+                key={option.value}
+                type="button"
+                className={\`game-mode-card \${option.theme} \${selectedGame === option.value ? "is-selected" : ""}\`}
+                aria-pressed={selectedGame === option.value}
+                onClick={() => setSelectedGame(option.value)}
+              >
+                <span className="game-mode-card-icon" aria-hidden="true">{option.icon}</span>
+                <span className="game-mode-card-title">{option.title}</span>
+                <span className="game-mode-card-description">{option.description}</span>
+                <span className="game-mode-card-check">{selectedGame === option.value ? "✓ Seleccionado" : "Elegir modalidad"}</span>
+              </button>
+            ))}
+          </div>
+
+          <div className="game-mode-actions">
+            <button type="button" className="game-mode-back" onClick={() => setActiveView("home")}>Volver</button>
+            <button type="button" className="cr-btn-gold game-mode-continue" onClick={() => setActiveView("create")}>Continuar con esta modalidad →</button>
+          </div>
+        </div>
       ) : activeView === "create" ? (
         <CreateTournament
+          initialGame={selectedGame}
           onSave={handleCreateTournamentSubmit}
-          onCancel={() => setActiveView("home")}
+          onCancel={() => setActiveView("chooseMode")}
         />
       ) : activeView === "edit" ? (
         <CreateTournament
