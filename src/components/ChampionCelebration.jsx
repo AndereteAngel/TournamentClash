@@ -7,15 +7,33 @@ export function ChampionCelebration({ tournament, onClose }) {
   const stats = getPlayerTournamentStats(tournament, podium.champion);
 
   return (
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label="Campeón del torneo"
+      style={{
+        position: "fixed",
+        inset: 0,
+        zIndex: 1000,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "1rem",
+        background: "rgba(3, 3, 10, 0.82)",
+        backdropFilter: "blur(6px)",
+        overflowY: "auto",
+      }}
+    >
     <section
       aria-label="Campeón del torneo"
       style={{
         width: "100%",
         maxWidth: "650px",
-        margin: "0 auto 1rem",
+        maxHeight: "calc(100vh - 2rem)",
+        overflowY: "auto",
+        margin: "auto",
         padding: "1.25rem",
         position: "relative",
-        overflow: "hidden",
         borderRadius: "18px",
         border: "2px solid #facc15",
         background: "radial-gradient(circle at 50% 0%, rgba(250,204,21,0.22), transparent 52%), linear-gradient(145deg, #171426, #080711 80%)",
@@ -23,6 +41,29 @@ export function ChampionCelebration({ tournament, onClose }) {
         textAlign: "center",
       }}
     >
+      <button
+        type="button"
+        onClick={onClose}
+        aria-label="Cerrar tarjeta del campeón"
+        title="Cerrar y ver el torneo"
+        style={{
+          position: "absolute",
+          top: "0.6rem",
+          right: "0.6rem",
+          width: "34px",
+          height: "34px",
+          borderRadius: "50%",
+          border: "1px solid rgba(255,255,255,0.25)",
+          background: "rgba(0,0,0,0.45)",
+          color: "#fff",
+          fontSize: "1.1rem",
+          fontWeight: 900,
+          cursor: "pointer",
+          zIndex: 2,
+        }}
+      >
+        ×
+      </button>
       <div style={{ fontSize: "0.7rem", fontWeight: 900, letterSpacing: "0.22em", color: "#facc15" }}>
         TOURNAMENTCLASH • CAMPEÓN
       </div>
@@ -70,8 +111,9 @@ export function ChampionCelebration({ tournament, onClose }) {
         🥇 TÍTULO REGISTRADO EN EL MEDALLERO
       </p>
       <button type="button" onClick={onClose} className="cr-btn-gold" style={{ maxWidth: "260px", padding: "0.65rem 1rem", fontSize: "0.8rem" }}>
-        Continuar
+        Ver torneo
       </button>
     </section>
+    </div>
   );
 }
