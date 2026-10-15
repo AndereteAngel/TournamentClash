@@ -2538,7 +2538,7 @@ export function TournamentClashApp() {
                 fontSize: "0.85rem",
               }}
             >
-              ✕ Volver
+              <span className="tc-close-symbol" aria-hidden="true">✕</span> Volver
             </button>
           </div>
 
