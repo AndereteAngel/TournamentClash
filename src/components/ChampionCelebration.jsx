@@ -93,7 +93,7 @@ export function ChampionCelebration({ tournament, onClose }) {
       <p style={{ margin: "0 auto 1rem", color: "#c4b5fd", fontSize: "0.85rem", overflowWrap: "anywhere" }}>
         {tournament.title || "Torneo TournamentClash"}
       </p>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, minmax(0, 1fr))", gap: "0.45rem" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(115px, 1fr))", gap: "0.45rem" }}>
         {[
           ["⚔️", "Jugados", stats.played],
           ["🏆", "Victorias", stats.wins],
