@@ -1713,25 +1713,46 @@ export function TournamentClashApp() {
   };
 
   const handleFinishTournament = async () => {
-    const finalRound = Array.isArray(activeTournament?.playoffs)
-      ? activeTournament.playoffs[activeTournament.playoffs.length - 1]
-      : null;
-    const finalMatch = Array.isArray(finalRound) && finalRound.length === 1
-      ? finalRound[0]
-      : null;
-    const champion = finalMatch?.winner ||
-      (finalMatch && finalMatch.score1 !== null && finalMatch.score1 !== undefined &&
-        finalMatch.score2 !== null && finalMatch.score2 !== undefined
-        ? Number(finalMatch.score1) > Number(finalMatch.score2)
-          ? finalMatch.team1
-          : Number(finalMatch.score2) > Number(finalMatch.score1)
-            ? finalMatch.team2
-            : null
-        : null);
+    const format = String(activeTournament?.format || "").trim().toLocaleLowerCase("es");
 
-    if (!champion || champion === "Empate (Definir)") {
-      alert("⚠️ No se puede finalizar todavía: cargá el resultado de la gran final y asegurate de que haya un ganador.");
-      return;
+    if (format === "league") {
+      const groups = Array.isArray(activeTournament?.groups) ? activeTournament.groups : [];
+      const matches = groups.flatMap((group) => group.matches || []);
+      const playedMatches = matches.filter((match) =>
+        match.score1 !== null && match.score1 !== undefined &&
+        match.score2 !== null && match.score2 !== undefined
+      );
+      if (!playedMatches.length) {
+        alert("⚠️ Para finalizar una liga tiene que haberse jugado al menos un partido.");
+        return;
+      }
+    } else {
+      const groups = Array.isArray(activeTournament?.groups) ? activeTournament.groups : [];
+      const groupMatches = groups.flatMap((group) => group.matches || []);
+      const rawPlayoffs = Array.isArray(activeTournament?.playoffs) ? activeTournament.playoffs : [];
+      const rounds = rawPlayoffs.length && !Array.isArray(rawPlayoffs[0]) ? [rawPlayoffs] : rawPlayoffs;
+      const allMatches = [...groupMatches, ...rounds.flatMap((round) => round || [])];
+      const hasIncompleteMatch = allMatches.some((match) =>
+        match.score1 === null || match.score1 === undefined ||
+        match.score2 === null || match.score2 === undefined
+      );
+
+      if (!rounds.length || hasIncompleteMatch) {
+        alert("⚠️ Para finalizar un torneo de Grupos + Playoffs, primero hay que completar todos los partidos de grupos y todas las llaves eliminatorias.");
+        return;
+      }
+
+      const finalRound = rounds[rounds.length - 1];
+      const finalMatch = Array.isArray(finalRound) && finalRound.length === 1 ? finalRound[0] : null;
+      const champion = finalMatch?.winner ||
+        (finalMatch && Number(finalMatch.score1) !== Number(finalMatch.score2)
+          ? Number(finalMatch.score1) > Number(finalMatch.score2) ? finalMatch.team1 : finalMatch.team2
+          : null);
+
+      if (!champion || champion === "Empate (Definir)") {
+        alert("⚠️ No se puede finalizar: la gran final debe tener un ganador.");
+        return;
+      }
     }
 
     const finishedObj = { ...activeTournament, status: "Finalizado" };
