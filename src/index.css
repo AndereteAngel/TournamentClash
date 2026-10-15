@@ -2418,3 +2418,71 @@ body[data-tc-theme="arena"] .tc-champion-close:hover {
   .tc-auth-card,.tc-auth-form,.tc-auth-card .tc-login-crest,.tc-auth-screen::before,.tc-auth-screen::after {animation:none !important}
   .tc-auth-form .cr-input,.tc-auth-submit {transition:none !important}
 }
+
+
+/* SISTEMA DE ICONOS ESPORTS — NAVBAR, HOME Y TORNEOS */
+.tc-icon-frame {
+  position:relative;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  flex:0 0 auto;
+  vertical-align:middle;
+  color:#93c5fd;
+  line-height:1;
+  filter:drop-shadow(0 0 5px rgba(59,130,246,.22));
+  transition:color .18s ease,filter .18s ease,transform .18s ease;
+}
+button:hover .tc-icon-frame,
+a:hover .tc-icon-frame,
+.tc-home-action:hover .tc-icon-frame {
+  color:#fcd34d;
+  filter:drop-shadow(0 0 7px rgba(251,191,36,.38));
+  transform:translateY(-1px) scale(1.04);
+}
+.tc-navbar .tc-icon-frame {
+  color:#bfdbfe;
+}
+.tc-navbar button:hover .tc-icon-frame {
+  color:#fcd34d;
+}
+.tc-home-action-icon {
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:48px;
+  height:44px;
+  margin-bottom:.7rem;
+  border:1px solid rgba(96,165,250,.62);
+  border-radius:13px;
+  color:#bfdbfe;
+  background:linear-gradient(145deg,rgba(37,99,235,.36),rgba(4,12,29,.94));
+  box-shadow:inset 0 1px rgba(255,255,255,.13),0 5px 15px rgba(0,0,0,.28),0 0 18px rgba(37,99,235,.12);
+  transition:transform .22s ease,border-color .22s ease,box-shadow .22s ease;
+}
+.tc-home-action:hover .tc-home-action-icon {
+  transform:translateY(-3px) rotate(-2deg);
+  border-color:rgba(251,191,36,.85);
+  color:#fcd34d;
+  box-shadow:inset 0 1px rgba(255,255,255,.18),0 8px 20px rgba(0,0,0,.35),0 0 22px rgba(37,99,235,.25);
+}
+.tc-home-enter-link {
+  display:inline-flex;
+  align-items:center;
+  gap:.25rem;
+  color:#93c5fd;
+  font-size:.7rem;
+  font-weight:800;
+}
+.tc-nav-copy-label {
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+}
+.tc-medal-counts { white-space:nowrap; }
+@media(max-width:480px) {
+  .tc-home-action-icon { width:42px;height:40px;margin-bottom:.55rem; }
+}
+@media(prefers-reduced-motion:reduce) {
+  .tc-icon-frame,.tc-home-action-icon { transition:none !important; }
+}
