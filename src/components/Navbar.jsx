@@ -32,7 +32,7 @@ export function Navbar({
       className="tc-navbar"
       style={{
         width: "100%",
-        maxWidth: "600px",
+        maxWidth: "100%",
         margin: "0 auto",
         background: "linear-gradient(135deg, #171426 0%, #100e1a 100%)",
         border: "3px solid #2d2b4e",
