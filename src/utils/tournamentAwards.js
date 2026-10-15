@@ -1,9 +1,36 @@
+import { calculateGroupStandings } from "./tournamentLogic";
+
 export function getTournamentPodium(tournament) {
   if (!tournament || tournament.status !== "Finalizado") return null;
 
   const rounds = Array.isArray(tournament.playoffs) ? tournament.playoffs : [];
   const finalMatch = rounds[rounds.length - 1]?.[0];
-  if (!finalMatch?.winner || finalMatch.winner === "Empate (Definir)") return null;
+
+  if (!finalMatch?.winner || finalMatch.winner === "Empate (Definir)") {
+    // En formato liga, el podio sale de la tabla cuando todos los partidos están cargados.
+    if (tournament.format !== "league") return null;
+    const groups = Array.isArray(tournament.groups) ? tournament.groups : [];
+    const allMatches = groups.flatMap((group) => group.matches || []);
+    if (!allMatches.length || allMatches.some((match) =>
+      match.score1 === null || match.score1 === undefined ||
+      match.score2 === null || match.score2 === undefined
+    )) return null;
+
+    const standings = groups.flatMap((group) =>
+      calculateGroupStandings(group.teams || [], group.matches || [])
+    ).sort((a, b) => {
+      if (b.points !== a.points) return b.points - a.points;
+      if (b.goalDifference !== a.goalDifference) return b.goalDifference - a.goalDifference;
+      return b.goalsFor - a.goalsFor;
+    });
+
+    if (standings.length < 2) return null;
+    return {
+      champion: standings[0]?.name || null,
+      runnerUp: standings[1]?.name || null,
+      bronze: standings[2]?.name ? [standings[2].name] : [],
+    };
+  }
 
   const champion = finalMatch.winner;
   const runnerUp = [finalMatch.team1, finalMatch.team2].find(
