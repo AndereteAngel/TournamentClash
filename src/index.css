@@ -2308,3 +2308,14 @@ body[data-tc-theme="arena"] .tc-champion-close:hover {
   .tc-home-action { padding:.9rem !important; }
   .tc-navbar { padding:.55rem .7rem !important; }
 }
+
+
+/* FIX: el desplegable del medallero debe quedar por encima de las cards */
+.tc-navbar {
+  position: relative !important;
+  z-index: 1000 !important;
+  overflow: visible !important;
+}
+.tc-navbar > div[style*="position: absolute"] {
+  z-index: 1100 !important;
+}
