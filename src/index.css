@@ -1515,3 +1515,40 @@ body[data-tc-theme="arena"] * { scrollbar-color: #d7192d #f4f5f7; }
   .tc-arena-hero img { height: 190px !important; aspect-ratio: 1.7 / 1 !important; }
   .tc-create-artwork img { height: 170px !important; }
 }
+
+
+/* Consistencia del tema claro también en el modo de inicio predeterminado. */
+.tc-navbar {
+  background: #ffffff !important;
+  color: #171717 !important;
+  border-color: #e0e2e7 !important;
+  box-shadow: 0 6px 20px rgba(22,25,31,.07) !important;
+}
+.tc-navbar span,
+.tc-navbar a,
+.tc-navbar button:not(.tc-theme-toggle),
+.tc-navbar button:not(.tc-theme-toggle) span {
+  color: #171717 !important;
+  text-shadow: none !important;
+}
+.tc-navbar > div:first-child {
+  background: linear-gradient(90deg, #ffffff, #d7192d, #ffffff) !important;
+}
+.cr-container [style*="background-color: rgb(12, 10, 18)"],
+.cr-container [style*="background-color: rgb(23, 20, 38)"],
+.cr-container [style*="background-color: rgb(16, 14, 26)"],
+.cr-container [style*="background: rgb(12, 10, 18)"],
+.cr-container [style*="background: rgb(23, 20, 38)"],
+.cr-container [style*="background: rgb(16, 14, 26)"] {
+  background: #fff1f2 !important;
+  color: #171717 !important;
+  border-color: #e5c7cb !important;
+}
+.cr-container [style*="#0c0a12"],
+.cr-container [style*="#171426"],
+.cr-container [style*="#100e1a"],
+.cr-container [style*="#090811"] {
+  background-color: #fff1f2 !important;
+  color: #171717 !important;
+  border-color: #e1c8cc !important;
+}
