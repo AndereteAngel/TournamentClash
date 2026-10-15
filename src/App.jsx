@@ -1861,15 +1861,6 @@ export function TournamentClashApp() {
 
             <h1 className="cr-logo-title">TournamentClash</h1>
 
-            <p
-              style={{
-                color: "#9ca3af",
-                fontSize: "0.75rem",
-                marginTop: "8px",
-              }}
-            >
-              Conectado a la Nube de Supabase ⚡
-            </p>
           </div>
 
           <form
