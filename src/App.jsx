@@ -2614,6 +2614,16 @@ export function TournamentClashApp() {
                   ⚙️ Modificar torneo
                 </button>
               )}
+              {isTournamentAdmin && String(activeTournament.format || "").trim().toLocaleLowerCase("es") === "league" && (
+                <button
+                  type="button"
+                  onClick={handleFinishTournament}
+                  className="cr-btn-gold"
+                  style={adminTournamentButtonStyle}
+                >
+                  🏁 Finalizar liga
+                </button>
+              )}
               {isAdmin && (
                 <button
                   type="button"
