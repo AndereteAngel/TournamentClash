@@ -931,3 +931,126 @@ td {
     font-size: 8px !important;
   }
 }
+
+/* =========================================================
+   TEMAS VISUALES: CLASH (original) / ARENA (blanco, rojo y negro)
+   La preferencia se conserva en el navegador del jugador.
+========================================================= */
+.tc-theme-toggle {
+  flex: 0 0 auto;
+  padding: 0.4rem 0.65rem;
+  border: 2px solid #ef4444;
+  border-bottom: 4px solid #991b1b;
+  border-radius: 8px;
+  background: linear-gradient(180deg, #ffffff 0%, #e5e5e5 100%);
+  color: #111111 !important;
+  font-size: 0.68rem;
+  font-weight: 900;
+  line-height: 1.2;
+  cursor: pointer;
+  white-space: nowrap;
+  box-shadow: 0 3px 0 rgba(0, 0, 0, 0.35);
+  transition: transform 0.15s ease, filter 0.15s ease;
+}
+
+.tc-theme-toggle:hover {
+  filter: brightness(1.06);
+  transform: translateY(-1px);
+}
+
+body[data-tc-theme="arena"] {
+  background-color: #f4f4f5 !important;
+  background-image:
+    radial-gradient(circle at 50% 0%, rgba(239, 68, 68, 0.13), transparent 48%),
+    linear-gradient(180deg, #ffffff 0%, #eeeeef 100%) !important;
+  color: #171717 !important;
+}
+
+body[data-tc-theme="arena"] .cr-container {
+  color: #171717;
+}
+
+body[data-tc-theme="arena"] .cr-card,
+body[data-tc-theme="arena"] .tc-navbar {
+  background: linear-gradient(145deg, #ffffff 0%, #f1f1f1 100%) !important;
+  border-color: #262626 !important;
+  color: #171717 !important;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.14), inset 0 2px 0 rgba(255, 255, 255, 0.9) !important;
+}
+
+body[data-tc-theme="arena"] .cr-card-glow,
+body[data-tc-theme="arena"] .tc-navbar > div:first-child {
+  background: linear-gradient(90deg, #111111, #e32636, #ffffff, #e32636, #111111) !important;
+}
+
+body[data-tc-theme="arena"] .cr-title,
+body[data-tc-theme="arena"] .cr-card h1,
+body[data-tc-theme="arena"] .cr-card h2,
+body[data-tc-theme="arena"] .cr-card h3,
+body[data-tc-theme="arena"] .cr-card label,
+body[data-tc-theme="arena"] .cr-card p,
+body[data-tc-theme="arena"] .cr-card span,
+body[data-tc-theme="arena"] .cr-card strong,
+body[data-tc-theme="arena"] .cr-card td,
+body[data-tc-theme="arena"] .cr-card th {
+  color: #171717 !important;
+  text-shadow: none !important;
+}
+
+body[data-tc-theme="arena"] .cr-logo-title {
+  color: #e32636 !important;
+  -webkit-text-stroke: 1px #111111;
+  text-shadow: 2px 2px 0 #ffffff, 4px 4px 0 rgba(0, 0, 0, 0.2) !important;
+}
+
+body[data-tc-theme="arena"] .cr-input,
+body[data-tc-theme="arena"] input,
+body[data-tc-theme="arena"] select,
+body[data-tc-theme="arena"] textarea,
+body[data-tc-theme="arena"] [style*="#0c0a12"],
+body[data-tc-theme="arena"] [style*="#171426"],
+body[data-tc-theme="arena"] [style*="#100e1a"],
+body[data-tc-theme="arena"] [style*="#090811"] {
+  background: #ffffff !important;
+  color: #171717 !important;
+  border-color: #b91c1c !important;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.08) !important;
+}
+
+body[data-tc-theme="arena"] .cr-btn-gold {
+  background: linear-gradient(180deg, #ef4444 0%, #b91c1c 100%) !important;
+  border-color: #7f1d1d !important;
+  border-bottom-color: #450a0a !important;
+  color: #ffffff !important;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.25) !important;
+  box-shadow: 0 5px 0 #450a0a, 0 8px 18px rgba(185, 28, 28, 0.18) !important;
+}
+
+body[data-tc-theme="arena"] .tc-navbar span {
+  text-shadow: none !important;
+}
+
+body[data-tc-theme="arena"] .tc-navbar button:not(.tc-theme-toggle) {
+  border-color: #b91c1c !important;
+}
+
+body[data-tc-theme="arena"] .tc-navbar button:not(.tc-theme-toggle),
+body[data-tc-theme="arena"] .tc-navbar button:not(.tc-theme-toggle) span {
+  color: #171717 !important;
+}
+
+body[data-tc-theme="arena"] table th {
+  background-color: #e5e5e5 !important;
+}
+
+body[data-tc-theme="arena"] * {
+  scrollbar-color: #b91c1c #e5e5e5;
+}
+
+@media (max-width: 640px) {
+  .tc-theme-toggle {
+    width: 100%;
+    white-space: normal;
+    font-size: 0.78rem;
+  }
+}
