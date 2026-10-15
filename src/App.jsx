@@ -2469,10 +2469,16 @@ export function TournamentClashApp() {
         </div>
         </>
       ) : activeView === "create" ? (
+        <>
+        <div className="tc-create-artwork">
+          <img src="/arena-card.svg" alt="Escenario original para crear un torneo de TournamentClash" />
+          <div><strong>PREPARÁ TU TORNEO</strong><span>La arena está lista. Que empiece la competencia.</span></div>
+        </div>
         <CreateTournament
           onSave={handleCreateTournamentSubmit}
           onCancel={() => setActiveView("home")}
         />
+        </>
       ) : activeView === "edit" ? (
         <CreateTournament
           isEditing={true}
