@@ -1577,3 +1577,137 @@ body[data-tc-theme="arena"] .tc-create-artwork strong {
     transition: none !important;
   }
 }
+
+
+/* =========================================================
+   ESPORTS PREMIUM — ANCHO Y ESTILO UNIFICADOS
+   Formularios, ingreso, estadísticas y competición.
+   Solo presentación; no modifica lógica.
+========================================================= */
+.tc-form-screen,
+.tc-competition-screen {
+  width: 100%;
+  max-width: 980px;
+  min-width: 0;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.tc-form-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 1rem;
+  animation: tc-home-enter 0.35s ease-out both;
+}
+
+.tc-form-screen .cr-card,
+.tc-competition-screen > .cr-card,
+.tc-playoffs-screen .cr-card {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  border: 1px solid rgba(96, 165, 250, 0.48) !important;
+  border-radius: 16px !important;
+  background: linear-gradient(145deg, rgba(13, 25, 46, 0.99), rgba(6, 13, 27, 0.99)) !important;
+  box-shadow: 0 16px 38px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.04) !important;
+}
+
+.tc-create-screen .tc-create-artwork {
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+}
+
+.tc-form-screen .cr-card-glow {
+  height: 3px;
+  background: linear-gradient(90deg, #2563eb, #60a5fa, #fbbf24);
+}
+
+.tc-form-screen .cr-title,
+.tc-stats-screen .cr-title {
+  color: #f8fafc !important;
+  text-shadow: 0 2px 16px rgba(59, 130, 246, 0.2);
+}
+
+.tc-form-screen .cr-input,
+.tc-form-screen input,
+.tc-form-screen select,
+.tc-form-screen textarea {
+  border-color: rgba(96, 165, 250, 0.36);
+  border-radius: 9px;
+  background-color: rgba(3, 12, 27, 0.9);
+  color: #f8fafc;
+}
+
+.tc-form-screen .cr-input:focus,
+.tc-form-screen input:focus,
+.tc-form-screen select:focus,
+.tc-form-screen textarea:focus {
+  outline: 2px solid rgba(96, 165, 250, 0.32);
+  outline-offset: 1px;
+  border-color: #60a5fa;
+}
+
+.tc-form-screen .cr-btn-gold,
+.tc-competition-screen .cr-btn-gold {
+  border-radius: 9px;
+  box-shadow: 0 5px 16px rgba(0, 0, 0, 0.22);
+}
+
+.tc-stats-screen > div {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0;
+}
+
+.tc-stats-screen .cr-card {
+  border-color: rgba(96, 165, 250, 0.35) !important;
+  background: linear-gradient(145deg, rgba(13, 25, 46, 0.99), rgba(6, 13, 27, 0.99)) !important;
+}
+
+.tc-stats-screen input,
+.tc-stats-screen select {
+  border-color: rgba(96, 165, 250, 0.34);
+  border-radius: 8px;
+}
+
+.tc-competition-screen {
+  align-items: stretch;
+}
+
+.tc-competition-screen > .cr-card {
+  max-width: 100% !important;
+}
+
+@media (max-width: 640px) {
+  .tc-form-screen,
+  .tc-competition-screen {
+    width: 100%;
+    max-width: 100%;
+    gap: 0.75rem;
+  }
+
+  .tc-form-screen .cr-card,
+  .tc-competition-screen > .cr-card,
+  .tc-playoffs-screen .cr-card {
+    padding: 1rem !important;
+    border-radius: 12px !important;
+  }
+
+  .tc-create-screen .tc-create-artwork img {
+    height: 145px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tc-form-screen,
+  .tc-form-screen *,
+  .tc-competition-screen,
+  .tc-competition-screen * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
