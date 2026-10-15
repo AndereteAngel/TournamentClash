@@ -2013,7 +2013,7 @@ export function TournamentClashApp() {
       ) : activeView === "home" ? (
         <>
         <section className="tc-arena-hero" aria-label="Bienvenido a la arena de TournamentClash">
-          <img src="/arena-banner.svg" alt="Arena fantástica de TournamentClash con corona y guerreros" />
+          <img src="https://images.unsplash.com/photo-1699500325700-761e52eb8625?auto=format&fit=crop&fm=jpg&q=85&w=2400" alt="Guerrero medieval con armadura y escudo en una arena" />
         </section>
         <div
           className="cr-card"
