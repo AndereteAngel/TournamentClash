@@ -1,3 +1,5 @@
+import { TCIcon } from "./TCIcon";
+
 export function PlayoffBracket({
   tournament,
   onUpdateTournament,
@@ -153,7 +155,7 @@ export function PlayoffBracket({
               {rounds.length === 1 ||
               (rIdx === rounds.length - 1 && rounds.length > 2)
                 ? rounds.length > 2 && rIdx === rounds.length - 1
-                  ? "🏆 Gran Final"
+                  ? "Gran Final"
                   : "Eliminación Directa"
                 : rIdx === 0
                 ? "Cuartos de Final"
@@ -196,7 +198,7 @@ export function PlayoffBracket({
                           match.winner === match.team1 ? "#4ade80" : "#fff",
                       }}
                     >
-                      {match.winner === match.team1 && "👑 "} {match.team1}
+                      {match.winner === match.team1 && <><TCIcon name="crown" size={13} /> </>} {match.team1}
                     </span>
 
                     <div
