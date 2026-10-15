@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { CreateTournament } from "./components/CreateTournament";
 import { GroupStageView } from "./components/GroupStageView";
 import { Navbar } from "./components/Navbar";
+import { ChampionCelebration } from "./components/ChampionCelebration";
 import { PlayoffBracket } from "./components/PlayoffBracket";
 import { supabase } from "./supabaseClient";
 
@@ -998,6 +999,7 @@ export function TournamentClashApp() {
   });
   const [activeView, setActiveView] = useState("home");
   const [activeTournament, setActiveTournament] = useState(null);
+  const [celebrationTournament, setCelebrationTournament] = useState(null);
   const [joinCodeInput, setJoinCodeInput] = useState("");
   const [tournaments, setTournaments] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -1710,6 +1712,7 @@ export function TournamentClashApp() {
     };
 
     handleUpdateTournamentInSupabase(finishedObj);
+    setCelebrationTournament(finishedObj);
 
     setActiveView("home");
     setActiveTournament(null);
@@ -1741,6 +1744,7 @@ export function TournamentClashApp() {
     }
 
     const torneoFinalizado = { ...activeTournament, status: "Finalizado" };
+    setCelebrationTournament(torneoFinalizado);
     setTournaments((prev) =>
       prev.map((t) => (t.id === torneoFinalizado.id ? torneoFinalizado : t))
     );
@@ -1757,6 +1761,14 @@ export function TournamentClashApp() {
           currentTitle={activeTournament?.title}
           tournamentCode={activeTournament?.code}
           currentUser={currentUser}
+          tournaments={tournaments}
+        />
+      )}
+
+      {currentUser && celebrationTournament && (
+        <ChampionCelebration
+          tournament={celebrationTournament}
+          onClose={() => setCelebrationTournament(null)}
         />
       )}
 
