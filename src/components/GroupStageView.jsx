@@ -1,4 +1,5 @@
 import { calculateGroupStandings } from "../utils/tournamentLogic";
+import { TCIcon } from "./TCIcon";
 import { useState } from "react";
 
 export function GroupStageView({
@@ -199,7 +200,7 @@ export function GroupStageView({
             }}
           >
             <h3 style={{ margin: 0, color: "#fff", fontSize: "0.95rem", fontWeight: 900 }}>
-              📋 Mis partidos
+              <TCIcon name="calendar" size={17} /> Mis partidos
             </h3>
             {playerGroup && (
               <span style={{ color: "#93c5fd", fontSize: "0.75rem", fontWeight: 700 }}>
@@ -295,7 +296,7 @@ export function GroupStageView({
                 </div>
               ) : (
                 <p style={{ margin: 0, color: "#4ade80", fontSize: "0.8rem", fontWeight: 700 }}>
-                  🏆 ¡Completaste todos tus partidos de esta fase!
+                  <TCIcon name="trophy" size={17} /> ¡Completaste todos tus partidos de esta fase!
                 </p>
               )}
             </>
