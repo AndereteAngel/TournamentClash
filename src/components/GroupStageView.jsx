@@ -19,21 +19,34 @@ export function GroupStageView({
   // Solo el creador del torneo puede cargar/modificar resultados
   const isCreator = currentUser?.id === tournament.created_by_user_id;
 
-  // Resumen personal: identifica los encuentros del jugador por su nombre de usuario.
+  // El resumen se calcula según el participante elegido en el torneo,
+  // que puede tener un nombre distinto al usuario con el que inició sesión.
   const normalizarNombre = (nombre) =>
     String(nombre || "").trim().toLocaleLowerCase("es");
 
+  const tournamentParticipants = [
+    ...new Set(tournament.groups.flatMap((group) => group.teams)),
+  ];
+
+  const [selectedParticipant, setSelectedParticipant] = useState(() => {
+    const usernameMatch = tournamentParticipants.find(
+      (participant) =>
+        normalizarNombre(participant) === normalizarNombre(currentUser?.username)
+    );
+    return usernameMatch || "";
+  });
+
   const playerGroup = tournament.groups.find((group) =>
     group.teams.some(
-      (team) => normalizarNombre(team) === normalizarNombre(currentUser?.username)
+      (team) => normalizarNombre(team) === normalizarNombre(selectedParticipant)
     )
   );
 
   const playerMatches = playerGroup
     ? playerGroup.matches.filter(
         (match) =>
-          normalizarNombre(match.team1) === normalizarNombre(currentUser?.username) ||
-          normalizarNombre(match.team2) === normalizarNombre(currentUser?.username)
+          normalizarNombre(match.team1) === normalizarNombre(selectedParticipant) ||
+          normalizarNombre(match.team2) === normalizarNombre(selectedParticipant)
       )
     : [];
 
@@ -194,9 +207,37 @@ export function GroupStageView({
             )}
           </div>
 
-          {!playerGroup ? (
+          <label style={{ display: "block", color: "#d1d5db", fontSize: "0.75rem", fontWeight: 700, marginBottom: "0.4rem" }}>
+            Elegí tu participante del torneo
+          </label>
+          <select
+            value={selectedParticipant}
+            onChange={(e) => setSelectedParticipant(e.target.value)}
+            style={{
+              width: "100%",
+              boxSizing: "border-box",
+              marginBottom: "0.85rem",
+              padding: "0.65rem 0.75rem",
+              borderRadius: "8px",
+              border: "1px solid rgba(96,165,250,0.45)",
+              background: "#15141c",
+              color: "#fff",
+              fontSize: "0.85rem",
+            }}
+          >
+            <option value="">Seleccioná tu nombre en la lista del torneo</option>
+            {tournamentParticipants.map((participant) => (
+              <option key={participant} value={participant}>{participant}</option>
+            ))}
+          </select>
+
+          {!selectedParticipant ? (
+            <p style={{ margin: 0, color: "#93c5fd", fontSize: "0.8rem", lineHeight: 1.5 }}>
+              Seleccioná el nombre con el que figurás en este torneo para ver tus partidos jugados y pendientes.
+            </p>
+          ) : !playerGroup ? (
             <p style={{ margin: 0, color: "#fbbf24", fontSize: "0.8rem", lineHeight: 1.5 }}>
-              No encontramos tu usuario en los participantes de este torneo. El organizador debe verificar que el nombre de la lista coincida con tu usuario: <strong>{currentUser.username}</strong>.
+              No encontramos partidos para <strong>{selectedParticipant}</strong> en esta fase.
             </p>
           ) : (
             <>
@@ -223,7 +264,7 @@ export function GroupStageView({
                   </p>
                   {pendingMatches.map((match) => {
                     const opponent =
-                      normalizarNombre(match.team1) === normalizarNombre(currentUser.username)
+                      normalizarNombre(match.team1) === normalizarNombre(selectedParticipant)
                         ? match.team2
                         : match.team1;
 
