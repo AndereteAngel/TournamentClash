@@ -1976,3 +1976,30 @@ body[data-tc-theme="arena"] .tc-champion-close:hover {
     transform: none !important;
   }
 }
+
+
+/* AJUSTE DE ANCHO — PANTALLA UNIRSE
+   El banner y la tarjeta comparten exactamente el mismo ancho. */
+.tc-form-screen.tc-join-screen {
+  width: 100%;
+  max-width: 520px;
+  margin-left: auto;
+  margin-right: auto;
+  align-items: stretch;
+}
+
+.tc-join-screen .tc-join-artwork,
+.tc-join-screen > .cr-card {
+  box-sizing: border-box;
+  width: 100% !important;
+  max-width: 100% !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+@media (max-width: 560px) {
+  .tc-form-screen.tc-join-screen {
+    width: 100%;
+    max-width: 100%;
+  }
+}
