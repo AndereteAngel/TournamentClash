@@ -1843,7 +1843,7 @@ export function TournamentClashApp() {
 
       {!currentUser ? (
         <div className="tc-form-screen tc-auth-screen">
-        <div className="cr-card" style={{ margin: "auto" }}>
+        <div className="cr-card tc-auth-card" style={{ margin: "auto" }}>
           <div className="cr-card-glow"></div>
 
           <div
@@ -1858,11 +1858,13 @@ export function TournamentClashApp() {
               className="tc-login-crest"
             />
 
+            <div className="tc-auth-kicker"><span></span> ARENA COMPETITIVA ONLINE <span></span></div>
             <h1 className="cr-logo-title">TournamentClash</h1>
-
+            <p className="tc-auth-tagline">{authMode === "login" ? "Tu próxima victoria empieza acá." : "Creá tu perfil. Entrá en la leyenda."}</p>
           </div>
 
           <form
+            className="tc-auth-form"
             onSubmit={handleAuthSubmit}
             style={{
               display: "flex",
@@ -1882,7 +1884,7 @@ export function TournamentClashApp() {
                     marginBottom: "4px",
                   }}
                 >
-                  Alias
+                  <span className="tc-auth-field-icon" aria-hidden="true">♛</span> Alias
                 </label>
 
                 <input
@@ -1912,7 +1914,7 @@ export function TournamentClashApp() {
                   marginBottom: "4px",
                 }}
               >
-                Email
+                <span className="tc-auth-field-icon" aria-hidden="true">✉</span> Email
               </label>
 
               <input
@@ -1941,7 +1943,7 @@ export function TournamentClashApp() {
                   marginBottom: "4px",
                 }}
               >
-                Contraseña
+                <span className="tc-auth-field-icon" aria-hidden="true">◆</span> Contraseña
               </label>
 
               <input
@@ -1961,7 +1963,7 @@ export function TournamentClashApp() {
 
             <button
               type="submit"
-              className="cr-btn-gold"
+              className="cr-btn-gold tc-auth-submit"
               style={{
                 marginTop: "0.5rem",
               }}
