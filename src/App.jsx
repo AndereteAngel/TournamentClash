@@ -2498,6 +2498,9 @@ export function TournamentClashApp() {
         </div>
       ) : activeView === "join" ? (
         <div className="tc-form-screen tc-join-screen">
+        <div className="tc-join-artwork">
+          <img src="/tournament-join.svg" alt="Arena esports de TournamentClash para unirse a una competencia" />
+        </div>
         <div
           className="cr-card"
           style={{
