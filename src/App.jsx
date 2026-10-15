@@ -2471,7 +2471,7 @@ export function TournamentClashApp() {
       ) : activeView === "create" ? (
         <>
         <div className="tc-create-artwork">
-          <img src="/arena-card.svg" alt="Escenario original para crear un torneo de TournamentClash" />
+          <img src="https://images.unsplash.com/photo-1768466588276-7dcf1c3472fb?auto=format&fit=crop&fm=jpg&q=85&w=1600" alt="Espada, casco y escudo de un campeón" />
           <div><strong>PREPARÁ TU TORNEO</strong><span>La arena está lista. Que empiece la competencia.</span></div>
         </div>
         <CreateTournament
