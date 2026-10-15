@@ -1666,7 +1666,7 @@ export function TournamentClashApp() {
     }
 
     setActiveTournament(found);
-    setShowChampionCard(found.status === "Finalizado");
+    setShowChampionCard(String(found.status || "").trim().toLocaleLowerCase("es") === "finalizado");
 
     if (found.playoffs && found.playoffs.length > 0) {
       setActiveView("playoffs");
@@ -1764,7 +1764,7 @@ export function TournamentClashApp() {
         />
       )}
 
-      {currentUser && activeTournament && showChampionCard && activeTournament.status === "Finalizado" && (
+      {currentUser && activeTournament && showChampionCard && String(activeTournament.status || "").trim().toLocaleLowerCase("es") === "finalizado" && (
         <ChampionCelebration
           tournament={activeTournament}
           onClose={() => setShowChampionCard(false)}
@@ -2225,7 +2225,7 @@ export function TournamentClashApp() {
                     key={t.id}
                     onClick={() => {
                       setActiveTournament(t);
-                      setShowChampionCard(t.status === "Finalizado");
+                      setShowChampionCard(String(t.status || "").trim().toLocaleLowerCase("es") === "finalizado");
 
                       setActiveView(
                         t.playoffs && t.playoffs.length > 0
