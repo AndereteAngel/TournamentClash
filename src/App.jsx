@@ -1705,6 +1705,38 @@ export function TournamentClashApp() {
 
   const isAdmin = currentUser?.id === ADMIN_UID;
 
+  const handleAdminForceFinishTournament = async () => {
+    if (!isAdmin || !activeTournament?.id) {
+      alert("❌ Solo el administrador puede finalizar torneos.");
+      return;
+    }
+
+    const confirmar = window.confirm(
+      `¿Querés finalizar el torneo "${activeTournament.title}" ahora? Esta acción no requiere cargar todos los resultados.`
+    );
+
+    if (!confirmar) return;
+
+    const { error } = await supabase
+      .from("tournaments")
+      .update({ status: "Finalizado" })
+      .eq("id", activeTournament.id);
+
+    if (error) {
+      console.error("Error al finalizar el torneo:", error);
+      alert("❌ No se pudo finalizar el torneo. Intentá nuevamente.");
+      return;
+    }
+
+    const torneoFinalizado = { ...activeTournament, status: "Finalizado" };
+    setTournaments((prev) =>
+      prev.map((t) => (t.id === torneoFinalizado.id ? torneoFinalizado : t))
+    );
+    setActiveView("home");
+    setActiveTournament(null);
+    alert("✅ Torneo finalizado correctamente.");
+  };
+
   return (
     <div className="cr-container">
       {currentUser && (
@@ -2460,43 +2492,66 @@ export function TournamentClashApp() {
             gap: "1rem",
           }}
         >
-          {isTournamentAdmin && (
+          {(isTournamentAdmin || isAdmin) && activeTournament.status !== "Finalizado" && (
             <div
               style={{
                 width: "100%",
                 maxWidth: "900px",
                 display: "flex",
                 justifyContent: "flex-end",
+                alignItems: "center",
+                gap: "0.5rem",
+                flexWrap: "wrap",
               }}
             >
-              <button
-                onClick={() => {
-                  if (tournamentHasResults(activeTournament)) {
-                    alert(
-                      "🔒 Este torneo ya tiene resultados cargados. No se puede modificar su organización."
-                    );
-                    return;
-                  }
+              {isTournamentAdmin && (
+                <button
+                  onClick={() => {
+                    if (tournamentHasResults(activeTournament)) {
+                      alert(
+                        "🔒 Este torneo ya tiene resultados cargados. No se puede modificar su organización."
+                      );
+                      return;
+                    }
 
-                  setEditingTournament(true);
-
-                  setActiveView("edit");
-                }}
-                className="cr-btn-gold"
-                style={{
-                  width: "auto",
-                  maxWidth: "fit-content",
-                  padding: "0.45rem 0.75rem",
-                  fontSize: "0.68rem",
-                  lineHeight: 1.2,
-                  borderWidth: "2px",
-                  borderBottomWidth: "3px",
-                  borderRadius: "8px",
-                  boxShadow: "0 3px 0 #422200, 0 5px 10px rgba(255,156,0,0.2)",
-                }}
-              >
-                ⚙️ Modificar torneo
-              </button>
+                    setEditingTournament(true);
+                    setActiveView("edit");
+                  }}
+                  className="cr-btn-gold"
+                  style={{
+                    width: "auto",
+                    maxWidth: "fit-content",
+                    padding: "0.45rem 0.75rem",
+                    fontSize: "0.68rem",
+                    lineHeight: 1.2,
+                    borderWidth: "2px",
+                    borderBottomWidth: "3px",
+                    borderRadius: "8px",
+                    boxShadow: "0 3px 0 #422200, 0 5px 10px rgba(255,156,0,0.2)",
+                  }}
+                >
+                  ⚙️ Modificar torneo
+                </button>
+              )}
+              {isAdmin && (
+                <button
+                  type="button"
+                  onClick={handleAdminForceFinishTournament}
+                  style={{
+                    width: "auto",
+                    padding: "0.45rem 0.75rem",
+                    background: "linear-gradient(135deg, #991b1b, #7f1d1d)",
+                    border: "1px solid #f87171",
+                    borderRadius: "8px",
+                    color: "#fff",
+                    fontSize: "0.68rem",
+                    fontWeight: "bold",
+                    cursor: "pointer",
+                  }}
+                >
+                  🏁 Finalizar torneo
+                </button>
+              )}
             </div>
           )}
 
@@ -2508,11 +2563,49 @@ export function TournamentClashApp() {
           />
         </div>
       ) : (
-        <PlayoffBracket
-          tournament={activeTournament}
-          onUpdateTournament={handleUpdateTournamentInSupabase}
-          onFinishTournament={handleFinishTournament}
-        />
+        <div
+          style={{
+            width: "100%",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: "1rem",
+          }}
+        >
+          {isAdmin && activeTournament.status !== "Finalizado" && (
+            <div
+              style={{
+                width: "100%",
+                maxWidth: "600px",
+                display: "flex",
+                justifyContent: "flex-end",
+              }}
+            >
+              <button
+                type="button"
+                onClick={handleAdminForceFinishTournament}
+                style={{
+                  width: "auto",
+                  padding: "0.45rem 0.75rem",
+                  background: "linear-gradient(135deg, #991b1b, #7f1d1d)",
+                  border: "1px solid #f87171",
+                  borderRadius: "8px",
+                  color: "#fff",
+                  fontSize: "0.68rem",
+                  fontWeight: "bold",
+                  cursor: "pointer",
+                }}
+              >
+                🏁 Finalizar torneo
+              </button>
+            </div>
+          )}
+          <PlayoffBracket
+            tournament={activeTournament}
+            onUpdateTournament={handleUpdateTournamentInSupabase}
+            onFinishTournament={handleFinishTournament}
+          />
+        </div>
       )}
     </div>
   );
