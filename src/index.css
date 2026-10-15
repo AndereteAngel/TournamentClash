@@ -1979,10 +1979,11 @@ body[data-tc-theme="arena"] .tc-champion-close:hover {
 
 
 /* AJUSTE DE ANCHO — PANTALLA UNIRSE
-   El banner y la tarjeta comparten exactamente el mismo ancho. */
+   Mantener el mismo ancho de página que las demás vistas principales. */
 .tc-form-screen.tc-join-screen {
   width: 100%;
-  max-width: 520px;
+  max-width: 980px;
+  min-width: 0;
   margin-left: auto;
   margin-right: auto;
   align-items: stretch;
@@ -1997,7 +1998,7 @@ body[data-tc-theme="arena"] .tc-champion-close:hover {
   margin-right: auto !important;
 }
 
-@media (max-width: 560px) {
+@media (max-width: 640px) {
   .tc-form-screen.tc-join-screen {
     width: 100%;
     max-width: 100%;
