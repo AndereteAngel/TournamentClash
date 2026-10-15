@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { TCIcon } from "./TCIcon";
 
 export function CreateTournament({
   onSave,
@@ -113,7 +114,7 @@ export function CreateTournament({
             textAlign: "left",
           }}
         >
-          {isEditing ? "⚙️ Modificar Torneo" : "⚔️ Configurar Torneo"}
+          {isEditing ? <><TCIcon name="settings" size={20} /> Modificar Torneo</> : <><TCIcon name="sword" size={20} /> Configurar Torneo</>}
         </h2>
 
         <button
@@ -148,7 +149,7 @@ export function CreateTournament({
             lineHeight: "1.4",
           }}
         >
-          ℹ️ Modificá solamente los datos que necesites. Los partidos y
+          <TCIcon name="info" size={15} /> Modificá solamente los datos que necesites. Los partidos y
           resultados existentes se conservarán siempre que no hagas un cambio
           estructural.
         </div>
