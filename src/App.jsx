@@ -1842,6 +1842,7 @@ export function TournamentClashApp() {
       )}
 
       {!currentUser ? (
+        <div className="tc-form-screen tc-auth-screen">
         <div className="cr-card" style={{ margin: "auto" }}>
           <div className="cr-card-glow"></div>
 
@@ -1995,8 +1996,11 @@ export function TournamentClashApp() {
             </div>
           </form>
         </div>
+        </div>
       ) : activeView === "stats" && isAdmin ? (
-        <AdminStats onBack={() => setActiveView("home")} />
+        <div className="tc-form-screen tc-stats-screen">
+          <AdminStats onBack={() => setActiveView("home")} />
+        </div>
       ) : activeView === "home" ? (
         <div className="tc-home-screen">
         <section className="tc-arena-hero" aria-label="Bienvenido a la arena de TournamentClash">
@@ -2470,7 +2474,7 @@ export function TournamentClashApp() {
         </div>
         </div>
       ) : activeView === "create" ? (
-        <>
+        <div className="tc-form-screen tc-create-screen">
         <div className="tc-create-artwork">
           <img src="https://cdn.wallpapersafari.com/57/78/NM76Ts.jpg" alt="Arena legendaria de videojuego con torres, puentes y estatuas" />
           <div><strong>PREPARÁ TU TORNEO</strong><span>La arena está lista. Que empiece la competencia.</span></div>
@@ -2479,8 +2483,9 @@ export function TournamentClashApp() {
           onSave={handleCreateTournamentSubmit}
           onCancel={() => setActiveView("home")}
         />
-        </>
+        </div>
       ) : activeView === "edit" ? (
+        <div className="tc-form-screen tc-edit-screen">
         <CreateTournament
           isEditing={true}
           initialData={activeTournament}
@@ -2490,7 +2495,9 @@ export function TournamentClashApp() {
             setActiveView("groups");
           }}
         />
+        </div>
       ) : activeView === "join" ? (
+        <div className="tc-form-screen tc-join-screen">
         <div
           className="cr-card"
           style={{
@@ -2580,6 +2587,7 @@ export function TournamentClashApp() {
               Ingresar a la Batalla ⚔️
             </button>
           </form>
+        </div>
         </div>
       ) : activeView === "groups" ? (
         <div
