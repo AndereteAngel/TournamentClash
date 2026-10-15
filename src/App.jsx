@@ -2593,7 +2593,7 @@ export function TournamentClashApp() {
             </div>
           )}
         </div>
-      )
+      )}
     </div>
   );
 }
