@@ -7,6 +7,8 @@ export function Navbar({
   tournamentCode,
   currentUser,
   tournaments = [],
+  visualTheme = "clash",
+  onToggleTheme,
 }) {
   const [copied, setCopied] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -27,6 +29,7 @@ export function Navbar({
 
   return (
     <div
+      className="tc-navbar"
       style={{
         width: "100%",
         maxWidth: "600px",
@@ -193,6 +196,15 @@ export function Navbar({
         </button>
 
         <button
+          type="button"
+          className="tc-theme-toggle"
+          onClick={onToggleTheme}
+          aria-label={visualTheme === "clash" ? "Cambiar a tema blanco, rojo y negro" : "Volver al tema Clash"}
+          title={visualTheme === "clash" ? "Cambiar colores: blanco, rojo y negro" : "Volver a los colores Clash"}
+        >
+          {visualTheme === "clash" ? "⚪🔴⚫ Arena" : "👑 Clash"}
+        </button>
+        <button
           onClick={onGoHome}
           style={{
             padding: "0.4rem 0.75rem",
@@ -308,6 +320,16 @@ export function Navbar({
             🏅 Medallero: 🥇 {medals.gold} · 🥈 {medals.silver} · 🥉 {medals.bronze}
           </button>
 
+          <button
+            type="button"
+            className="tc-theme-toggle"
+            onClick={() => {
+              onToggleTheme?.();
+              setMenuOpen(false);
+            }}
+          >
+            {visualTheme === "clash" ? "⚪🔴⚫ Cambiar a blanco, rojo y negro" : "👑 Volver al tema Clash"}
+          </button>
           <button
             onClick={() => {
               setMenuOpen(false);
