@@ -2583,6 +2583,7 @@ export function TournamentClashApp() {
         </div>
       ) : activeView === "groups" ? (
         <div
+          className="tc-competition-screen tc-groups-screen"
           style={{
             width: "100%",
             display: "flex",
@@ -2655,6 +2656,7 @@ export function TournamentClashApp() {
         </div>
       ) : (
         <div
+          className="tc-competition-screen tc-playoffs-screen"
           style={{
             width: "100%",
             display: "flex",
