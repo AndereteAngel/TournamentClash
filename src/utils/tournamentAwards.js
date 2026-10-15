@@ -1,14 +1,35 @@
 import { calculateGroupStandings } from "./tournamentLogic";
 
 export function getTournamentPodium(tournament) {
-  if (!tournament || tournament.status !== "Finalizado") return null;
+  const status = String(tournament?.status || "").trim().toLocaleLowerCase("es");
+  if (!tournament || status !== "finalizado") return null;
 
-  const rounds = Array.isArray(tournament.playoffs) ? tournament.playoffs : [];
-  const finalMatch = rounds[rounds.length - 1]?.[0];
+  // Supabase guarda normalmente las llaves como una lista de rondas; también
+  // toleramos una ronda plana para no perder el campeón por diferencias de formato.
+  const rawPlayoffs = Array.isArray(tournament.playoffs) ? tournament.playoffs : [];
+  const rounds = rawPlayoffs.length && !Array.isArray(rawPlayoffs[0])
+    ? [rawPlayoffs]
+    : rawPlayoffs;
+  const finalRound = rounds[rounds.length - 1];
+  const finalMatch = Array.isArray(finalRound) && finalRound.length
+    ? finalRound[0]
+    : null;
+  const computedWinner = finalMatch?.winner ||
+    (finalMatch && finalMatch.score1 !== null && finalMatch.score1 !== undefined &&
+      finalMatch.score2 !== null && finalMatch.score2 !== undefined
+      ? Number(finalMatch.score1) > Number(finalMatch.score2)
+        ? finalMatch.team1
+        : Number(finalMatch.score2) > Number(finalMatch.score1)
+          ? finalMatch.team2
+          : null
+      : null);
+  const championFromFinal = computedWinner && computedWinner !== "Empate (Definir)"
+    ? computedWinner
+    : null;
 
-  if (!finalMatch?.winner || finalMatch.winner === "Empate (Definir)") {
+  if (!championFromFinal) {
     // En formato liga, el podio sale de la tabla cuando todos los partidos están cargados.
-    if (tournament.format !== "league") return null;
+    if (String(tournament.format || "").trim().toLocaleLowerCase("es") !== "league") return null;
     const groups = Array.isArray(tournament.groups) ? tournament.groups : [];
     const allMatches = groups.flatMap((group) => group.matches || []);
     if (!allMatches.length || allMatches.some((match) =>
@@ -32,7 +53,7 @@ export function getTournamentPodium(tournament) {
     };
   }
 
-  const champion = finalMatch.winner;
+  const champion = championFromFinal;
   const runnerUp = [finalMatch.team1, finalMatch.team2].find(
     (name) => name && name !== champion && name !== "Pasaje Directo"
   );
@@ -41,9 +62,18 @@ export function getTournamentPodium(tournament) {
   const bronze = [];
   if (Array.isArray(semifinalRound) && semifinalRound.length === 2) {
     semifinalRound.forEach((match) => {
-      if (!match?.winner || match.winner === "Empate (Definir)") return;
+      const matchWinner = match?.winner ||
+        (match && match.score1 !== null && match.score1 !== undefined &&
+          match.score2 !== null && match.score2 !== undefined
+          ? Number(match.score1) > Number(match.score2)
+            ? match.team1
+            : Number(match.score2) > Number(match.score1)
+              ? match.team2
+              : null
+          : null);
+      if (!matchWinner || matchWinner === "Empate (Definir)") return;
       const loser = [match.team1, match.team2].find(
-        (name) => name && name !== match.winner && name !== "Pasaje Directo"
+        (name) => name && name !== matchWinner && name !== "Pasaje Directo"
       );
       if (loser && loser !== champion && loser !== runnerUp) bronze.push(loser);
     });
