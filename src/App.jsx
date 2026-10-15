@@ -999,7 +999,7 @@ export function TournamentClashApp() {
   });
   const [activeView, setActiveView] = useState("home");
   const [activeTournament, setActiveTournament] = useState(null);
-  const [celebrationTournament, setCelebrationTournament] = useState(null);
+  const [showChampionCard, setShowChampionCard] = useState(false);
   const [joinCodeInput, setJoinCodeInput] = useState("");
   const [tournaments, setTournaments] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -1666,6 +1666,7 @@ export function TournamentClashApp() {
     }
 
     setActiveTournament(found);
+    setShowChampionCard(found.status === "Finalizado");
 
     if (found.playoffs && found.playoffs.length > 0) {
       setActiveView("playoffs");
@@ -1712,7 +1713,6 @@ export function TournamentClashApp() {
     };
 
     handleUpdateTournamentInSupabase(finishedObj);
-    setCelebrationTournament(finishedObj);
 
     setActiveView("home");
     setActiveTournament(null);
@@ -1744,7 +1744,6 @@ export function TournamentClashApp() {
     }
 
     const torneoFinalizado = { ...activeTournament, status: "Finalizado" };
-    setCelebrationTournament(torneoFinalizado);
     setTournaments((prev) =>
       prev.map((t) => (t.id === torneoFinalizado.id ? torneoFinalizado : t))
     );
@@ -1765,10 +1764,10 @@ export function TournamentClashApp() {
         />
       )}
 
-      {currentUser && celebrationTournament && (
+      {currentUser && activeTournament && showChampionCard && activeTournament.status === "Finalizado" && (
         <ChampionCelebration
-          tournament={celebrationTournament}
-          onClose={() => setCelebrationTournament(null)}
+          tournament={activeTournament}
+          onClose={() => setShowChampionCard(false)}
         />
       )}
 
