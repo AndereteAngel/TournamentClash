@@ -1732,10 +1732,12 @@ export function TournamentClashApp() {
       const rawPlayoffs = Array.isArray(activeTournament?.playoffs) ? activeTournament.playoffs : [];
       const rounds = rawPlayoffs.length && !Array.isArray(rawPlayoffs[0]) ? [rawPlayoffs] : rawPlayoffs;
       const allMatches = [...groupMatches, ...rounds.flatMap((round) => round || [])];
-      const hasIncompleteMatch = allMatches.some((match) =>
-        match.score1 === null || match.score1 === undefined ||
-        match.score2 === null || match.score2 === undefined
-      );
+      const hasIncompleteMatch = allMatches.some((match) => {
+        const isBye = match.team1 === "Pasaje Directo" || match.team2 === "Pasaje Directo";
+        if (isBye) return false;
+        return match.score1 === null || match.score1 === undefined ||
+          match.score2 === null || match.score2 === undefined;
+      });
 
       if (!rounds.length || hasIncompleteMatch) {
         alert("⚠️ Para finalizar un torneo de Grupos + Playoffs, primero hay que completar todos los partidos de grupos y todas las llaves eliminatorias.");
