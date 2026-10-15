@@ -1629,6 +1629,14 @@ export function TournamentClashApp() {
   };
 
   const handleUpdateTournamentInSupabase = async (updatedTournament) => {
+    const currentStatus = String(activeTournament?.status || updatedTournament?.status || "")
+      .trim()
+      .toLocaleLowerCase("es");
+    if (currentStatus === "finalizado") {
+      alert("🔒 Este torneo ya está finalizado. No se pueden modificar sus resultados.");
+      return;
+    }
+
     setActiveTournament(updatedTournament);
 
     const { error } = await supabase
@@ -1704,18 +1712,44 @@ export function TournamentClashApp() {
     setActiveView("playoffs");
   };
 
-  const handleFinishTournament = () => {
-    alert("¡Torneo finalizado con éxito! El campeón ha sido coronado.");
+  const handleFinishTournament = async () => {
+    const finalRound = Array.isArray(activeTournament?.playoffs)
+      ? activeTournament.playoffs[activeTournament.playoffs.length - 1]
+      : null;
+    const finalMatch = Array.isArray(finalRound) && finalRound.length === 1
+      ? finalRound[0]
+      : null;
+    const champion = finalMatch?.winner ||
+      (finalMatch && finalMatch.score1 !== null && finalMatch.score1 !== undefined &&
+        finalMatch.score2 !== null && finalMatch.score2 !== undefined
+        ? Number(finalMatch.score1) > Number(finalMatch.score2)
+          ? finalMatch.team1
+          : Number(finalMatch.score2) > Number(finalMatch.score1)
+            ? finalMatch.team2
+            : null
+        : null);
 
-    const finishedObj = {
-      ...activeTournament,
-      status: "Finalizado",
-    };
+    if (!champion || champion === "Empate (Definir)") {
+      alert("⚠️ No se puede finalizar todavía: cargá el resultado de la gran final y asegurate de que haya un ganador.");
+      return;
+    }
 
-    handleUpdateTournamentInSupabase(finishedObj);
+    const finishedObj = { ...activeTournament, status: "Finalizado" };
+    const { error } = await supabase
+      .from("tournaments")
+      .update({ status: "Finalizado", groups: finishedObj.groups, playoffs: finishedObj.playoffs })
+      .eq("id", finishedObj.id);
 
-    setActiveView("home");
-    setActiveTournament(null);
+    if (error) {
+      console.error("Error al finalizar el torneo:", error);
+      alert("❌ No se pudo finalizar el torneo. Intentá nuevamente.");
+      return;
+    }
+
+    setActiveTournament(finishedObj);
+    setTournaments((prev) => prev.map((t) => t.id === finishedObj.id ? finishedObj : t));
+    setShowChampionCard(true);
+    alert("🏆 ¡Torneo finalizado! El campeón quedó registrado.");
   };
 
   const isAdmin = currentUser?.id === ADMIN_UID;
@@ -1723,6 +1757,10 @@ export function TournamentClashApp() {
   const handleAdminForceFinishTournament = async () => {
     if (!isAdmin || !activeTournament?.id) {
       alert("❌ Solo el administrador puede finalizar torneos.");
+      return;
+    }
+    if (String(activeTournament.status || "").trim().toLocaleLowerCase("es") === "finalizado") {
+      alert("Este torneo ya está finalizado.");
       return;
     }
 
@@ -1744,12 +1782,12 @@ export function TournamentClashApp() {
     }
 
     const torneoFinalizado = { ...activeTournament, status: "Finalizado" };
+    setActiveTournament(torneoFinalizado);
     setTournaments((prev) =>
       prev.map((t) => (t.id === torneoFinalizado.id ? torneoFinalizado : t))
     );
-    setActiveView("home");
-    setActiveTournament(null);
-    alert("✅ Torneo finalizado correctamente.");
+    setShowChampionCard(true);
+    alert("✅ Torneo finalizado. Si no hay resultados suficientes para calcular el podio, la tarjeta no podrá mostrar un campeón todavía.");
   };
 
   return (
