@@ -2225,6 +2225,7 @@ export function TournamentClashApp() {
                     key={t.id}
                     onClick={() => {
                       setActiveTournament(t);
+                      setShowChampionCard(t.status === "Finalizado");
 
                       setActiveView(
                         t.playoffs && t.playoffs.length > 0
