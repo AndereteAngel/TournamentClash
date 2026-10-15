@@ -17,7 +17,8 @@ export function GroupStageView({
   );
 
   // Solo el creador del torneo puede cargar/modificar resultados
-  const isCreator = currentUser?.id === tournament.created_by_user_id;
+  const isFinalized = String(tournament.status || "").trim().toLocaleLowerCase("es") === "finalizado";
+  const isCreator = currentUser?.id === tournament.created_by_user_id && !isFinalized;
 
   // El resumen se calcula según el participante elegido en el torneo,
   // que puede tener un nombre distinto al usuario con el que inició sesión.
@@ -62,7 +63,7 @@ export function GroupStageView({
 
   const handleScoreChange = (matchId, field, value) => {
     // Seguridad adicional en la interfaz
-    if (!isCreator) return;
+    if (!isCreator || isFinalized) return;
 
     const numValue = value === "" ? null : Number(value);
 
