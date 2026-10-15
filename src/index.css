@@ -1170,7 +1170,7 @@ body[data-tc-theme="arena"] .tc-create-artwork strong {
 ========================================================= */
 .tc-home-screen {
   width: 100%;
-  max-width: 1040px;
+  max-width: 980px;
   margin: 0 auto;
   padding: 0 0 1.5rem;
   display: flex;
@@ -1288,6 +1288,10 @@ body[data-tc-theme="arena"] .tc-create-artwork strong {
 }
 
 .tc-home-screen > .tc-home-panel {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
   padding: clamp(1rem, 2.5vw, 1.65rem) !important;
   border: 1px solid rgba(71, 101, 148, 0.52) !important;
   border-radius: 16px !important;
