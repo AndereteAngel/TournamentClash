@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { getPlayerMedals } from "../utils/tournamentAwards";
+import { TCIcon } from "./TCIcon";
 
 export function Navbar({
   onGoHome,
@@ -109,7 +110,7 @@ export function Navbar({
               textTransform: "uppercase",
             }}
           >
-            👤 {username}
+            <TCIcon name="user" size={13} /> {username}
           </span>
         </div>
       </div>
@@ -142,7 +143,7 @@ export function Navbar({
               boxShadow: "inset 0 2px 4px rgba(0,0,0,0.8)",
             }}
           >
-            <span>🔑</span>
+            <TCIcon name="key" size={14} />
 
             <span
               style={{
@@ -160,7 +161,7 @@ export function Navbar({
                 marginLeft: "2px",
               }}
             >
-              {copied ? "✅" : "📋"}
+              {copied ? <TCIcon name="check" size={13} /> : <TCIcon name="clipboard" size={13} />}
             </span>
           </button>
         )}
@@ -181,7 +182,7 @@ export function Navbar({
           }}
           title="Usuario actual"
         >
-          👤 {username}
+          <TCIcon name="user" size={13} /> {username}
         </div>
 
         <button
@@ -190,7 +191,7 @@ export function Navbar({
           style={medalButtonStyle}
           title="Ver historial de medallas"
         >
-          🏅 {medals.gold + medals.silver + medals.bronze}
+          <TCIcon name="medal" size={15} /> {medals.gold + medals.silver + medals.bronze}
         </button>
 
         <button
@@ -211,7 +212,7 @@ export function Navbar({
             boxShadow: "0 4px 0 #0f172a, 0 6px 12px rgba(27, 95, 168, 0.4)",
           }}
         >
-          🏠 Inicio
+          <TCIcon name="home" size={15} /> Inicio
         </button>
       </div>
 
@@ -230,7 +231,7 @@ export function Navbar({
           cursor: "pointer",
         }}
       >
-        {menuOpen ? <span className="tc-close-symbol" aria-hidden="true">✕</span> : "☰"}
+        {menuOpen ? <span className="tc-close-symbol" aria-hidden="true">✕</span> : <TCIcon name="menu" size={20} />}
       </button>
 
       {/* MENU MOVIL */}
@@ -265,7 +266,7 @@ export function Navbar({
               fontWeight: "bold",
             }}
           >
-            👤 {username}
+            <TCIcon name="user" size={14} /> {username}
           </div>
 
           {tournamentCode && (
@@ -286,7 +287,7 @@ export function Navbar({
                 cursor: "pointer",
               }}
             >
-              <span>🔑 Copiar Código:</span>
+              <span className="tc-nav-copy-label"><TCIcon name="key" size={14} /> Copiar Código:</span>
 
               <span
                 style={{
@@ -297,7 +298,7 @@ export function Navbar({
                 {tournamentCode}
               </span>
 
-              <span>{copied ? "✅" : "📋"}</span>
+              <span>{copied ? <TCIcon name="check" size={13} /> : <TCIcon name="clipboard" size={13} />}</span>
             </button>
           )}
 
@@ -306,7 +307,7 @@ export function Navbar({
             onClick={() => setMedalOpen((open) => !open)}
             style={{ ...medalButtonStyle, padding: "0.7rem", fontSize: "0.8rem" }}
           >
-            🏅 Medallero: 🥇 {medals.gold} · 🥈 {medals.silver} · 🥉 {medals.bronze}
+            <TCIcon name="medal" size={16} /> Medallero: <span className="tc-medal-counts">🥇 {medals.gold} · 🥈 {medals.silver} · 🥉 {medals.bronze}</span>
           </button>
 
           <button
@@ -329,7 +330,7 @@ export function Navbar({
               cursor: "pointer",
             }}
           >
-            🏠 Volver al Inicio
+            <TCIcon name="home" size={16} /> Volver al Inicio
           </button>
         </div>
       )}
