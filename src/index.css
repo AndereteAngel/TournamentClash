@@ -1455,3 +1455,121 @@ body[data-tc-theme="arena"] .tc-create-artwork strong {
     transition: none !important;
   }
 }
+
+
+/* =========================================================
+   VISTAS DE COMPETICIÓN — GRUPOS, PARTIDOS Y PLAYOFFS
+   Estilos aislados: no afectan Inicio ni otras pantallas.
+========================================================= */
+.tc-competition-screen {
+  animation: tc-home-enter 0.35s ease-out both;
+}
+
+.tc-competition-screen > .cr-card {
+  width: 100%;
+  max-width: min(900px, 100%) !important;
+  padding: clamp(1rem, 2.8vw, 1.65rem) !important;
+  border: 1px solid rgba(71, 101, 148, 0.58) !important;
+  border-radius: 16px !important;
+  background: linear-gradient(145deg, rgba(13, 25, 46, 0.99), rgba(6, 13, 27, 0.99)) !important;
+  box-shadow: 0 16px 38px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.035) !important;
+}
+
+.tc-competition-screen .tournament-header {
+  border-bottom-color: rgba(96, 165, 250, 0.24) !important;
+}
+
+.tc-competition-screen .tournament-main-title {
+  border-left-color: #60a5fa !important;
+  background: linear-gradient(90deg, rgba(37, 99, 235, 0.19), rgba(37, 99, 235, 0.015)) !important;
+  color: #dbeafe !important;
+  text-shadow: 0 2px 14px rgba(59, 130, 246, 0.16) !important;
+}
+
+.tc-competition-screen .tournament-phase-badge {
+  letter-spacing: 0.055em;
+}
+
+.tc-competition-screen .cr-title {
+  color: #f8fafc !important;
+  text-shadow: 0 2px 16px rgba(59, 130, 246, 0.18);
+}
+
+.tc-competition-screen input,
+.tc-competition-screen select {
+  border-color: rgba(96, 165, 250, 0.34) !important;
+  border-radius: 8px !important;
+  background-color: rgba(3, 12, 27, 0.88) !important;
+  color: #f8fafc !important;
+}
+
+.tc-competition-screen input:focus,
+.tc-competition-screen select:focus {
+  outline: 2px solid rgba(96, 165, 250, 0.35);
+  outline-offset: 1px;
+  border-color: #60a5fa !important;
+}
+
+.tc-competition-screen button {
+  transition: transform 0.16s ease, filter 0.16s ease, box-shadow 0.16s ease;
+}
+
+.tc-competition-screen button:hover:not(:disabled) {
+  filter: brightness(1.08);
+}
+
+.tc-competition-screen button:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.tc-competition-screen button:focus-visible {
+  outline: 2px solid #93c5fd;
+  outline-offset: 3px;
+}
+
+.tc-competition-screen .cr-btn-gold {
+  border-radius: 8px;
+  box-shadow: 0 5px 16px rgba(0, 0, 0, 0.2);
+}
+
+.tc-playoffs-screen > .cr-card {
+  max-width: min(720px, 100%) !important;
+}
+
+.tc-playoffs-screen .cr-card > div[style*="border-bottom"] {
+  border-bottom-color: rgba(96, 165, 250, 0.25) !important;
+}
+
+.tc-playoffs-screen .cr-card h3 {
+  letter-spacing: 0.045em;
+}
+
+@media (max-width: 640px) {
+  .tc-competition-screen {
+    gap: 0.75rem !important;
+  }
+
+  .tc-competition-screen > .cr-card {
+    padding: 0.95rem !important;
+    border-radius: 12px !important;
+  }
+
+  .tc-competition-screen .tournament-header {
+    gap: 0.65rem !important;
+    margin-bottom: 1rem !important;
+    padding-bottom: 0.85rem !important;
+  }
+
+  .tc-competition-screen .tournament-phase-badge {
+    font-size: 0.56rem !important;
+    padding: 5px 7px !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tc-competition-screen,
+  .tc-competition-screen * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
