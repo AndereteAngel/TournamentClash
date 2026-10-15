@@ -2484,8 +2484,15 @@ export function TournamentClashApp() {
                 }}
                 className="cr-btn-gold"
                 style={{
-                  maxWidth: "240px",
-                  fontSize: "0.8rem",
+                  width: "auto",
+                  maxWidth: "fit-content",
+                  padding: "0.45rem 0.75rem",
+                  fontSize: "0.68rem",
+                  lineHeight: 1.2,
+                  borderWidth: "2px",
+                  borderBottomWidth: "3px",
+                  borderRadius: "8px",
+                  boxShadow: "0 3px 0 #422200, 0 5px 10px rgba(255,156,0,0.2)",
                 }}
               >
                 ⚙️ Modificar torneo
