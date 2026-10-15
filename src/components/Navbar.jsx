@@ -230,7 +230,7 @@ export function Navbar({
           cursor: "pointer",
         }}
       >
-        {menuOpen ? "✕" : "☰"}
+        {menuOpen ? <span className="tc-close-symbol" aria-hidden="true">✕</span> : "☰"}
       </button>
 
       {/* MENU MOVIL */}
@@ -338,7 +338,7 @@ export function Navbar({
         <div style={{ position: "absolute", top: "calc(100% + 10px)", right: 0, width: "min(340px, calc(100vw - 32px))", maxHeight: "70vh", overflowY: "auto", padding: "1rem", borderRadius: "14px", border: "2px solid #8b7a39", background: "linear-gradient(145deg, #171426, #090811)", boxShadow: "0 12px 35px rgba(0,0,0,0.8)", zIndex: 200 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "0.5rem", marginBottom: "0.8rem" }}>
             <strong style={{ color: "#facc15", fontSize: "0.85rem" }}>🏅 MI MEDALLERO</strong>
-            <button type="button" onClick={() => setMedalOpen(false)} aria-label="Cerrar medallero" style={{ background: "transparent", border: 0, color: "#d1d5db", fontSize: "1rem", cursor: "pointer" }}>✕</button>
+            <button type="button" onClick={() => setMedalOpen(false)} aria-label="Cerrar medallero" className="tc-close-button" style={{ background: "transparent", border: 0, color: "#d1d5db", fontSize: "1rem", cursor: "pointer" }}>✕</button>
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(3, minmax(0, 1fr))", gap: "0.4rem", marginBottom: "0.9rem" }}>
             {[
