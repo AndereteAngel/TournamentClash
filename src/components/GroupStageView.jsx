@@ -19,6 +19,34 @@ export function GroupStageView({
   // Solo el creador del torneo puede cargar/modificar resultados
   const isCreator = currentUser?.id === tournament.created_by_user_id;
 
+  // Resumen personal: identifica los encuentros del jugador por su nombre de usuario.
+  const normalizarNombre = (nombre) =>
+    String(nombre || "").trim().toLocaleLowerCase("es");
+
+  const playerGroup = tournament.groups.find((group) =>
+    group.teams.some(
+      (team) => normalizarNombre(team) === normalizarNombre(currentUser?.username)
+    )
+  );
+
+  const playerMatches = playerGroup
+    ? playerGroup.matches.filter(
+        (match) =>
+          normalizarNombre(match.team1) === normalizarNombre(currentUser?.username) ||
+          normalizarNombre(match.team2) === normalizarNombre(currentUser?.username)
+      )
+    : [];
+
+  const playedMatches = playerMatches.filter(
+    (match) => match.score1 !== null && match.score1 !== undefined &&
+      match.score2 !== null && match.score2 !== undefined
+  );
+
+  const pendingMatches = playerMatches.filter(
+    (match) => match.score1 === null || match.score1 === undefined ||
+      match.score2 === null || match.score2 === undefined
+  );
+
   const handleScoreChange = (matchId, field, value) => {
     // Seguridad adicional en la interfaz
     if (!isCreator) return;
@@ -93,13 +121,22 @@ export function GroupStageView({
           </span>
 
           <h2
-            className="cr-title"
+            className="tournament-main-title"
             style={{
-              fontSize: "1.3rem",
-              textAlign: "left",
               margin: 0,
-              lineHeight: 1.2,
-              overflowWrap: "break-word",
+              padding: "0.55rem 0.75rem",
+              borderLeft: "4px solid #ffd700",
+              borderRadius: "0 8px 8px 0",
+              background: "linear-gradient(90deg, rgba(255,215,0,0.13), rgba(255,215,0,0.015))",
+              color: "#ffd700",
+              fontSize: "clamp(1.25rem, 3.5vw, 1.8rem)",
+              fontWeight: 900,
+              lineHeight: 1.15,
+              textAlign: "left",
+              textShadow: "0 2px 8px rgba(255, 215, 0, 0.15)",
+              textTransform: "uppercase",
+              whiteSpace: "normal",
+              overflowWrap: "anywhere",
             }}
           >
             {tournament.title}
@@ -124,6 +161,105 @@ export function GroupStageView({
           FASE DE GRUPOS
         </span>
       </div>
+
+      {/* RESUMEN PERSONAL DEL JUGADOR */}
+      {currentUser?.username && (
+        <section
+          aria-label="Resumen de mis partidos"
+          style={{
+            marginBottom: "1.25rem",
+            padding: "1rem",
+            borderRadius: "12px",
+            background: "linear-gradient(135deg, rgba(27,95,168,0.2), rgba(18,16,25,0.92))",
+            border: "1px solid rgba(96,165,250,0.3)",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              flexWrap: "wrap",
+              gap: "0.6rem",
+              marginBottom: "0.75rem",
+            }}
+          >
+            <h3 style={{ margin: 0, color: "#fff", fontSize: "0.95rem", fontWeight: 900 }}>
+              📋 Mis partidos
+            </h3>
+            {playerGroup && (
+              <span style={{ color: "#93c5fd", fontSize: "0.75rem", fontWeight: 700 }}>
+                {playedMatches.length} jugados de {playerMatches.length}
+              </span>
+            )}
+          </div>
+
+          {!playerGroup ? (
+            <p style={{ margin: 0, color: "#fbbf24", fontSize: "0.8rem", lineHeight: 1.5 }}>
+              No encontramos tu usuario en los participantes de este torneo. El organizador debe verificar que el nombre de la lista coincida con tu usuario: <strong>{currentUser.username}</strong>.
+            </p>
+          ) : (
+            <>
+              <div
+                style={{
+                  display: "flex",
+                  gap: "0.5rem",
+                  flexWrap: "wrap",
+                  marginBottom: pendingMatches.length ? "0.8rem" : 0,
+                }}
+              >
+                <span style={{ padding: "0.35rem 0.6rem", borderRadius: "7px", background: "rgba(34,197,94,0.12)", color: "#4ade80", fontSize: "0.75rem", fontWeight: 800 }}>
+                  ✓ {playedMatches.length} jugados
+                </span>
+                <span style={{ padding: "0.35rem 0.6rem", borderRadius: "7px", background: "rgba(251,191,36,0.12)", color: "#fbbf24", fontSize: "0.75rem", fontWeight: 800 }}>
+                  ⏳ {pendingMatches.length} pendientes
+                </span>
+              </div>
+
+              {pendingMatches.length > 0 ? (
+                <div style={{ display: "flex", flexDirection: "column", gap: "0.45rem" }}>
+                  <p style={{ margin: "0 0 0.2rem", color: "#d1d5db", fontSize: "0.75rem", fontWeight: 700 }}>
+                    Te falta jugar contra:
+                  </p>
+                  {pendingMatches.map((match) => {
+                    const opponent =
+                      normalizarNombre(match.team1) === normalizarNombre(currentUser.username)
+                        ? match.team2
+                        : match.team1;
+
+                    return (
+                      <div
+                        key={match.id}
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                          gap: "0.5rem",
+                          padding: "0.55rem 0.65rem",
+                          borderRadius: "8px",
+                          background: "rgba(0,0,0,0.2)",
+                          border: "1px solid rgba(255,255,255,0.06)",
+                          color: "#fff",
+                          fontSize: "0.8rem",
+                        }}
+                      >
+                        <span style={{ overflowWrap: "anywhere" }}>{opponent}</span>
+                        <span style={{ color: "#fbbf24", fontSize: "0.68rem", fontWeight: 800, flexShrink: 0 }}>
+                          PENDIENTE
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <p style={{ margin: 0, color: "#4ade80", fontSize: "0.8rem", fontWeight: 700 }}>
+                  🏆 ¡Completaste todos tus partidos de esta fase!
+                </p>
+              )}
+            </>
+          )}
+        </section>
+      )}
 
       {/* AVISO DE PERMISOS */}
       <div
