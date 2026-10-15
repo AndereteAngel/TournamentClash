@@ -8,6 +8,7 @@ export function ChampionCelebration({ tournament, onClose }) {
 
   return (
     <div
+      className="tc-champion-overlay"
       role="dialog"
       aria-modal="true"
       aria-label="Campeón del torneo"
@@ -25,6 +26,7 @@ export function ChampionCelebration({ tournament, onClose }) {
       }}
     >
     <section
+      className="tc-champion-card"
       aria-label="Campeón del torneo"
       style={{
         width: "100%",
@@ -42,6 +44,7 @@ export function ChampionCelebration({ tournament, onClose }) {
       }}
     >
       <button
+        className="tc-champion-close"
         type="button"
         onClick={onClose}
         aria-label="Cerrar tarjeta del campeón"
@@ -68,6 +71,7 @@ export function ChampionCelebration({ tournament, onClose }) {
         TOURNAMENTCLASH • CAMPEÓN
       </div>
       <div
+        className="tc-champion-trophy"
         aria-hidden="true"
         style={{
           width: "104px",
@@ -87,7 +91,7 @@ export function ChampionCelebration({ tournament, onClose }) {
       <div style={{ color: "#fef3c7", fontSize: "0.7rem", fontWeight: 800, textTransform: "uppercase" }}>
         ¡Tenemos campeón!
       </div>
-      <h2 style={{ margin: "0.35rem 0", color: "#fff", fontSize: "clamp(1.4rem, 6vw, 2rem)", fontWeight: 900, overflowWrap: "anywhere" }}>
+      <h2 className="tc-champion-name" style={{ margin: "0.35rem 0", color: "#fff", fontSize: "clamp(1.4rem, 6vw, 2rem)", fontWeight: 900, overflowWrap: "anywhere" }}>
         {podium.champion}
       </h2>
       <p style={{ margin: "0 auto 1rem", color: "#c4b5fd", fontSize: "0.85rem", overflowWrap: "anywhere" }}>
@@ -100,7 +104,7 @@ export function ChampionCelebration({ tournament, onClose }) {
           ["🛡️", "Derrotas", stats.losses],
           ["🎯", "Efectividad", stats.winRate + "%"],
         ].map(([icon, label, value]) => (
-          <div key={label} style={{ padding: "0.7rem 0.25rem", borderRadius: "10px", background: "rgba(255,255,255,0.055)", border: "1px solid rgba(255,255,255,0.09)" }}>
+          <div key={label} className="tc-champion-stat" style={{ padding: "0.7rem 0.25rem", borderRadius: "10px", background: "rgba(255,255,255,0.055)", border: "1px solid rgba(255,255,255,0.09)" }}>
             <div style={{ fontSize: "1.1rem" }}>{icon}</div>
             <div style={{ color: "#fff", fontSize: "1.15rem", fontWeight: 900 }}>{value}</div>
             <div style={{ color: "#a1a1aa", fontSize: "0.62rem", fontWeight: 800, textTransform: "uppercase" }}>{label}</div>
