@@ -1998,12 +1998,18 @@ export function TournamentClashApp() {
       ) : activeView === "stats" && isAdmin ? (
         <AdminStats onBack={() => setActiveView("home")} />
       ) : activeView === "home" ? (
-        <>
+        <div className="tc-home-screen">
         <section className="tc-arena-hero" aria-label="Bienvenido a la arena de TournamentClash">
           <img src="https://cdn.wallpapersafari.com/57/78/NM76Ts.jpg" alt="Arena legendaria de Clash Royale con islas flotantes y torres" />
+          <div className="tc-home-hero-overlay">
+            <span className="tc-home-eyebrow">LA COMPETENCIA EMPIEZA ACÁ</span>
+            <h1>TOURNAMENT<span>CLASH</span></h1>
+            <p>Competí. Superate. Conquistá la arena.</p>
+            <div className="tc-home-hero-tag"><span></span> TU PRÓXIMA VICTORIA TE ESPERA</div>
+          </div>
         </section>
         <div
-          className="cr-card"
+          className="cr-card tc-home-panel"
           style={{
             width: "100%",
             maxWidth: "980px",
@@ -2070,6 +2076,7 @@ export function TournamentClashApp() {
             </div>
 
             <button
+              className="tc-home-logout"
               onClick={handleLogout}
               style={{
                 padding: "0.35rem 0.75rem",
@@ -2090,6 +2097,7 @@ export function TournamentClashApp() {
 
           {isAdmin && (
             <button
+              className="tc-home-admin-action"
               onClick={() => setActiveView("stats")}
               style={{
                 width: "100%",
@@ -2114,8 +2122,10 @@ export function TournamentClashApp() {
               gap: "0.75rem",
               marginBottom: "1.5rem",
             }}
+            className="tc-home-actions"
           >
             <button
+              className="tc-home-action tc-home-action-create"
               onClick={() => setActiveView("create")}
               style={{
                 padding: "1rem",
@@ -2158,6 +2168,7 @@ export function TournamentClashApp() {
             </button>
 
             <button
+              className="tc-home-action tc-home-action-join"
               onClick={() => setActiveView("join")}
               style={{
                 padding: "1rem",
@@ -2200,8 +2211,9 @@ export function TournamentClashApp() {
             </button>
           </div>
 
-          <div>
+          <div className="tc-home-tournaments">
             <div
+              className="tc-home-tournaments-heading"
               style={{
                 display: "flex",
                 alignItems: "center",
@@ -2277,6 +2289,7 @@ export function TournamentClashApp() {
               >
                 {tournaments.map((t) => (
                   <div
+                    className="tc-home-tournament-item"
                     key={t.id}
                     onClick={() => {
                       setActiveTournament(t);
@@ -2455,7 +2468,7 @@ export function TournamentClashApp() {
             )}
           </div>
         </div>
-        </>
+        </div>
       ) : activeView === "create" ? (
         <>
         <div className="tc-create-artwork">
