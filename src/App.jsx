@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { CreateTournament } from "./components/CreateTournament";
 import { GroupStageView } from "./components/GroupStageView";
 import { Navbar } from "./components/Navbar";
+import { TCIcon } from "./components/TCIcon";
 import { ChampionCelebration } from "./components/ChampionCelebration";
 import { PlayoffBracket } from "./components/PlayoffBracket";
 import { supabase } from "./supabaseClient";
@@ -2143,13 +2144,8 @@ export function TournamentClashApp() {
                 color: "#fff",
               }}
             >
-              <div
-                style={{
-                  fontSize: "20px",
-                  marginBottom: "4px",
-                }}
-              >
-                ⚔️
+              <div className="tc-home-action-icon">
+                <TCIcon name="sword" size={25} />
               </div>
 
               <h3
@@ -2186,13 +2182,8 @@ export function TournamentClashApp() {
                 color: "#fff",
               }}
             >
-              <div
-                style={{
-                  fontSize: "20px",
-                  marginBottom: "4px",
-                }}
-              >
-                🔍
+              <div className="tc-home-action-icon">
+                <TCIcon name="search" size={25} />
               </div>
 
               <h3
@@ -2234,7 +2225,7 @@ export function TournamentClashApp() {
                   gap: "0.5rem",
                 }}
               >
-                <span>⚡</span>
+                <TCIcon name="bolt" size={17} />
 
                 <h3
                   style={{
@@ -2259,7 +2250,7 @@ export function TournamentClashApp() {
                   cursor: "pointer",
                 }}
               >
-                🔄 Recargar
+                <TCIcon name="refresh" size={13} /> Recargar
               </button>
             </div>
 
@@ -2360,7 +2351,7 @@ export function TournamentClashApp() {
                               border: "1px solid rgba(239, 68, 68, 0.3)",
                             }}
                           >
-                            🔒 Privado
+                            <><TCIcon name="lock" size={12} /> Privado</>
                           </span>
                         )}
 
@@ -2371,7 +2362,7 @@ export function TournamentClashApp() {
                             color: "#ffd700",
                           }}
                         >
-                          👑 {t.created_by}
+                          <TCIcon name="crown" size={13} /> {t.created_by}
                         </span>
                       </div>
 
