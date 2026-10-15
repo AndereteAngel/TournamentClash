@@ -4,45 +4,25 @@ export function getTournamentPodium(tournament) {
   const status = String(tournament?.status || "").trim().toLocaleLowerCase("es");
   if (!tournament || status !== "finalizado") return null;
 
-  // Supabase guarda normalmente las llaves como una lista de rondas; también
-  // toleramos una ronda plana para no perder el campeón por diferencias de formato.
-  const rawPlayoffs = Array.isArray(tournament.playoffs) ? tournament.playoffs : [];
-  const rounds = rawPlayoffs.length && !Array.isArray(rawPlayoffs[0])
-    ? [rawPlayoffs]
-    : rawPlayoffs;
-  const finalRound = rounds[rounds.length - 1];
-  const finalMatch = Array.isArray(finalRound) && finalRound.length
-    ? finalRound[0]
-    : null;
-  const computedWinner = finalMatch?.winner ||
-    (finalMatch && finalMatch.score1 !== null && finalMatch.score1 !== undefined &&
-      finalMatch.score2 !== null && finalMatch.score2 !== undefined
-      ? Number(finalMatch.score1) > Number(finalMatch.score2)
-        ? finalMatch.team1
-        : Number(finalMatch.score2) > Number(finalMatch.score1)
-          ? finalMatch.team2
-          : null
-      : null);
-  const championFromFinal = computedWinner && computedWinner !== "Empate (Definir)"
-    ? computedWinner
-    : null;
+  const format = String(tournament.format || "").trim().toLocaleLowerCase("es");
 
-  if (!championFromFinal) {
-    // En formato liga, el podio sale de la tabla cuando todos los partidos están cargados.
-    if (String(tournament.format || "").trim().toLocaleLowerCase("es") !== "league") return null;
+  // En liga, se permite cerrar con partidos pendientes: cuentan los puntos acumulados.
+  if (format === "league") {
     const groups = Array.isArray(tournament.groups) ? tournament.groups : [];
-    const allMatches = groups.flatMap((group) => group.matches || []);
-    if (!allMatches.length || allMatches.some((match) =>
-      match.score1 === null || match.score1 === undefined ||
-      match.score2 === null || match.score2 === undefined
-    )) return null;
+    const matches = groups.flatMap((group) => group.matches || []);
+    const playedMatches = matches.filter((match) =>
+      match.score1 !== null && match.score1 !== undefined &&
+      match.score2 !== null && match.score2 !== undefined
+    );
+    if (!playedMatches.length) return null;
 
     const standings = groups.flatMap((group) =>
       calculateGroupStandings(group.teams || [], group.matches || [])
     ).sort((a, b) => {
       if (b.points !== a.points) return b.points - a.points;
       if (b.goalDifference !== a.goalDifference) return b.goalDifference - a.goalDifference;
-      return b.goalsFor - a.goalsFor;
+      if (b.goalsFor !== a.goalsFor) return b.goalsFor - a.goalsFor;
+      return String(a.name || "").localeCompare(String(b.name || ""), "es");
     });
 
     if (standings.length < 2) return null;
@@ -53,32 +33,40 @@ export function getTournamentPodium(tournament) {
     };
   }
 
-  const champion = championFromFinal;
+  // En grupos + playoffs, el campeón y el subcampeón salen de la final.
+  const rawPlayoffs = Array.isArray(tournament.playoffs) ? tournament.playoffs : [];
+  const rounds = rawPlayoffs.length && !Array.isArray(rawPlayoffs[0]) ? [rawPlayoffs] : rawPlayoffs;
+  const finalRound = rounds[rounds.length - 1];
+  const finalMatch = Array.isArray(finalRound) && finalRound.length === 1 ? finalRound[0] : null;
+  const hasScores = (match) => match &&
+    match.score1 !== null && match.score1 !== undefined &&
+    match.score2 !== null && match.score2 !== undefined;
+  const winnerOf = (match) => {
+    if (!match) return null;
+    if (match.winner && match.winner !== "Empate (Definir)") return match.winner;
+    if (!hasScores(match)) return null;
+    if (Number(match.score1) > Number(match.score2)) return match.team1;
+    if (Number(match.score2) > Number(match.score1)) return match.team2;
+    return null;
+  };
+
+  const champion = winnerOf(finalMatch);
+  if (!champion) return null;
   const runnerUp = [finalMatch.team1, finalMatch.team2].find(
     (name) => name && name !== champion && name !== "Pasaje Directo"
   );
-
   const semifinalRound = rounds.length >= 2 ? rounds[rounds.length - 2] : [];
   const bronze = [];
   if (Array.isArray(semifinalRound) && semifinalRound.length === 2) {
     semifinalRound.forEach((match) => {
-      const matchWinner = match?.winner ||
-        (match && match.score1 !== null && match.score1 !== undefined &&
-          match.score2 !== null && match.score2 !== undefined
-          ? Number(match.score1) > Number(match.score2)
-            ? match.team1
-            : Number(match.score2) > Number(match.score1)
-              ? match.team2
-              : null
-          : null);
-      if (!matchWinner || matchWinner === "Empate (Definir)") return;
+      const matchWinner = winnerOf(match);
+      if (!matchWinner) return;
       const loser = [match.team1, match.team2].find(
         (name) => name && name !== matchWinner && name !== "Pasaje Directo"
       );
       if (loser && loser !== champion && loser !== runnerUp) bronze.push(loser);
     });
   }
-
   return { champion, runnerUp: runnerUp || null, bronze: [...new Set(bronze)] };
 }
 
