@@ -71,7 +71,7 @@ function AdminStats({ onBack }) {
       return;
     }
 
-    setVisitas(visitasData || []);
+    setVisitas((visitasData || []).filter((visita) => visita.user_id));
     setPerfiles(perfilesData || []);
     setLoadingStats(false);
   };
@@ -144,8 +144,6 @@ function AdminStats({ onBack }) {
     );
 
   const usuariosRegistrados = perfiles.length;
-
-  const visitasAnonimas = visitas.filter((visita) => !visita.user_id).length;
 
   const visitasMobile = visitas.filter(
     (visita) => visita.device === "mobile"
@@ -408,10 +406,9 @@ function AdminStats({ onBack }) {
         }}
       >
         {[
-          ["👁️", "Visitas totales", visitas.length],
-          ["📅", "Visitas hoy", visitasHoy],
+          ["👁️", "Sesiones registradas", visitas.length],
+          ["📅", "Sesiones hoy", visitasHoy],
           ["👥", "Jugadores", usuariosRegistrados],
-          ["🕵️", "Anónimas", visitasAnonimas],
           ["🟢", "Activos", usuariosActivos],
           ["⏱️", "Tiempo promedio", formatearDuracion(tiempoPromedio)],
         ].map(([icono, titulo, valor]) => (
@@ -1084,7 +1081,7 @@ export function TournamentClashApp() {
   };
 
   // =========================================================
-  // REGISTRAR VISITAS DE TODOS LOS VISITANTES
+  // REGISTRAR ACTIVIDAD DE USUARIOS AUTENTICADOS
   // =========================================================
 
   useEffect(() => {
