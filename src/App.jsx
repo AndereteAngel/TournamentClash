@@ -1005,6 +1005,23 @@ export function TournamentClashApp() {
   const [loading, setLoading] = useState(false);
   const [editingTournament, setEditingTournament] = useState(false);
   const [deletingTournamentId, setDeletingTournamentId] = useState(null);
+  const [visualTheme, setVisualTheme] = useState(() => {
+    try {
+      return localStorage.getItem("tc_visual_theme") === "arena" ? "arena" : "clash";
+    } catch {
+      return "clash";
+    }
+  });
+
+  useEffect(() => {
+    document.documentElement.dataset.tcTheme = visualTheme;
+    document.body.dataset.tcTheme = visualTheme;
+    try {
+      localStorage.setItem("tc_visual_theme", visualTheme);
+    } catch {
+      // La elección visual sigue funcionando aunque el navegador bloquee el almacenamiento.
+    }
+  }, [visualTheme]);
 
   // =========================================================
   // RECUPERAR SESIÓN
@@ -1817,7 +1834,7 @@ export function TournamentClashApp() {
   };
 
   return (
-    <div className="cr-container">
+    <div className={`cr-container tc-theme-${visualTheme}`}>
       {currentUser && (
         <Navbar
           onGoHome={handleGoHome}
@@ -1825,6 +1842,8 @@ export function TournamentClashApp() {
           tournamentCode={activeTournament?.code}
           currentUser={currentUser}
           tournaments={tournaments}
+          visualTheme={visualTheme}
+          onToggleTheme={() => setVisualTheme((theme) => theme === "clash" ? "arena" : "clash")}
         />
       )}
 
