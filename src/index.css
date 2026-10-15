@@ -1711,3 +1711,113 @@ body[data-tc-theme="arena"] .tc-create-artwork strong {
     transition: none !important;
   }
 }
+
+
+/* =========================================================
+   ANIMACIÓN ÉPICA DE CAMPEÓN — SOLO PRESENTACIÓN VISUAL
+========================================================= */
+.tc-champion-overlay {
+  animation: tc-champion-backdrop 0.32s ease-out both;
+}
+
+.tc-champion-card {
+  transform-origin: center;
+  animation: tc-champion-arrive 0.58s cubic-bezier(0.2, 0.85, 0.25, 1.15) both;
+}
+
+.tc-champion-trophy {
+  animation: tc-trophy-reveal 0.8s 0.18s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.tc-champion-name {
+  animation: tc-champion-name-reveal 0.5s 0.28s ease-out both;
+}
+
+.tc-champion-stat {
+  animation: tc-champion-stat-reveal 0.45s ease-out both;
+}
+
+.tc-champion-stat:nth-child(1) { animation-delay: 0.32s; }
+.tc-champion-stat:nth-child(2) { animation-delay: 0.4s; }
+.tc-champion-stat:nth-child(3) { animation-delay: 0.48s; }
+.tc-champion-stat:nth-child(4) { animation-delay: 0.56s; }
+
+.tc-champion-close {
+  transition: transform 0.18s ease, background-color 0.18s ease, border-color 0.18s ease;
+}
+
+.tc-champion-close:hover {
+  transform: rotate(90deg) scale(1.06);
+  background: rgba(255, 255, 255, 0.12) !important;
+  border-color: rgba(255, 255, 255, 0.55) !important;
+}
+
+@keyframes tc-champion-backdrop {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes tc-champion-arrive {
+  0% { opacity: 0; transform: translateY(24px) scale(0.92); }
+  72% { opacity: 1; transform: translateY(-3px) scale(1.015); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes tc-trophy-reveal {
+  0% { opacity: 0; transform: translateY(12px) scale(0.45) rotate(-14deg); }
+  65% { opacity: 1; transform: translateY(-3px) scale(1.12) rotate(5deg); }
+  100% { opacity: 1; transform: translateY(0) scale(1) rotate(0); }
+}
+
+@keyframes tc-champion-name-reveal {
+  from { opacity: 0; transform: translateY(8px); filter: blur(3px); }
+  to { opacity: 1; transform: translateY(0); filter: blur(0); }
+}
+
+@keyframes tc-champion-stat-reveal {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+body[data-tc-theme="arena"] .tc-champion-card {
+  border-color: #ef4444 !important;
+  background: radial-gradient(circle at 50% 0%, rgba(239, 68, 68, 0.16), transparent 52%), linear-gradient(145deg, #ffffff, #ededed 80%) !important;
+  box-shadow: 0 0 28px rgba(239, 68, 68, 0.12), inset 0 1px 0 rgba(255,255,255,0.9) !important;
+}
+
+body[data-tc-theme="arena"] .tc-champion-card h2,
+body[data-tc-theme="arena"] .tc-champion-card p,
+body[data-tc-theme="arena"] .tc-champion-card div {
+  color: #171717;
+}
+
+body[data-tc-theme="arena"] .tc-champion-card .tc-champion-trophy {
+  color: initial;
+}
+
+@media (max-width: 640px) {
+  .tc-champion-card {
+    padding: 1rem !important;
+    border-radius: 14px !important;
+  }
+
+  .tc-champion-trophy {
+    width: 88px !important;
+    height: 88px !important;
+    font-size: 3rem !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tc-champion-overlay,
+  .tc-champion-card,
+  .tc-champion-trophy,
+  .tc-champion-name,
+  .tc-champion-stat,
+  .tc-champion-close {
+    animation: none !important;
+    transition: none !important;
+    filter: none !important;
+    transform: none !important;
+  }
+}
