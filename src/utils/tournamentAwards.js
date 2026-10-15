@@ -5,15 +5,17 @@ export function getTournamentPodium(tournament) {
   if (!tournament || status !== "finalizado") return null;
 
   const format = String(tournament.format || "").trim().toLocaleLowerCase("es");
+  const isLeague = ["league", "round_robin", "round-robin", "round robin", "todos contra todos", "todos_contra_todos", "todos-contra-todos", "liga"].includes(format);
 
-  // En liga, se permite cerrar con partidos pendientes: cuentan los puntos acumulados.
-  if (format === "league") {
+  // En todos contra todos se calcula el podio con los resultados cargados, aunque queden partidos pendientes.
+  if (isLeague) {
     const groups = Array.isArray(tournament.groups) ? tournament.groups : [];
     const matches = groups.flatMap((group) => group.matches || []);
-    const playedMatches = matches.filter((match) =>
-      match.score1 !== null && match.score1 !== undefined &&
-      match.score2 !== null && match.score2 !== undefined
-    );
+    const playedMatches = matches.filter((match) => {
+      const hasScore1 = match.score1 !== null && match.score1 !== undefined && match.score1 !== "";
+      const hasScore2 = match.score2 !== null && match.score2 !== undefined && match.score2 !== "";
+      return hasScore1 && hasScore2 && Number.isFinite(Number(match.score1)) && Number.isFinite(Number(match.score2));
+    });
     if (!playedMatches.length) return null;
 
     const standings = groups.flatMap((group) =>
