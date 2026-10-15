@@ -4,8 +4,10 @@ export function PlayoffBracket({
   onFinishTournament,
 }) {
   const rounds = tournament.playoffs || [];
+  const isFinalized = String(tournament.status || "").trim().toLocaleLowerCase("es") === "finalizado";
 
   const handleScoreChange = (roundIdx, matchId, field, value) => {
+    if (isFinalized) return;
     const numValue = value === "" ? null : Number(value);
 
     // Copiamos las rondas actuales y eliminamos rondas posteriores si se modifica un resultado anterior
@@ -207,6 +209,7 @@ export function PlayoffBracket({
                       <input
                         type="number"
                         min="0"
+                        disabled={isFinalized}
                         value={match.score1 !== null ? match.score1 : ""}
                         onChange={(e) =>
                           handleScoreChange(
@@ -230,6 +233,7 @@ export function PlayoffBracket({
                       <input
                         type="number"
                         min="0"
+                        disabled={isFinalized}
                         value={match.score2 !== null ? match.score2 : ""}
                         onChange={(e) =>
                           handleScoreChange(
@@ -308,7 +312,7 @@ export function PlayoffBracket({
         </div>
       )}
 
-      {isTournamentComplete && (
+      {isTournamentComplete && !isFinalized && (
         <button onClick={onFinishTournament} className="cr-btn-gold">
           Guardar y Salir al Lobby ⚔️
         </button>
