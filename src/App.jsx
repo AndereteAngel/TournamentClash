@@ -2013,7 +2013,7 @@ export function TournamentClashApp() {
       ) : activeView === "home" ? (
         <>
         <section className="tc-arena-hero" aria-label="Bienvenido a la arena de TournamentClash">
-          <img src="https://images.unsplash.com/photo-1699500325700-761e52eb8625?auto=format&fit=crop&fm=jpg&q=85&w=2400" alt="Guerrero medieval con armadura y escudo en una arena" />
+          <img src="https://images.stockcake.com/public/a/1/0/a10b220e-3f65-4c4d-a098-87c35b9046c5_medium/dawn-battle-clash-stockcake.jpg" alt="Arena épica con guerreros, estandartes rojos y luz cinematográfica" />
         </section>
         <div
           className="cr-card"
@@ -2471,7 +2471,7 @@ export function TournamentClashApp() {
       ) : activeView === "create" ? (
         <>
         <div className="tc-create-artwork">
-          <img src="https://images.unsplash.com/photo-1768466588276-7dcf1c3472fb?auto=format&fit=crop&fm=jpg&q=85&w=1600" alt="Espada, casco y escudo de un campeón" />
+          <img src="https://images.stockcake.com/public/a/1/0/a10b220e-3f65-4c4d-a098-87c35b9046c5_medium/dawn-battle-clash-stockcake.jpg" alt="Guerreros y estandartes rojos en una arena cinematográfica" />
           <div><strong>PREPARÁ TU TORNEO</strong><span>La arena está lista. Que empiece la competencia.</span></div>
         </div>
         <CreateTournament
