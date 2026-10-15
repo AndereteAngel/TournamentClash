@@ -85,7 +85,7 @@ export function Navbar({
             boxShadow: "0 2px 5px rgba(0,0,0,0.5)",
           }}
         >
-          👑
+          <img src="/tc-crest.svg" alt="" aria-hidden="true" style={{ width: "25px", height: "27px", objectFit: "contain" }} />
         </div>
 
         <div>
