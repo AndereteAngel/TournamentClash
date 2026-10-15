@@ -1864,22 +1864,11 @@ export function TournamentClashApp() {
               marginBottom: "1.5rem",
             }}
           >
-            <div
-              style={{
-                width: "64px",
-                height: "64px",
-                backgroundColor: "rgba(27, 95, 168, 0.4)",
-                border: "2px solid #ffd700",
-                borderRadius: "12px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                margin: "0 auto 1rem auto",
-                fontSize: "32px",
-              }}
-            >
-              🏆
-            </div>
+            <img
+              src="/tc-crest.svg"
+              alt="Escudo original de TournamentClash"
+              className="tc-login-crest"
+            />
 
             <h1 className="cr-logo-title">TournamentClash</h1>
 
@@ -2022,6 +2011,10 @@ export function TournamentClashApp() {
       ) : activeView === "stats" && isAdmin ? (
         <AdminStats onBack={() => setActiveView("home")} />
       ) : activeView === "home" ? (
+        <>
+        <section className="tc-arena-hero" aria-label="Bienvenido a la arena de TournamentClash">
+          <img src="/arena-banner.svg" alt="Arena fantástica de TournamentClash con corona y guerreros" />
+        </section>
         <div
           className="cr-card"
           style={{
@@ -2474,6 +2467,7 @@ export function TournamentClashApp() {
             )}
           </div>
         </div>
+        </>
       ) : activeView === "create" ? (
         <CreateTournament
           onSave={handleCreateTournamentSubmit}
