@@ -2492,16 +2492,24 @@ export function TournamentClashApp() {
             gap: "1rem",
           }}
         >
+          <GroupStageView
+            tournament={activeTournament}
+            onUpdateTournament={handleUpdateTournamentInSupabase}
+            onProceedToPlayoffs={handleProceedToPlayoffs}
+            currentUser={currentUser}
+          />
+
           {(isTournamentAdmin || isAdmin) && activeTournament.status !== "Finalizado" && (
             <div
               style={{
                 width: "100%",
                 maxWidth: "900px",
                 display: "flex",
-                justifyContent: "flex-end",
+                justifyContent: "center",
                 alignItems: "center",
                 gap: "0.5rem",
                 flexWrap: "wrap",
+                marginTop: "0.25rem",
               }}
             >
               {isTournamentAdmin && (
@@ -2537,16 +2545,17 @@ export function TournamentClashApp() {
                 <button
                   type="button"
                   onClick={handleAdminForceFinishTournament}
+                  className="cr-btn-gold"
                   style={{
                     width: "auto",
+                    maxWidth: "fit-content",
                     padding: "0.45rem 0.75rem",
-                    background: "linear-gradient(135deg, #991b1b, #7f1d1d)",
-                    border: "1px solid #f87171",
-                    borderRadius: "8px",
-                    color: "#fff",
                     fontSize: "0.68rem",
-                    fontWeight: "bold",
-                    cursor: "pointer",
+                    lineHeight: 1.2,
+                    borderWidth: "2px",
+                    borderBottomWidth: "3px",
+                    borderRadius: "8px",
+                    boxShadow: "0 3px 0 #422200, 0 5px 10px rgba(255,156,0,0.2)",
                   }}
                 >
                   🏁 Finalizar torneo
@@ -2554,13 +2563,6 @@ export function TournamentClashApp() {
               )}
             </div>
           )}
-
-          <GroupStageView
-            tournament={activeTournament}
-            onUpdateTournament={handleUpdateTournamentInSupabase}
-            onProceedToPlayoffs={handleProceedToPlayoffs}
-            currentUser={currentUser}
-          />
         </div>
       ) : (
         <div
@@ -2572,41 +2574,44 @@ export function TournamentClashApp() {
             gap: "1rem",
           }}
         >
+          <PlayoffBracket
+            tournament={activeTournament}
+            onUpdateTournament={handleUpdateTournamentInSupabase}
+            onFinishTournament={handleFinishTournament}
+          />
+
           {isAdmin && activeTournament.status !== "Finalizado" && (
             <div
               style={{
                 width: "100%",
                 maxWidth: "600px",
                 display: "flex",
-                justifyContent: "flex-end",
+                justifyContent: "center",
+                marginTop: "0.25rem",
               }}
             >
               <button
                 type="button"
                 onClick={handleAdminForceFinishTournament}
+                className="cr-btn-gold"
                 style={{
                   width: "auto",
+                  maxWidth: "fit-content",
                   padding: "0.45rem 0.75rem",
-                  background: "linear-gradient(135deg, #991b1b, #7f1d1d)",
-                  border: "1px solid #f87171",
-                  borderRadius: "8px",
-                  color: "#fff",
                   fontSize: "0.68rem",
-                  fontWeight: "bold",
-                  cursor: "pointer",
+                  lineHeight: 1.2,
+                  borderWidth: "2px",
+                  borderBottomWidth: "3px",
+                  borderRadius: "8px",
+                  boxShadow: "0 3px 0 #422200, 0 5px 10px rgba(255,156,0,0.2)",
                 }}
               >
                 🏁 Finalizar torneo
               </button>
             </div>
           )}
-          <PlayoffBracket
-            tournament={activeTournament}
-            onUpdateTournament={handleUpdateTournamentInSupabase}
-            onFinishTournament={handleFinishTournament}
-          />
         </div>
-      )}
+      )
     </div>
   );
 }
