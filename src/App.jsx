@@ -1079,6 +1079,9 @@ export function TournamentClashApp() {
   // =========================================================
 
   useEffect(() => {
+    // La pantalla de acceso/registro no cuenta como navegación dentro de la app.
+    if (!currentUser) return;
+
     let cancelado = false;
 
     const obtenerVisitaId = () => {
