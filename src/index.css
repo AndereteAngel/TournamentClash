@@ -1362,3 +1362,156 @@ body[data-tc-theme="arena"] .tc-create-artwork strong { color: #f2c66d; }
   .cr-card { border-radius: 14px; }
   .tc-arena-hero, .tc-create-artwork { border-radius: 12px; }
 }
+
+
+/* =========================================================
+   TOURNAMENTCLASH — ARENA CLARA, ROJO Y BLANCO
+   Ajustes visuales solamente. No modifica lógica ni datos.
+========================================================= */
+:root {
+  color-scheme: light;
+  --tc-bg: #f4f5f7;
+  --tc-surface: #ffffff;
+  --tc-surface-raised: #fff1f2;
+  --tc-border: #e1e3e8;
+  --tc-text: #171717;
+  --tc-muted: #626773;
+  --tc-red: #d7192d;
+  --tc-red-dark: #a80f20;
+  --tc-gold: #b88726;
+}
+
+html, body, #root {
+  background-color: #f4f5f7 !important;
+  color: #171717 !important;
+}
+body {
+  background-image:
+    radial-gradient(ellipse at 50% 0%, rgba(215, 25, 45, .09), transparent 48%),
+    linear-gradient(180deg, #ffffff 0%, #f3f4f6 100%) !important;
+  color: #171717 !important;
+}
+.cr-container { color: #171717 !important; }
+.cr-card,
+body[data-tc-theme="arena"] .cr-card {
+  background: #ffffff !important;
+  color: #171717 !important;
+  border: 1px solid #e0e2e7 !important;
+  border-radius: 18px;
+  box-shadow: 0 12px 32px rgba(22, 25, 31, .08) !important;
+}
+.cr-card h1, .cr-card h2, .cr-card h3, .cr-card h4,
+.cr-card p, .cr-card label, .cr-card small, .cr-card li,
+.cr-card td, .cr-card th, .cr-card strong, .cr-card span,
+.cr-title, body[data-tc-theme="arena"] .cr-title,
+body[data-tc-theme="arena"] .cr-card h1,
+body[data-tc-theme="arena"] .cr-card h2,
+body[data-tc-theme="arena"] .cr-card h3,
+body[data-tc-theme="arena"] .cr-card label,
+body[data-tc-theme="arena"] .cr-card p,
+body[data-tc-theme="arena"] .cr-card span,
+body[data-tc-theme="arena"] .cr-card strong,
+body[data-tc-theme="arena"] .cr-card td,
+body[data-tc-theme="arena"] .cr-card th {
+  color: #171717 !important;
+  text-shadow: none !important;
+}
+.cr-logo-title,
+body[data-tc-theme="arena"] .cr-logo-title {
+  color: #171717 !important;
+  text-shadow: 0 2px 0 #ffffff, 0 5px 16px rgba(0,0,0,.08) !important;
+}
+.cr-card-glow,
+body[data-tc-theme="arena"] .cr-card-glow {
+  background: linear-gradient(90deg, #ffffff, #d7192d 38%, #f28b95 70%, #ffffff) !important;
+}
+.cr-btn-gold,
+body[data-tc-theme="arena"] .cr-btn-gold {
+  background: linear-gradient(180deg, #ed3448 0%, #bd1026 100%) !important;
+  border: 1px solid #d7192d !important;
+  border-bottom: 3px solid #8e0c1b !important;
+  border-radius: 10px;
+  color: #ffffff !important;
+  box-shadow: 0 3px 0 #8e0c1b, 0 8px 18px rgba(215,25,45,.18) !important;
+}
+.cr-btn-gold:hover { filter: brightness(1.06); }
+.cr-input,
+body[data-tc-theme="arena"] .cr-input,
+body[data-tc-theme="arena"] input,
+body[data-tc-theme="arena"] select,
+body[data-tc-theme="arena"] textarea {
+  background: #ffffff !important;
+  color: #171717 !important;
+  border: 1px solid #cfd3da !important;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,.025) !important;
+}
+.cr-input:focus,
+body[data-tc-theme="arena"] .cr-input:focus {
+  border-color: #d7192d !important;
+  box-shadow: 0 0 0 3px rgba(215,25,45,.12) !important;
+}
+.tc-arena-hero {
+  width: min(100%, 980px) !important;
+  margin: 0 auto 1rem !important;
+  border: 1px solid #e0e2e7 !important;
+  border-radius: 18px !important;
+  background: #fff !important;
+  box-shadow: 0 16px 38px rgba(22,25,31,.12) !important;
+}
+.tc-arena-hero img {
+  width: 100%;
+  height: clamp(220px, 32vw, 380px) !important;
+  aspect-ratio: 2.5 / 1 !important;
+  object-fit: cover !important;
+  object-position: center 34% !important;
+}
+.tc-container > .cr-card,
+.cr-container > .cr-card {
+  width: 100% !important;
+  max-width: 980px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+.tc-create-artwork {
+  border: 1px solid #e1e3e8 !important;
+  background: #171717 !important;
+  box-shadow: 0 12px 28px rgba(22,25,31,.12) !important;
+}
+.tc-create-artwork img {
+  height: 220px !important;
+  opacity: .88 !important;
+  object-position: center 55%;
+}
+.tc-create-artwork > div {
+  background: linear-gradient(transparent, rgba(15,15,15,.96) 42%) !important;
+}
+.tc-create-artwork strong { color: #ff6472 !important; }
+.tc-create-artwork span { color: #ffffff !important; }
+.tc-login-crest { filter: drop-shadow(0 5px 10px rgba(215,25,45,.18)); }
+.tc-theme-toggle {
+  background: #ffffff !important;
+  color: #171717 !important;
+  border: 1px solid #d1d5db !important;
+}
+body[data-tc-theme="arena"] .tc-navbar {
+  background: #ffffff !important;
+  color: #171717 !important;
+  border-color: #e0e2e7 !important;
+  box-shadow: 0 6px 20px rgba(22,25,31,.07) !important;
+}
+body[data-tc-theme="arena"] .tc-navbar span,
+body[data-tc-theme="arena"] .tc-navbar button:not(.tc-theme-toggle),
+body[data-tc-theme="arena"] .tc-navbar button:not(.tc-theme-toggle) span {
+  color: #171717 !important;
+}
+body[data-tc-theme="arena"] .tc-navbar > div:first-child {
+  background: linear-gradient(90deg, #ffffff, #d7192d, #ffffff) !important;
+}
+body[data-tc-theme="arena"] table th { background: #fff1f2 !important; }
+body[data-tc-theme="arena"] * { scrollbar-color: #d7192d #f4f5f7; }
+
+@media (max-width: 700px) {
+  .tc-arena-hero { border-radius: 12px !important; }
+  .tc-arena-hero img { height: 190px !important; aspect-ratio: 1.7 / 1 !important; }
+  .tc-create-artwork img { height: 170px !important; }
+}
