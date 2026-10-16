@@ -1003,6 +1003,11 @@ export function TournamentClashApp() {
   const [loading, setLoading] = useState(false);
   const [editingTournament, setEditingTournament] = useState(false);
   const [deletingTournamentId, setDeletingTournamentId] = useState(null);
+  const [registeredProfiles, setRegisteredProfiles] = useState([]);
+  const [loadingRegisteredProfiles, setLoadingRegisteredProfiles] = useState(false);
+  const [registeredProfilesSearch, setRegisteredProfilesSearch] = useState("");
+  const [selectedRegisteredProfileIds, setSelectedRegisteredProfileIds] = useState([]);
+
   useEffect(() => {
     document.documentElement.dataset.tcTheme = "clash";
     document.body.dataset.tcTheme = "clash";
@@ -1557,6 +1562,79 @@ export function TournamentClashApp() {
     setTournaments((prev) => prev.map((item) => item.id === updatedTournament.id ? updatedTournament : item));
     if (activeTournament?.id === updatedTournament.id) setActiveTournament(updatedTournament);
     alert(`✅ ¡Te inscribiste en "${updatedTournament.title}"!`);
+  };
+
+  const handleLoadRegisteredProfiles = async () => {
+    setLoadingRegisteredProfiles(true);
+    const { data, error } = await supabase.from("profiles")
+      .select("id, username, email").order("username", { ascending: true });
+    setLoadingRegisteredProfiles(false);
+    if (error) {
+      console.error("Error al cargar usuarios registrados:", error);
+      alert("No se pudo cargar la lista de usuarios. Revisá los permisos de lectura de profiles en Supabase.");
+      return;
+    }
+    setRegisteredProfiles(data || []);
+    setSelectedRegisteredProfileIds([]);
+  };
+
+  const handleAddSelectedRegisteredProfiles = async () => {
+    if (!activeTournament?.id || !currentUser) return;
+    const isOwner = activeTournament.created_by_user_id === currentUser.id ||
+      (!activeTournament.created_by_user_id && currentUser.username === activeTournament.created_by);
+    if (!isOwner && currentUser.id !== ADMIN_UID) {
+      alert("Solo el creador o administrador puede agregar participantes.");
+      return;
+    }
+    const { data: latest, error: fetchError } = await supabase.from("tournaments")
+      .select("id, title, groups, status").eq("id", activeTournament.id).maybeSingle();
+    if (fetchError || !latest) {
+      console.error("Error al consultar torneo:", fetchError);
+      alert("No se pudo actualizar el torneo. Volvé a intentarlo.");
+      return;
+    }
+    if (String(latest.status || "").trim().toLocaleLowerCase("es") !== "inscripciones") {
+      alert("Las inscripciones ya están cerradas.");
+      await fetchTournaments();
+      return;
+    }
+    const groups = Array.isArray(latest.groups) ? [...latest.groups] : [];
+    const index = groups.findIndex((group) => group?.name === "__INSCRIPCIONES__");
+    if (index < 0) {
+      alert("No se encontró la lista de inscriptos.");
+      return;
+    }
+    const registration = { ...groups[index] };
+    const participants = Array.isArray(registration.teams) ? [...registration.teams] : [];
+    const capacity = Number(registration.capacity || 0);
+    const chosenProfiles = registeredProfiles.filter((profile) => selectedRegisteredProfileIds.includes(profile.id));
+    const alreadyRegistered = new Set(participants.map((name) => String(name).toLocaleLowerCase("es")));
+    const namesToAdd = chosenProfiles.map((profile) => String(profile.username || "").trim())
+      .filter((name) => name && !alreadyRegistered.has(name.toLocaleLowerCase("es")));
+    if (!namesToAdd.length) {
+      alert("Seleccioná al menos un usuario que todavía no esté inscripto.");
+      return;
+    }
+    if (capacity > 0 && participants.length + namesToAdd.length > capacity) {
+      alert(`La selección supera el cupo. Hay ${participants.length}/${capacity} inscriptos y seleccionaste ${namesToAdd.length} usuarios nuevos.`);
+      return;
+    }
+    registration.teams = [...participants, ...namesToAdd];
+    groups[index] = registration;
+    const { data: updatedRows, error: updateError } = await supabase.from("tournaments")
+      .update({ groups }).eq("id", activeTournament.id).eq("status", "Inscripciones").select();
+    if (updateError || !updatedRows?.length) {
+      console.error("Error al guardar participantes seleccionados:", updateError);
+      alert(updateError?.message
+        ? `Supabase rechazó la actualización: ${updateError.message}`
+        : "No se pudo guardar la lista. Puede que el torneo haya cambiado de estado.");
+      return;
+    }
+    const updatedTournament = updatedRows[0];
+    setActiveTournament(updatedTournament);
+    setTournaments((prev) => prev.map((item) => item.id === updatedTournament.id ? updatedTournament : item));
+    setSelectedRegisteredProfileIds([]);
+    alert(`Se agregaron ${namesToAdd.length} participante(s) al torneo.`);
   };
 
   const handleStartRegistrationTournament = async () => {
@@ -2781,6 +2859,36 @@ export function TournamentClashApp() {
                       </div>
                     ) : <p style={{ color: "#9ca3af" }}>Todavía no hay jugadores inscriptos.</p>}
                     <p style={{ color: "#9ca3af", fontSize: "0.8rem" }}>El creador dará comienzo al torneo cuando esté listo. Al iniciar, se cerrarán las inscripciones y se sortearán los grupos y partidos.</p>
+                    {(isOwner || currentUser?.id === ADMIN_UID) && (
+                      <div style={{ marginTop: "1rem", padding: "0.85rem", background: "#171522", border: "1px solid #3b82f6", borderRadius: "10px" }}>
+                        <h3 style={{ color: "#fff", margin: "0 0 0.35rem" }}>👥 Agregar jugadores registrados</h3>
+                        <p style={{ color: "#9ca3af", fontSize: "0.78rem", marginTop: 0 }}>Seleccioná cuentas existentes. Podés filtrar por alias o correo y se respeta el cupo.</p>
+                        <button type="button" onClick={handleLoadRegisteredProfiles} disabled={loadingRegisteredProfiles} style={{ width: "100%", padding: "0.65rem", borderRadius: "8px", background: "#1b5fa8", border: "1px solid #60a5fa", color: "#fff", cursor: loadingRegisteredProfiles ? "wait" : "pointer", fontWeight: "bold" }}>
+                          {loadingRegisteredProfiles ? "Cargando usuarios..." : registeredProfiles.length ? "↻ Recargar lista de usuarios" : "🔎 Cargar lista de usuarios"}
+                        </button>
+                        {registeredProfiles.length > 0 && (
+                          <>
+                            <input type="search" value={registeredProfilesSearch} onChange={(e) => setRegisteredProfilesSearch(e.target.value)} placeholder="Filtrar por alias o correo..." aria-label="Filtrar usuarios registrados" style={{ width: "100%", boxSizing: "border-box", margin: "0.65rem 0", padding: "0.65rem", borderRadius: "7px", border: "1px solid #4b5563", background: "#121019", color: "#fff" }} />
+                            <div style={{ maxHeight: "260px", overflowY: "auto", display: "grid", gap: "0.35rem" }}>
+                              {registeredProfiles.filter((profile) => {
+                                const query = registeredProfilesSearch.trim().toLocaleLowerCase("es");
+                                return !query || String(profile.username || "").toLocaleLowerCase("es").includes(query) || String(profile.email || "").toLocaleLowerCase("es").includes(query);
+                              }).map((profile) => {
+                                const isAlreadyRegistered = participants.some((name) => String(name).toLocaleLowerCase("es") === String(profile.username || "").toLocaleLowerCase("es"));
+                                return (
+                                  <label key={profile.id} style={{ display: "flex", gap: "0.6rem", alignItems: "center", padding: "0.55rem", borderRadius: "7px", background: "#121019", color: isAlreadyRegistered ? "#6b7280" : "#e5e7eb", fontSize: "0.82rem", cursor: isAlreadyRegistered ? "not-allowed" : "pointer" }}>
+                                    <input type="checkbox" checked={isAlreadyRegistered || selectedRegisteredProfileIds.includes(profile.id)} disabled={isAlreadyRegistered} onChange={(e) => setSelectedRegisteredProfileIds((prev) => e.target.checked ? [...prev, profile.id] : prev.filter((id) => id !== profile.id))} />
+                                    <span style={{ flex:  1, minWidth: 0, overflowWrap: "anywhere" }}>{profile.username || "Sin alias"}{profile.email ? <small style={{ display: "block", color: "#9ca3af" }}>{profile.email}</small> : null}</span>
+                                    {isAlreadyRegistered && <span>✓ Inscripto</span>}
+                                  </label>
+                                );
+                              })}
+                            </div>
+                            <button type="button" onClick={handleAddSelectedRegisteredProfiles} disabled={!selectedRegisteredProfileIds.length} className="cr-btn-gold" style={{ width: "100%", marginTop: "0.65rem", opacity: selectedRegisteredProfileIds.length ? 1 : 0.55 }}>➕ Agregar seleccionados ({selectedRegisteredProfileIds.length})</button>
+                          </>
+                        )}
+                      </div>
+                    )}
                     {(isOwner || currentUser?.id === ADMIN_UID) && (
                       <button type="button" className="cr-btn-gold" onClick={handleStartRegistrationTournament} style={{ width: "100%", marginTop: "0.5rem" }}>
                         🏁 Dar comienzo al torneo
