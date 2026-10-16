@@ -9,6 +9,7 @@ import { GroupStageView } from "./components/GroupStageView";
 import { Navbar } from "./components/Navbar";
 import { TCIcon } from "./components/TCIcon";
 import { ChampionCelebration } from "./components/ChampionCelebration";
+import { TournamentNotice, useTournamentNotice } from "./components/TournamentNotice";
 import { PlayoffBracket } from "./components/PlayoffBracket";
 import { supabase } from "./supabaseClient";
 
@@ -988,6 +989,7 @@ function AdminStats({ onBack }) {
 }
 
 export function TournamentClashApp() {
+  const { notice, showNotice, clearNotice } = useTournamentNotice();
   const [currentUser, setCurrentUser] = useState(null);
   const [authMode, setAuthMode] = useState("login");
   const [authInput, setAuthInput] = useState({
@@ -1247,12 +1249,12 @@ export function TournamentClashApp() {
 
   const handleDeleteTournament = async (tournament) => {
     if (!currentUser || currentUser.id !== ADMIN_UID) {
-      alert("❌ No tenés permisos para eliminar torneos.");
+      showNotice("❌ No tenés permisos para eliminar torneos.");
       return;
     }
 
     if (!tournament?.id) {
-      alert("❌ No se pudo identificar el torneo.");
+      showNotice("❌ No se pudo identificar el torneo.");
       return;
     }
 
@@ -1276,7 +1278,7 @@ export function TournamentClashApp() {
       if (error) {
         console.error("Error al eliminar torneo:", error);
 
-        alert(
+        showNotice(
           `❌ No se pudo eliminar el torneo.\n\n${
             error.message || "Error desconocido."
           }`
@@ -1293,11 +1295,11 @@ export function TournamentClashApp() {
         setEditingTournament(false);
       }
 
-      alert("✅ Torneo eliminado correctamente.");
+      showNotice("✅ Torneo eliminado correctamente.");
     } catch (error) {
       console.error("Error inesperado al eliminar torneo:", error);
 
-      alert("❌ Ocurrió un error al intentar eliminar el torneo.");
+      showNotice("❌ Ocurrió un error al intentar eliminar el torneo.");
     } finally {
       setDeletingTournamentId(null);
     }
@@ -1316,17 +1318,17 @@ export function TournamentClashApp() {
 
     if (authMode === "register") {
       if (!username || !email || !password) {
-        alert("❌ Completá todos los campos.");
+        showNotice("❌ Completá todos los campos.");
         return;
       }
 
       if (username.length < 3) {
-        alert("❌ El alias debe tener al menos 3 caracteres.");
+        showNotice("❌ El alias debe tener al menos 3 caracteres.");
         return;
       }
 
       if (password.length < 6) {
-        alert("❌ La contraseña debe tener al menos 6 caracteres.");
+        showNotice("❌ La contraseña debe tener al menos 6 caracteres.");
         return;
       }
 
@@ -1340,7 +1342,7 @@ export function TournamentClashApp() {
         console.error("Error al verificar alias:", profileError);
 
       if (existingProfile) {
-        alert("❌ Este alias ya está registrado.");
+        showNotice("❌ Este alias ya está registrado.");
         return;
       }
 
@@ -1356,16 +1358,16 @@ export function TournamentClashApp() {
         console.error("Error al registrar usuario:", error);
 
         if (error.message?.toLowerCase().includes("already registered")) {
-          alert("❌ Este email ya está registrado.");
+          showNotice("❌ Este email ya está registrado.");
         } else {
-          alert(`❌ No se pudo registrar el usuario: ${error.message}`);
+          showNotice(`❌ No se pudo registrar el usuario: ${error.message}`);
         }
 
         return;
       }
 
       if (!data.session) {
-        alert(
+        showNotice(
           "✅ Registro realizado.\n\nRevisá tu correo electrónico para confirmar la cuenta y luego iniciá sesión."
         );
 
@@ -1393,7 +1395,7 @@ export function TournamentClashApp() {
     }
 
     if (!email || !password) {
-      alert("❌ Ingresá tu email y contraseña.");
+      showNotice("❌ Ingresá tu email y contraseña.");
       return;
     }
 
@@ -1405,7 +1407,7 @@ export function TournamentClashApp() {
     if (error) {
       console.error("Error al iniciar sesión:", error);
 
-      alert("❌ Email o contraseña incorrectos.");
+      showNotice("❌ Email o contraseña incorrectos.");
 
       return;
     }
@@ -1452,7 +1454,7 @@ export function TournamentClashApp() {
 
   const handleCreateTournamentSubmit = async (config) => {
     if (!currentUser) {
-      alert("❌ Tenés que iniciar sesión para crear un torneo.");
+      showNotice("❌ Tenés que iniciar sesión para crear un torneo.");
       return;
     }
 
@@ -1486,7 +1488,7 @@ export function TournamentClashApp() {
       .select();
 
     if (error) {
-      alert("❌ Error al guardar el torneo en Supabase.");
+      showNotice("❌ Error al guardar el torneo en Supabase.");
       console.error(error);
       return;
     }
@@ -1509,12 +1511,12 @@ export function TournamentClashApp() {
 
     if (fetchError || !latest) {
       console.error("Error al consultar inscripción:", fetchError);
-      alert("No se pudo comprobar el estado de las inscripciones. Intentá de nuevo.");
+      showNotice("No se pudo comprobar el estado de las inscripciones. Intentá de nuevo.");
       return;
     }
 
     if (String(latest.status || "").trim().toLocaleLowerCase("es") !== "inscripciones") {
-      alert("🔒 Las inscripciones ya están cerradas.");
+      showNotice("🔒 Las inscripciones ya están cerradas.");
       await fetchTournaments();
       return;
     }
@@ -1522,20 +1524,20 @@ export function TournamentClashApp() {
     const groups = Array.isArray(latest.groups) ? [...latest.groups] : [];
     const registrationIndex = groups.findIndex((group) => group?.name === "__INSCRIPCIONES__");
     if (registrationIndex < 0) {
-      alert("No se encontró la lista de inscriptos de este torneo.");
+      showNotice("No se encontró la lista de inscriptos de este torneo.");
       return;
     }
 
     const registration = { ...groups[registrationIndex] };
     const participants = Array.isArray(registration.teams) ? [...registration.teams] : [];
     if (participants.some((name) => String(name).toLocaleLowerCase("es") === currentUser.username.toLocaleLowerCase("es"))) {
-      alert("Ya estás inscripto en este torneo.");
+      showNotice("Ya estás inscripto en este torneo.");
       return;
     }
 
     const capacity = Number(registration.capacity || 0);
     if (capacity > 0 && participants.length >= capacity) {
-      alert("🚫 El cupo de este torneo ya está completo.");
+      showNotice("🚫 El cupo de este torneo ya está completo.");
       await fetchTournaments();
       return;
     }
@@ -1553,7 +1555,7 @@ export function TournamentClashApp() {
 
     if (updateError || !updatedRows?.length) {
       console.error("Error al guardar la inscripción:", updateError);
-      alert("No se pudo completar la inscripción. Puede que el torneo haya comenzado o se haya completado el cupo.");
+      showNotice("No se pudo completar la inscripción. Puede que el torneo haya comenzado o se haya completado el cupo.");
       await fetchTournaments();
       return;
     }
@@ -1561,7 +1563,7 @@ export function TournamentClashApp() {
     const updatedTournament = updatedRows[0];
     setTournaments((prev) => prev.map((item) => item.id === updatedTournament.id ? updatedTournament : item));
     if (activeTournament?.id === updatedTournament.id) setActiveTournament(updatedTournament);
-    alert(`✅ ¡Te inscribiste en "${updatedTournament.title}"!`);
+    showNotice(`✅ ¡Te inscribiste en "${updatedTournament.title}"!`);
   };
 
   const handleLoadRegisteredProfiles = async () => {
@@ -1571,7 +1573,7 @@ export function TournamentClashApp() {
     setLoadingRegisteredProfiles(false);
     if (error) {
       console.error("Error al cargar usuarios registrados:", error);
-      alert("No se pudo cargar la lista de usuarios. Revisá los permisos de lectura de profiles en Supabase.");
+      showNotice("No se pudo cargar la lista de usuarios. Revisá los permisos de lectura de profiles en Supabase.");
       return;
     }
     setRegisteredProfiles(data || []);
@@ -1583,25 +1585,25 @@ export function TournamentClashApp() {
     const isOwner = activeTournament.created_by_user_id === currentUser.id ||
       (!activeTournament.created_by_user_id && currentUser.username === activeTournament.created_by);
     if (!isOwner && currentUser.id !== ADMIN_UID) {
-      alert("Solo el creador o administrador puede agregar participantes.");
+      showNotice("Solo el creador o administrador puede agregar participantes.");
       return;
     }
     const { data: latest, error: fetchError } = await supabase.from("tournaments")
       .select("id, title, groups, status").eq("id", activeTournament.id).maybeSingle();
     if (fetchError || !latest) {
       console.error("Error al consultar torneo:", fetchError);
-      alert("No se pudo actualizar el torneo. Volvé a intentarlo.");
+      showNotice("No se pudo actualizar el torneo. Volvé a intentarlo.");
       return;
     }
     if (String(latest.status || "").trim().toLocaleLowerCase("es") !== "inscripciones") {
-      alert("Las inscripciones ya están cerradas.");
+      showNotice("Las inscripciones ya están cerradas.");
       await fetchTournaments();
       return;
     }
     const groups = Array.isArray(latest.groups) ? [...latest.groups] : [];
     const index = groups.findIndex((group) => group?.name === "__INSCRIPCIONES__");
     if (index < 0) {
-      alert("No se encontró la lista de inscriptos.");
+      showNotice("No se encontró la lista de inscriptos.");
       return;
     }
     const registration = { ...groups[index] };
@@ -1612,11 +1614,11 @@ export function TournamentClashApp() {
     const namesToAdd = chosenProfiles.map((profile) => String(profile.username || "").trim())
       .filter((name) => name && !alreadyRegistered.has(name.toLocaleLowerCase("es")));
     if (!namesToAdd.length) {
-      alert("Seleccioná al menos un usuario que todavía no esté inscripto.");
+      showNotice("Seleccioná al menos un usuario que todavía no esté inscripto.");
       return;
     }
     if (capacity > 0 && participants.length + namesToAdd.length > capacity) {
-      alert(`La selección supera el cupo. Hay ${participants.length}/${capacity} inscriptos y seleccionaste ${namesToAdd.length} usuarios nuevos.`);
+      showNotice(`La selección supera el cupo. Hay ${participants.length}/${capacity} inscriptos y seleccionaste ${namesToAdd.length} usuarios nuevos.`);
       return;
     }
     registration.teams = [...participants, ...namesToAdd];
@@ -1625,7 +1627,7 @@ export function TournamentClashApp() {
       .update({ groups }).eq("id", activeTournament.id).eq("status", "Inscripciones").select();
     if (updateError || !updatedRows?.length) {
       console.error("Error al guardar participantes seleccionados:", updateError);
-      alert(updateError?.message
+      showNotice(updateError?.message
         ? `Supabase rechazó la actualización: ${updateError.message}`
         : "No se pudo guardar la lista. Puede que el torneo haya cambiado de estado.");
       return;
@@ -1634,7 +1636,7 @@ export function TournamentClashApp() {
     setActiveTournament(updatedTournament);
     setTournaments((prev) => prev.map((item) => item.id === updatedTournament.id ? updatedTournament : item));
     setSelectedRegisteredProfileIds([]);
-    alert(`Se agregaron ${namesToAdd.length} participante(s) al torneo.`);
+    showNotice(`Se agregaron ${namesToAdd.length} participante(s) al torneo.`);
   };
 
   const handleStartRegistrationTournament = async () => {
@@ -1645,7 +1647,7 @@ export function TournamentClashApp() {
       (activeTournament.created_by_user_id === currentUser.id ||
         (!activeTournament.created_by_user_id && currentUser.username === activeTournament.created_by));
     if (!isOwner && currentUser?.id !== ADMIN_UID) {
-      alert("Solo el creador del torneo puede dar comienzo.");
+      showNotice("Solo el creador del torneo puede dar comienzo.");
       return;
     }
 
@@ -1654,11 +1656,11 @@ export function TournamentClashApp() {
     const numGroups = activeTournament.format === "groups_playoff" ? Number(registration?.numGroups || 2) : 1;
 
     if (participants.length < 4) {
-      alert("Necesitás al menos 4 participantes inscriptos para dar comienzo.");
+      showNotice("Necesitás al menos 4 participantes inscriptos para dar comienzo.");
       return;
     }
     if (participants.length < numGroups) {
-      alert(`Para armar ${numGroups} grupos necesitás al menos ${numGroups} participantes.`);
+      showNotice(`Para armar ${numGroups} grupos necesitás al menos ${numGroups} participantes.`);
       return;
     }
 
@@ -1697,7 +1699,7 @@ export function TournamentClashApp() {
 
     if (error || !data?.length) {
       console.error("Error al iniciar torneo:", error);
-      alert("No se pudo iniciar el torneo. Puede que ya haya comenzado; actualizá la lista e intentá de nuevo.");
+      showNotice("No se pudo iniciar el torneo. Puede que ya haya comenzado; actualizá la lista e intentá de nuevo.");
       await fetchTournaments();
       return;
     }
@@ -1705,7 +1707,7 @@ export function TournamentClashApp() {
     setActiveTournament(data[0]);
     setTournaments((prev) => prev.map((item) => item.id === data[0].id ? data[0] : item));
     setActiveView("groups");
-    alert("🏆 ¡Torneo en marcha! Los grupos y partidos se generaron automáticamente.");
+    showNotice("🏆 ¡Torneo en marcha! Los grupos y partidos se generaron automáticamente.");
   };
 
   // =========================================================
@@ -1737,12 +1739,12 @@ export function TournamentClashApp() {
     if (!activeTournament) return;
 
     if (!isTournamentAdmin) {
-      alert("❌ Solo el administrador puede modificar este torneo.");
+      showNotice("❌ Solo el administrador puede modificar este torneo.");
       return;
     }
 
     if (tournamentHasResults(activeTournament)) {
-      alert(
+      showNotice(
         "🔒 Este torneo ya tiene resultados cargados. No se puede modificar su organización para proteger los partidos existentes."
       );
       return;
@@ -1812,7 +1814,7 @@ export function TournamentClashApp() {
     if (error) {
       console.error("Error al modificar torneo:", error);
 
-      alert("❌ No se pudieron guardar los cambios.");
+      showNotice("❌ No se pudieron guardar los cambios.");
 
       return;
     }
@@ -1826,7 +1828,7 @@ export function TournamentClashApp() {
 
       setEditingTournament(false);
 
-      alert("✅ Torneo modificado correctamente.");
+      showNotice("✅ Torneo modificado correctamente.");
     }
   };
 
@@ -1835,7 +1837,7 @@ export function TournamentClashApp() {
       .trim()
       .toLocaleLowerCase("es");
     if (currentStatus === "finalizado") {
-      alert("🔒 Este torneo ya está finalizado. No se pueden modificar sus resultados.");
+      showNotice("🔒 Este torneo ya está finalizado. No se pueden modificar sus resultados.");
       return;
     }
 
@@ -1871,7 +1873,7 @@ export function TournamentClashApp() {
     const found = tournaments.find((t) => t.code === cleanCode);
 
     if (!found) {
-      alert("❌ Código de torneo no encontrado en la base de datos.");
+      showNotice("❌ Código de torneo no encontrado en la base de datos.");
       return;
     }
 
@@ -1925,7 +1927,7 @@ export function TournamentClashApp() {
         match.score2 !== null && match.score2 !== undefined
       );
       if (!playedMatches.length) {
-        alert("⚠️ Para finalizar una liga tiene que haberse jugado al menos un partido.");
+        showNotice("⚠️ Para finalizar una liga tiene que haberse jugado al menos un partido.");
         return;
       }
     } else {
@@ -1942,7 +1944,7 @@ export function TournamentClashApp() {
       });
 
       if (!rounds.length || hasIncompleteMatch) {
-        alert("⚠️ Para finalizar un torneo de Grupos + Playoffs, primero hay que completar todos los partidos de grupos y todas las llaves eliminatorias.");
+        showNotice("⚠️ Para finalizar un torneo de Grupos + Playoffs, primero hay que completar todos los partidos de grupos y todas las llaves eliminatorias.");
         return;
       }
 
@@ -1954,7 +1956,7 @@ export function TournamentClashApp() {
           : null);
 
       if (!champion || champion === "Empate (Definir)") {
-        alert("⚠️ No se puede finalizar: la gran final debe tener un ganador.");
+        showNotice("⚠️ No se puede finalizar: la gran final debe tener un ganador.");
         return;
       }
     }
@@ -1967,25 +1969,25 @@ export function TournamentClashApp() {
 
     if (error) {
       console.error("Error al finalizar el torneo:", error);
-      alert("❌ No se pudo finalizar el torneo. Intentá nuevamente.");
+      showNotice("❌ No se pudo finalizar el torneo. Intentá nuevamente.");
       return;
     }
 
     setActiveTournament(finishedObj);
     setTournaments((prev) => prev.map((t) => t.id === finishedObj.id ? finishedObj : t));
     setShowChampionCard(true);
-    alert("🏆 ¡Torneo finalizado! El campeón quedó registrado.");
+    showNotice("🏆 ¡Torneo finalizado! El campeón quedó registrado.");
   };
 
   const isAdmin = currentUser?.id === ADMIN_UID;
 
   const handleAdminForceFinishTournament = async () => {
     if (!isAdmin || !activeTournament?.id) {
-      alert("❌ Solo el administrador puede finalizar torneos.");
+      showNotice("❌ Solo el administrador puede finalizar torneos.");
       return;
     }
     if (String(activeTournament.status || "").trim().toLocaleLowerCase("es") === "finalizado") {
-      alert("Este torneo ya está finalizado.");
+      showNotice("Este torneo ya está finalizado.");
       return;
     }
 
@@ -2002,7 +2004,7 @@ export function TournamentClashApp() {
 
     if (error) {
       console.error("Error al finalizar el torneo:", error);
-      alert("❌ No se pudo finalizar el torneo. Intentá nuevamente.");
+      showNotice("❌ No se pudo finalizar el torneo. Intentá nuevamente.");
       return;
     }
 
@@ -2012,11 +2014,12 @@ export function TournamentClashApp() {
       prev.map((t) => (t.id === torneoFinalizado.id ? torneoFinalizado : t))
     );
     setShowChampionCard(true);
-    alert("✅ Torneo finalizado. Si no hay resultados suficientes para calcular el podio, la tarjeta no podrá mostrar un campeón todavía.");
+    showNotice("✅ Torneo finalizado. Si no hay resultados suficientes para calcular el podio, la tarjeta no podrá mostrar un campeón todavía.");
   };
 
   return (
     <div className="cr-container tc-theme-clash">
+      <TournamentNotice notice={notice} onClose={clearNotice} />
       {currentUser && (
         <Navbar
           onGoHome={handleGoHome}
@@ -2927,7 +2930,7 @@ export function TournamentClashApp() {
                 <button
                   onClick={() => {
                     if (tournamentHasResults(activeTournament)) {
-                      alert(
+                      showNotice(
                         "🔒 Este torneo ya tiene resultados cargados. No se puede modificar su organización."
                       );
                       return;
