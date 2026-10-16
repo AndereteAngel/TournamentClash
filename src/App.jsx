@@ -1460,7 +1460,7 @@ export function TournamentClashApp() {
     const registrationGroup = {
       id: 0,
       name: "__INSCRIPCIONES__",
-      teams: [],
+      teams: Array.isArray(config.teams) ? config.teams : [],
       matches: [],
       capacity: Number(config.maxParticipants),
       numGroups: config.format === "groups_playoff" ? Number(config.numGroups) : 1,
