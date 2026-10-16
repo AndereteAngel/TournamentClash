@@ -41,6 +41,7 @@ export function CreateTournament({
         qualifiersPerGroup: 2,
         isPublic: true,
         participantsInput: "",
+        maxParticipants: 16,
       };
     }
 
@@ -55,6 +56,7 @@ export function CreateTournament({
       qualifiersPerGroup: initialData.qualifiers_per_group || 2,
       isPublic: initialData.is_public !== false,
       participantsInput: participants.join("\n"),
+      maxParticipants: initialData.max_participants || 16,
     };
   };
 
@@ -80,19 +82,25 @@ export function CreateTournament({
       .map((name) => name.trim())
       .filter((name) => name.length > 0);
 
-    if (teams.length < 4) {
-      alert("Necesitas al menos 4 participantes para armar el torneo.");
-      return;
-    }
+    if (isEditing) {
+      if (teams.length < 4) {
+        alert("Necesitas al menos 4 participantes para armar el torneo.");
+        return;
+      }
 
-    if (formData.format === "groups_playoff" && teams.length < formData.numGroups) {
-      alert(`Para armar ${formData.numGroups} grupos necesitás al menos ${formData.numGroups} participantes.`);
+      if (formData.format === "groups_playoff" && teams.length < formData.numGroups) {
+        alert(`Para armar ${formData.numGroups} grupos necesitás al menos ${formData.numGroups} participantes.`);
+        return;
+      }
+    } else if (!Number.isInteger(Number(formData.maxParticipants)) || Number(formData.maxParticipants) < 4 || Number(formData.maxParticipants) > 256) {
+      alert("El cupo máximo debe ser un número entre 4 y 256.");
       return;
     }
 
     onSave({
       ...formData,
-      teams,
+      maxParticipants: Number(formData.maxParticipants),
+      teams: isEditing ? teams : [],
     });
   };
 
@@ -422,6 +430,38 @@ export function CreateTournament({
           </div>
         )}
 
+        {!isEditing ? (
+          <div>
+            <label
+              style={{
+                display: "block",
+                fontSize: "0.75rem",
+                fontWeight: "bold",
+                textTransform: "uppercase",
+                color: "#d1d5db",
+                marginBottom: "4px",
+              }}
+            >
+              Cupo máximo de participantes
+            </label>
+            <input
+              type="number"
+              min="4"
+              max="256"
+              step="1"
+              value={formData.maxParticipants}
+              onChange={(e) =>
+                setFormData({ ...formData, maxParticipants: e.target.value })
+              }
+              required
+              className="cr-input"
+            />
+            <span style={{ fontSize: "10px", color: "#9ca3af", marginTop: "4px", display: "block" }}>
+              El torneo quedará abierto para inscripciones. Cuando estés listo, el administrador podrá dar comienzo y se generarán los grupos automáticamente.
+            </span>
+          </div>
+        ) : (
+        <>
         {/* ===================================================
             PARTICIPANTES
             =================================================== */}
@@ -470,6 +510,8 @@ export function CreateTournament({
             línea.
           </span>
         </div>
+        </>
+        )}
 
         {/* ===================================================
             BOTÓN
@@ -484,7 +526,7 @@ export function CreateTournament({
         >
           {isEditing
             ? "💾 Guardar modificaciones"
-            : "Generar Torneo y Calendario 🏆"}
+            : "Crear Torneo y Abrir Inscripciones 📝"}
         </button>
       </form>
     </div>
