@@ -607,7 +607,7 @@ export function CreateTournament({
         >
           {isEditing
             ? "💾 Guardar modificaciones"
-            : "Crear Torneo y Abrir Inscripciones 📝"}
+            : "Crear Torneo ⚔️"}
         </button>
       </form>
       </div>
