@@ -2508,7 +2508,10 @@ export function TournamentClashApp() {
                         type="button"
                         disabled={(() => {
                           const registration = (t.groups || []).find((group) => group?.name === "__INSCRIPCIONES__");
-                          return Number(registration?.capacity || 0) > 0 && (registration?.teams || []).length >= Number(registration.capacity);
+                          const teams = registration?.teams || [];
+                          const alreadyRegistered = teams.some((name) => String(name).toLocaleLowerCase("es") === currentUser.username.toLocaleLowerCase("es"));
+                          const full = Number(registration?.capacity || 0) > 0 && teams.length >= Number(registration.capacity);
+                          return alreadyRegistered || full;
                         })()}
                         onClick={(e) => {
                           e.stopPropagation();
@@ -2526,13 +2529,19 @@ export function TournamentClashApp() {
                           whiteSpace: "nowrap",
                           opacity: (() => {
                             const registration = (t.groups || []).find((group) => group?.name === "__INSCRIPCIONES__");
-                            return Number(registration?.capacity || 0) > 0 && (registration?.teams || []).length >= Number(registration.capacity) ? 0.55 : 1;
+                            const teams = registration?.teams || [];
+                            const alreadyRegistered = teams.some((name) => String(name).toLocaleLowerCase("es") === currentUser.username.toLocaleLowerCase("es"));
+                            const full = Number(registration?.capacity || 0) > 0 && teams.length >= Number(registration.capacity);
+                            return alreadyRegistered || full ? 0.55 : 1;
                           })(),
                         }}
                       >
                         {(() => {
                           const registration = (t.groups || []).find((group) => group?.name === "__INSCRIPCIONES__");
-                          return Number(registration?.capacity || 0) > 0 && (registration?.teams || []).length >= Number(registration.capacity) ? "Cupo completo" : "📝 Inscripción";
+                          const teams = registration?.teams || [];
+                          const alreadyRegistered = teams.some((name) => String(name).toLocaleLowerCase("es") === currentUser.username.toLocaleLowerCase("es"));
+                          const full = Number(registration?.capacity || 0) > 0 && teams.length >= Number(registration.capacity);
+                          return alreadyRegistered ? "✓ Inscripto" : full ? "Cupo completo" : "📝 Inscripción";
                         })()}
                       </button>
                     )}
