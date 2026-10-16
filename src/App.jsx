@@ -2496,6 +2496,10 @@ export function TournamentClashApp() {
                     {String(t.status || "").trim().toLocaleLowerCase("es") === "inscripciones" && (
                       <button
                         type="button"
+                        disabled={(() => {
+                          const registration = (t.groups || []).find((group) => group?.name === "__INSCRIPCIONES__");
+                          return Number(registration?.capacity || 0) > 0 && (registration?.teams || []).length >= Number(registration.capacity);
+                        })()}
                         onClick={(e) => {
                           e.stopPropagation();
                           handleRegisterForTournament(t);
@@ -2510,9 +2514,16 @@ export function TournamentClashApp() {
                           fontWeight: 900,
                           cursor: "pointer",
                           whiteSpace: "nowrap",
+                          opacity: (() => {
+                            const registration = (t.groups || []).find((group) => group?.name === "__INSCRIPCIONES__");
+                            return Number(registration?.capacity || 0) > 0 && (registration?.teams || []).length >= Number(registration.capacity) ? 0.55 : 1;
+                          })(),
                         }}
                       >
-                        📝 Inscripción
+                        {(() => {
+                          const registration = (t.groups || []).find((group) => group?.name === "__INSCRIPCIONES__");
+                          return Number(registration?.capacity || 0) > 0 && (registration?.teams || []).length >= Number(registration.capacity) ? "Cupo completo" : "📝 Inscripción";
+                        })()}
                       </button>
                     )}
                     <div
@@ -2772,7 +2783,7 @@ export function TournamentClashApp() {
             />
           )}
 
-          {(isTournamentAdmin || isAdmin) && activeTournament.status !== "Finalizado" && (
+          {(isTournamentAdmin || isAdmin) && activeTournament.status !== "Finalizado" && String(activeTournament.status || "").trim().toLocaleLowerCase("es") !== "inscripciones" && (
             <div
               style={{
                 width: "100%",
