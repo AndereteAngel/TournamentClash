@@ -85,6 +85,11 @@ export function CreateTournament({
       return;
     }
 
+    if (formData.format === "groups_playoff" && teams.length < formData.numGroups) {
+      alert(`Para armar ${formData.numGroups} grupos necesitás al menos ${formData.numGroups} participantes.`);
+      return;
+    }
+
     onSave({
       ...formData,
       teams,
