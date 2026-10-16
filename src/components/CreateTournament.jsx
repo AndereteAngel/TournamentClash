@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { TCIcon } from "./TCIcon";
 import { supabase } from "../supabaseClient";
+import { TournamentNotice, useTournamentNotice } from "./TournamentNotice";
 
 export function CreateTournament({
   onSave,
@@ -62,6 +63,7 @@ export function CreateTournament({
   };
 
   const [formData, setFormData] = useState(getInitialFormData());
+  const { notice, showNotice, clearNotice } = useTournamentNotice();
   const [registeredProfiles, setRegisteredProfiles] = useState([]);
   const [loadingProfiles, setLoadingProfiles] = useState(false);
   const [profileSearch, setProfileSearch] = useState("");
@@ -120,21 +122,21 @@ export function CreateTournament({
 
     if (isEditing) {
       if (teams.length < 4) {
-        alert("Necesitas al menos 4 participantes para armar el torneo.");
+        showNotice("Necesitas al menos 4 participantes para armar el torneo.");
         return;
       }
 
       if (formData.format === "groups_playoff" && teams.length < formData.numGroups) {
-        alert(`Para armar ${formData.numGroups} grupos necesitás al menos ${formData.numGroups} participantes.`);
+        showNotice(`Para armar ${formData.numGroups} grupos necesitás al menos ${formData.numGroups} participantes.`);
         return;
       }
     } else {
       if (!Number.isInteger(Number(formData.maxParticipants)) || Number(formData.maxParticipants) < 4 || Number(formData.maxParticipants) > 256) {
-        alert("El cupo máximo debe ser un número entre 4 y 256.");
+        showNotice("El cupo máximo debe ser un número entre 4 y 256.");
         return;
       }
       if (teams.length > Number(formData.maxParticipants)) {
-        alert(`Seleccionaste ${teams.length} jugadores, pero el cupo máximo es ${formData.maxParticipants}.`);
+        showNotice(`Seleccionaste ${teams.length} jugadores, pero el cupo máximo es ${formData.maxParticipants}.`);
         return;
       }
     }
@@ -147,7 +149,9 @@ export function CreateTournament({
   };
 
   return (
-    <div className="cr-card" style={{ maxWidth: "520px" }}>
+    <>
+      <TournamentNotice notice={notice} onClose={clearNotice} />
+      <div className="cr-card" style={{ maxWidth: "520px" }}>
       <div className="cr-card-glow"></div>
 
       {/* =====================================================
@@ -489,7 +493,7 @@ export function CreateTournament({
                 className="cr-input"
               />
               <span style={{ fontSize: "10px", color: "#9ca3af", marginTop: "4px", display: "block" }}>
-                Podés cargar jugadores ahora o dejar el torneo abierto para que se inscriban después.
+                Podés cargar los jugadores ahora o completar la lista antes de iniciar el torneo.
               </span>
             </div>
 
@@ -606,6 +610,7 @@ export function CreateTournament({
             : "Crear Torneo y Abrir Inscripciones 📝"}
         </button>
       </form>
-    </div>
+      </div>
+    </>
   );
 }
