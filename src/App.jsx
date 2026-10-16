@@ -1443,45 +1443,15 @@ export function TournamentClashApp() {
       return;
     }
 
-    const shuffled = [...config.teams].sort(() => 0.5 - Math.random());
-
-    const groups = [];
-
-    const numGroups = config.format === "groups_playoff" ? config.numGroups : 1;
-
-    for (let i = 0; i < numGroups; i++) {
-      groups.push({
-        id: i + 1,
-        name: `Grupo ${String.fromCharCode(65 + i)}`,
-        teams: [],
-        matches: [],
-      });
-    }
-
-    shuffled.forEach((team, idx) => {
-      groups[idx % numGroups].teams.push(team);
-    });
-
-    groups.forEach((group) => {
-      const groupMatches = [];
-      const t = group.teams;
-
-      for (let i = 0; i < t.length; i++) {
-        for (let j = i + 1; j < t.length; j++) {
-          groupMatches.push({
-            id: `${t[i]}-${t[j]}`,
-            team1: t[i],
-            team2: t[j],
-            score1: null,
-            score2: null,
-          });
-        }
-      }
-
-      group.matches = groupMatches;
-    });
-
     const randomCode = "CR-" + Math.floor(1000 + Math.random() * 9000);
+    const registrationGroup = {
+      id: 0,
+      name: "__INSCRIPCIONES__",
+      teams: [],
+      matches: [],
+      capacity: Number(config.maxParticipants),
+      numGroups: config.format === "groups_playoff" ? Number(config.numGroups) : 1,
+    };
 
     const newTournamentObj = {
       code: randomCode,
@@ -1492,9 +1462,9 @@ export function TournamentClashApp() {
       is_public: config.isPublic,
       created_by_user_id: currentUser.id,
       created_by: currentUser.username,
-      groups,
+      groups: [registrationGroup],
       playoffs: null,
-      status: "En curso",
+      status: "Inscripciones",
     };
 
     const { data, error } = await supabase
@@ -1504,7 +1474,6 @@ export function TournamentClashApp() {
 
     if (error) {
       alert("❌ Error al guardar el torneo en Supabase.");
-
       console.error(error);
       return;
     }
@@ -1514,6 +1483,141 @@ export function TournamentClashApp() {
       setTournaments((prev) => [data[0], ...prev]);
       setActiveView("groups");
     }
+  };
+
+  const handleRegisterForTournament = async (tournament) => {
+    if (!currentUser || !tournament?.id) return;
+
+    const { data: latest, error: fetchError } = await supabase
+      .from("tournaments")
+      .select("id, groups, status")
+      .eq("id", tournament.id)
+      .maybeSingle();
+
+    if (fetchError || !latest) {
+      console.error("Error al consultar inscripción:", fetchError);
+      alert("No se pudo comprobar el estado de las inscripciones. Intentá de nuevo.");
+      return;
+    }
+
+    if (String(latest.status || "").trim().toLocaleLowerCase("es") !== "inscripciones") {
+      alert("🔒 Las inscripciones ya están cerradas.");
+      await fetchTournaments();
+      return;
+    }
+
+    const groups = Array.isArray(latest.groups) ? [...latest.groups] : [];
+    const registrationIndex = groups.findIndex((group) => group?.name === "__INSCRIPCIONES__");
+    if (registrationIndex < 0) {
+      alert("No se encontró la lista de inscriptos de este torneo.");
+      return;
+    }
+
+    const registration = { ...groups[registrationIndex] };
+    const participants = Array.isArray(registration.teams) ? [...registration.teams] : [];
+    if (participants.some((name) => String(name).toLocaleLowerCase("es") === currentUser.username.toLocaleLowerCase("es"))) {
+      alert("Ya estás inscripto en este torneo.");
+      return;
+    }
+
+    const capacity = Number(registration.capacity || 0);
+    if (capacity > 0 && participants.length >= capacity) {
+      alert("🚫 El cupo de este torneo ya está completo.");
+      await fetchTournaments();
+      return;
+    }
+
+    participants.push(currentUser.username);
+    registration.teams = participants;
+    groups[registrationIndex] = registration;
+
+    const { data: updatedRows, error: updateError } = await supabase
+      .from("tournaments")
+      .update({ groups })
+      .eq("id", tournament.id)
+      .eq("status", "Inscripciones")
+      .select();
+
+    if (updateError || !updatedRows?.length) {
+      console.error("Error al guardar la inscripción:", updateError);
+      alert("No se pudo completar la inscripción. Puede que el torneo haya comenzado o se haya completado el cupo.");
+      await fetchTournaments();
+      return;
+    }
+
+    const updatedTournament = updatedRows[0];
+    setTournaments((prev) => prev.map((item) => item.id === updatedTournament.id ? updatedTournament : item));
+    if (activeTournament?.id === updatedTournament.id) setActiveTournament(updatedTournament);
+    alert(`✅ ¡Te inscribiste en "${updatedTournament.title}"!`);
+  };
+
+  const handleStartRegistrationTournament = async () => {
+    if (!activeTournament?.id) return;
+
+    const isOwner =
+      currentUser &&
+      (activeTournament.created_by_user_id === currentUser.id ||
+        (!activeTournament.created_by_user_id && currentUser.username === activeTournament.created_by));
+    if (!isOwner && currentUser?.id !== ADMIN_UID) {
+      alert("Solo el creador del torneo puede dar comienzo.");
+      return;
+    }
+
+    const registration = (activeTournament.groups || []).find((group) => group?.name === "__INSCRIPCIONES__");
+    const participants = Array.isArray(registration?.teams) ? registration.teams : [];
+    const numGroups = activeTournament.format === "groups_playoff" ? Number(registration?.numGroups || 2) : 1;
+
+    if (participants.length < 4) {
+      alert("Necesitás al menos 4 participantes inscriptos para dar comienzo.");
+      return;
+    }
+    if (participants.length < numGroups) {
+      alert(`Para armar ${numGroups} grupos necesitás al menos ${numGroups} participantes.`);
+      return;
+    }
+
+    const shuffled = [...participants].sort(() => Math.random() - 0.5);
+    const groups = Array.from({ length: numGroups }, (_, index) => ({
+      id: index + 1,
+      name: `Grupo ${String.fromCharCode(65 + index)}`,
+      teams: [],
+      matches: [],
+    }));
+
+    shuffled.forEach((team, index) => groups[index % numGroups].teams.push(team));
+    groups.forEach((group) => {
+      const teams = group.teams;
+      for (let i = 0; i < teams.length; i++) {
+        for (let j = i + 1; j < teams.length; j++) {
+          group.matches.push({
+            id: `${teams[i]}-${teams[j]}`,
+            team1: teams[i],
+            team2: teams[j],
+            score1: null,
+            score2: null,
+          });
+        }
+      }
+    });
+
+    const { data, error } = await supabase
+      .from("tournaments")
+      .update({ groups, status: "En curso" })
+      .eq("id", activeTournament.id)
+      .eq("status", "Inscripciones")
+      .select();
+
+    if (error || !data?.length) {
+      console.error("Error al iniciar torneo:", error);
+      alert("No se pudo iniciar el torneo. Puede que ya haya comenzado; actualizá la lista e intentá de nuevo.");
+      await fetchTournaments();
+      return;
+    }
+
+    setActiveTournament(data[0]);
+    setTournaments((prev) => prev.map((item) => item.id === data[0].id ? data[0] : item));
+    setActiveView("groups");
+    alert("🏆 ¡Torneo en marcha! Los grupos y partidos se generaron automáticamente.");
   };
 
   // =========================================================
@@ -2389,33 +2493,56 @@ export function TournamentClashApp() {
                         flexShrink: 0,
                       }}
                     >
-                      <div
+                    {String(t.status || "").trim().toLocaleLowerCase("es") === "inscripciones" && (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleRegisterForTournament(t);
+                        }}
                         style={{
-                          textAlign: "right",
+                          padding: "0.5rem 0.65rem",
+                          background: "linear-gradient(135deg, #166534, #14532d)",
+                          border: "1px solid #4ade80",
+                          borderRadius: "8px",
+                          color: "#dcfce7",
+                          fontSize: "0.68rem",
+                          fontWeight: 900,
+                          cursor: "pointer",
+                          whiteSpace: "nowrap",
                         }}
                       >
-                        <span
-                          style={{
-                            fontSize: "0.75rem",
-                            fontWeight: 900,
-                            color:
-                              t.status === "En curso" ? "#34d399" : "#60a5fa",
-                            display: "block",
-                          }}
-                        >
-                          {t.status}
-                        </span>
+                        📝 Inscripción
+                      </button>
+                    )}
+                    <div
+                      style={{
+                        textAlign: "right",
+                      }}
+                    >
+                      <span
+                        style={{
+                          fontSize: "0.75rem",
+                          fontWeight: 900,
+                          color:
+                            String(t.status || "").trim().toLocaleLowerCase("es") === "en curso" ? "#34d399" :
+                            String(t.status || "").trim().toLocaleLowerCase("es") === "inscripciones" ? "#facc15" : "#60a5fa",
+                          display: "block",
+                        }}
+                      >
+                        {t.status}
+                      </span>
 
-                        <span
-                          style={{
-                            fontSize: "9px",
-                            color: "#9ca3af",
-                            fontWeight: 500,
-                          }}
-                        >
-                          Entrar ➔
-                        </span>
-                      </div>
+                      <span
+                        style={{
+                          fontSize: "9px",
+                          color: "#9ca3af",
+                          fontWeight: 500,
+                        }}
+                      >
+                        Entrar ➔
+                      </span>
+                    </div>
 
                       {/* BOTÓN ELIMINAR - SOLO ADMIN */}
 
@@ -2596,12 +2723,54 @@ export function TournamentClashApp() {
             gap: "1rem",
           }}
         >
-          <GroupStageView
-            tournament={activeTournament}
-            onUpdateTournament={handleUpdateTournamentInSupabase}
-            onProceedToPlayoffs={handleProceedToPlayoffs}
-            currentUser={currentUser}
-          />
+          {String(activeTournament?.status || "").trim().toLocaleLowerCase("es") === "inscripciones" ? (
+            <div className="cr-card" style={{ width: "100%", maxWidth: "900px", boxSizing: "border-box" }}>
+              <div className="cr-card-glow"></div>
+              {(() => {
+                const registration = (activeTournament.groups || []).find((group) => group?.name === "__INSCRIPCIONES__");
+                const participants = Array.isArray(registration?.teams) ? registration.teams : [];
+                const capacity = Number(registration?.capacity || 0);
+                const isOwner = currentUser && (
+                  activeTournament.created_by_user_id === currentUser.id ||
+                  (!activeTournament.created_by_user_id && currentUser.username === activeTournament.created_by)
+                );
+                return (
+                  <>
+                    <h2 className="cr-title" style={{ marginBottom: "0.5rem" }}>📝 Inscripciones abiertas</h2>
+                    <p style={{ color: "#9ca3af", marginTop: 0 }}>{activeTournament.title} · {participants.length}/{capacity} participantes</p>
+                    <div style={{ height: "8px", background: "#272532", borderRadius: "8px", overflow: "hidden", marginBottom: "1rem" }}>
+                      <div style={{ width: `${Math.min(100, capacity ? participants.length / capacity * 100 : 0)}%`, height: "100%", background: "linear-gradient(90deg, #1b5fa8, #ffd700)" }} />
+                    </div>
+                    {participants.length ? (
+                      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: "0.5rem", marginBottom: "1rem" }}>
+                        {participants.map((name, index) => (
+                          <div key={name} style={{ padding: "0.65rem", borderRadius: "8px", background: "#121019", border: "1px solid #2d2b3b", color: "#fff" }}>
+                            <span style={{ color: "#ffd700", marginRight: "0.4rem" }}>#{index + 1}</span>{name}
+                          </div>
+                        ))}
+                      </div>
+                    ) : <p style={{ color: "#9ca3af" }}>Todavía no hay jugadores inscriptos.</p>}
+                    <p style={{ color: "#9ca3af", fontSize: "0.8rem" }}>El creador dará comienzo al torneo cuando esté listo. Al iniciar, se cerrarán las inscripciones y se sortearán los grupos y partidos.</p>
+                    {(isOwner || currentUser?.id === ADMIN_UID) && (
+                      <button type="button" className="cr-btn-gold" onClick={handleStartRegistrationTournament} style={{ width: "100%", marginTop: "0.5rem" }}>
+                        🏁 Dar comienzo al torneo
+                      </button>
+                    )}
+                    <button type="button" onClick={fetchTournaments} style={{ marginTop: "0.65rem", width: "100%", padding: "0.65rem", borderRadius: "8px", background: "#121019", border: "1px solid #3b82f6", color: "#93c5fd", cursor: "pointer" }}>
+                      ↻ Actualizar inscriptos
+                    </button>
+                  </>
+                );
+              })()}
+            </div>
+          ) : (
+            <GroupStageView
+              tournament={activeTournament}
+              onUpdateTournament={handleUpdateTournamentInSupabase}
+              onProceedToPlayoffs={handleProceedToPlayoffs}
+              currentUser={currentUser}
+            />
+          )}
 
           {(isTournamentAdmin || isAdmin) && activeTournament.status !== "Finalizado" && (
             <div
