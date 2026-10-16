@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { TCIcon } from "./TCIcon";
+import { supabase } from "../supabaseClient";
 
 export function CreateTournament({
   onSave,
@@ -61,6 +62,30 @@ export function CreateTournament({
   };
 
   const [formData, setFormData] = useState(getInitialFormData());
+  const [registeredProfiles, setRegisteredProfiles] = useState([]);
+  const [loadingProfiles, setLoadingProfiles] = useState(false);
+  const [profileSearch, setProfileSearch] = useState("");
+  const [selectedProfileIds, setSelectedProfileIds] = useState([]);
+  const [profileError, setProfileError] = useState("");
+
+  const loadRegisteredProfiles = async () => {
+    setLoadingProfiles(true);
+    setProfileError("");
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("id, username")
+      .order("username", { ascending: true });
+
+    if (error) {
+      console.error("Error al cargar perfiles:", error);
+      setProfileError("No se pudo cargar la lista. Revisá los permisos de lectura de profiles en Supabase. También podés ingresar los nombres manualmente.");
+      setLoadingProfiles(false);
+      return;
+    }
+
+    setRegisteredProfiles(data || []);
+    setLoadingProfiles(false);
+  };
 
   // =========================================================
   // ACTUALIZAR FORMULARIO AL ENTRAR EN EDICIÓN
@@ -77,10 +102,21 @@ export function CreateTournament({
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    const teams = formData.participantsInput
+    const manualTeams = formData.participantsInput
       .split("\n")
       .map((name) => name.trim())
       .filter((name) => name.length > 0);
+
+    const selectedTeams = !isEditing
+      ? registeredProfiles
+          .filter((profile) => selectedProfileIds.includes(profile.id))
+          .map((profile) => String(profile.username || "").trim())
+          .filter(Boolean)
+      : [];
+
+    const teams = [...new Map(
+      [...selectedTeams, ...manualTeams].map((name) => [name.toLocaleLowerCase("es"), name])
+    ).values()];
 
     if (isEditing) {
       if (teams.length < 4) {
@@ -92,15 +128,21 @@ export function CreateTournament({
         alert(`Para armar ${formData.numGroups} grupos necesitás al menos ${formData.numGroups} participantes.`);
         return;
       }
-    } else if (!Number.isInteger(Number(formData.maxParticipants)) || Number(formData.maxParticipants) < 4 || Number(formData.maxParticipants) > 256) {
-      alert("El cupo máximo debe ser un número entre 4 y 256.");
-      return;
+    } else {
+      if (!Number.isInteger(Number(formData.maxParticipants)) || Number(formData.maxParticipants) < 4 || Number(formData.maxParticipants) > 256) {
+        alert("El cupo máximo debe ser un número entre 4 y 256.");
+        return;
+      }
+      if (teams.length > Number(formData.maxParticipants)) {
+        alert(`Seleccionaste ${teams.length} jugadores, pero el cupo máximo es ${formData.maxParticipants}.`);
+        return;
+      }
     }
 
     onSave({
       ...formData,
       maxParticipants: Number(formData.maxParticipants),
-      teams: isEditing ? teams : [],
+      teams,
     });
   };
 
@@ -431,35 +473,70 @@ export function CreateTournament({
         )}
 
         {!isEditing ? (
-          <div>
-            <label
-              style={{
-                display: "block",
-                fontSize: "0.75rem",
-                fontWeight: "bold",
-                textTransform: "uppercase",
-                color: "#d1d5db",
-                marginBottom: "4px",
-              }}
-            >
-              Cupo máximo de participantes
-            </label>
-            <input
-              type="number"
-              min="4"
-              max="256"
-              step="1"
-              value={formData.maxParticipants}
-              onChange={(e) =>
-                setFormData({ ...formData, maxParticipants: e.target.value })
-              }
-              required
-              className="cr-input"
-            />
-            <span style={{ fontSize: "10px", color: "#9ca3af", marginTop: "4px", display: "block" }}>
-              El torneo quedará abierto para inscripciones. Cuando estés listo, el administrador podrá dar comienzo y se generarán los grupos automáticamente.
-            </span>
-          </div>
+          <>
+            <div>
+              <label style={{ display: "block", fontSize: "0.75rem", fontWeight: "bold", textTransform: "uppercase", color: "#d1d5db", marginBottom: "4px" }}>
+                Cupo máximo de participantes
+              </label>
+              <input
+                type="number"
+                min="4"
+                max="256"
+                step="1"
+                value={formData.maxParticipants}
+                onChange={(e) => setFormData({ ...formData, maxParticipants: e.target.value })}
+                required
+                className="cr-input"
+              />
+              <span style={{ fontSize: "10px", color: "#9ca3af", marginTop: "4px", display: "block" }}>
+                Podés cargar jugadores ahora o dejar el torneo abierto para que se inscriban después.
+              </span>
+            </div>
+
+            <div style={{ padding: "0.85rem", border: "1px solid rgba(96,165,250,0.45)", borderRadius: "10px", background: "rgba(27,95,168,0.12)" }}>
+              <label style={{ display: "block", fontSize: "0.75rem", fontWeight: "bold", textTransform: "uppercase", color: "#d1d5db", marginBottom: "8px" }}>
+                Jugadores registrados
+              </label>
+              <button type="button" onClick={loadRegisteredProfiles} disabled={loadingProfiles} style={{ width: "100%", padding: "0.65rem", borderRadius: "8px", background: "#1b5fa8", border: "1px solid #60a5fa", color: "#fff", cursor: loadingProfiles ? "wait" : "pointer", fontWeight: "bold" }}>
+                {loadingProfiles ? "Cargando jugadores..." : registeredProfiles.length ? "↻ Actualizar lista de jugadores" : "🔎 Buscar cuentas registradas"}
+              </button>
+              {profileError && <p role="alert" style={{ color: "#fca5a5", fontSize: "0.75rem", lineHeight: 1.4 }}>{profileError}</p>}
+              {registeredProfiles.length > 0 && (
+                <>
+                  <input type="search" value={profileSearch} onChange={(e) => setProfileSearch(e.target.value)} placeholder="Filtrar por alias..." aria-label="Filtrar jugadores registrados" className="cr-input" style={{ marginTop: "0.65rem" }} />
+                  <div style={{ maxHeight: "190px", overflowY: "auto", display: "grid", gap: "0.35rem", marginTop: "0.55rem" }}>
+                    {registeredProfiles.filter((profile) => {
+                      const query = profileSearch.trim().toLocaleLowerCase("es");
+                      return !query || String(profile.username || "").toLocaleLowerCase("es").includes(query);
+                    }).map((profile) => (
+                      <label key={profile.id} style={{ display: "flex", alignItems: "center", gap: "0.55rem", padding: "0.5rem", borderRadius: "7px", background: "#121019", color: "#e5e7eb", fontSize: "0.82rem", cursor: "pointer" }}>
+                        <input type="checkbox" checked={selectedProfileIds.includes(profile.id)} onChange={(e) => setSelectedProfileIds((prev) => e.target.checked ? [...prev, profile.id] : prev.filter((id) => id !== profile.id))} />
+                        <span>{profile.username || "Sin alias"}</span>
+                      </label>
+                    ))}
+                  </div>
+                  <p style={{ color: "#93c5fd", fontSize: "0.75rem", marginBottom: 0 }}>Seleccionados: {selectedProfileIds.length}</p>
+                </>
+              )}
+            </div>
+
+            <div>
+              <label style={{ display: "block", fontSize: "0.75rem", fontWeight: "bold", textTransform: "uppercase", color: "#d1d5db", marginBottom: "4px" }}>
+                Agregar jugadores manualmente (opcional)
+              </label>
+              <textarea
+                placeholder={"ReyAzul99\nPrincesaPoder\nPekkaMaster"}
+                rows={4}
+                value={formData.participantsInput}
+                onChange={(e) => setFormData({ ...formData, participantsInput: e.target.value })}
+                className="cr-input"
+                style={{ resize: "vertical", fontFamily: "inherit" }}
+              />
+              <span style={{ fontSize: "10px", color: "#9ca3af", marginTop: "4px", display: "block" }}>
+                Escribí un alias por línea. Los duplicados se eliminan automáticamente.
+              </span>
+            </div>
+          </>
         ) : (
         <>
         {/* ===================================================
