@@ -1575,8 +1575,6 @@ export function TournamentClashApp() {
     const participants = Array.isArray(registration?.teams) ? registration.teams : [];
     const numGroups = activeTournament.format === "groups_playoff" ? Number(registration?.numGroups || 2) : 1;
 
-    if (!window.confirm(`¿Dar comienzo a "${activeTournament.title}" con ${participants.length} participantes? Las inscripciones se cerrarán y se generarán los grupos y partidos.`)) return;
-
     if (participants.length < 4) {
       alert("Necesitás al menos 4 participantes inscriptos para dar comienzo.");
       return;
@@ -1585,6 +1583,8 @@ export function TournamentClashApp() {
       alert(`Para armar ${numGroups} grupos necesitás al menos ${numGroups} participantes.`);
       return;
     }
+
+    if (!window.confirm(`¿Dar comienzo a "${activeTournament.title}" con ${participants.length} participantes? Las inscripciones se cerrarán y se generarán los grupos y partidos.`)) return;
 
     const shuffled = [...participants].sort(() => Math.random() - 0.5);
     const groups = Array.from({ length: numGroups }, (_, index) => ({
