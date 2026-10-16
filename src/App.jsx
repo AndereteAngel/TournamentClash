@@ -989,7 +989,14 @@ function AdminStats({ onBack }) {
 }
 
 export function TournamentClashApp() {
-  const { notice, showNotice, clearNotice } = useTournamentNotice();
+  const {
+    notice,
+    showNotice,
+    clearNotice,
+    confirmation,
+    confirmTournament,
+    resolveConfirmation,
+  } = useTournamentNotice();
   const [currentUser, setCurrentUser] = useState(null);
   const [authMode, setAuthMode] = useState("login");
   const [authInput, setAuthInput] = useState({
@@ -1258,7 +1265,7 @@ export function TournamentClashApp() {
       return;
     }
 
-    const confirmar = window.confirm(
+    const confirmar = await confirmTournament(
       `⚠️ ELIMINAR TORNEO\n\n` +
         `"${tournament.title}"\n\n` +
         `Esta acción eliminará el torneo de TournamentClash.\n\n` +
@@ -1664,7 +1671,8 @@ export function TournamentClashApp() {
       return;
     }
 
-    if (!window.confirm(`¿Dar comienzo a "${activeTournament.title}" con ${participants.length} participantes? Las inscripciones se cerrarán y se generarán los grupos y partidos.`)) return;
+    const confirmar = await confirmTournament(`¿Dar comienzo a "${activeTournament.title}" con ${participants.length} participantes? Las inscripciones se cerrarán y se generarán los grupos y partidos.`);
+    if (!confirmar) return;
 
     const shuffled = [...participants].sort(() => Math.random() - 0.5);
     const groups = Array.from({ length: numGroups }, (_, index) => ({
@@ -1991,7 +1999,7 @@ export function TournamentClashApp() {
       return;
     }
 
-    const confirmar = window.confirm(
+    const confirmar = await confirmTournament(
       `¿Querés finalizar el torneo "${activeTournament.title}" ahora? Esta acción no requiere cargar todos los resultados.`
     );
 
@@ -2019,7 +2027,12 @@ export function TournamentClashApp() {
 
   return (
     <div className="cr-container tc-theme-clash">
-      <TournamentNotice notice={notice} onClose={clearNotice} />
+      <TournamentNotice
+        notice={notice}
+        onClose={clearNotice}
+        confirmation={confirmation}
+        onResolveConfirmation={resolveConfirmation}
+      />
       {currentUser && (
         <Navbar
           onGoHome={handleGoHome}
