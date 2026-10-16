@@ -1222,8 +1222,16 @@ export function TournamentClashApp() {
         ascending: false,
       });
 
-    if (error) console.error("Error al obtener torneos:", error);
-    else setTournaments(data || []);
+    if (error) {
+      console.error("Error al obtener torneos:", error);
+    } else {
+      const freshTournaments = data || [];
+      setTournaments(freshTournaments);
+      if (activeTournament?.id) {
+        const refreshedActiveTournament = freshTournaments.find((item) => item.id === activeTournament.id);
+        if (refreshedActiveTournament) setActiveTournament(refreshedActiveTournament);
+      }
+    }
 
     setLoading(false);
   };
@@ -1566,6 +1574,8 @@ export function TournamentClashApp() {
     const registration = (activeTournament.groups || []).find((group) => group?.name === "__INSCRIPCIONES__");
     const participants = Array.isArray(registration?.teams) ? registration.teams : [];
     const numGroups = activeTournament.format === "groups_playoff" ? Number(registration?.numGroups || 2) : 1;
+
+    if (!window.confirm(`¿Dar comienzo a "${activeTournament.title}" con ${participants.length} participantes? Las inscripciones se cerrarán y se generarán los grupos y partidos.`)) return;
 
     if (participants.length < 4) {
       alert("Necesitás al menos 4 participantes inscriptos para dar comienzo.");
