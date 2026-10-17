@@ -87,7 +87,7 @@ export function ChampionCelebration({ tournament, onClose }) {
           fontSize: "3.5rem",
         }}
       >
-        🏆
+        <TCIcon name="trophy" size={46} />
       </div>
       <div style={{ color: "#fef3c7", fontSize: "0.7rem", fontWeight: 800, textTransform: "uppercase" }}>
         ¡Tenemos campeón!
@@ -103,10 +103,10 @@ export function ChampionCelebration({ tournament, onClose }) {
           ["sword", "Jugados", stats.played],
           ["trophy", "Victorias", stats.wins],
           ["shield", "Derrotas", stats.losses],
-          ["🎯", "Efectividad", stats.winRate + "%"],
+          ["target", "Efectividad", stats.winRate + "%"],
         ].map(([icon, label, value]) => (
           <div key={label} className="tc-champion-stat" style={{ padding: "0.7rem 0.25rem", borderRadius: "10px", background: "rgba(255,255,255,0.055)", border: "1px solid rgba(255,255,255,0.09)" }}>
-            <div style={{ fontSize: "1.1rem" }}>{icon}</div>
+            <div className="tc-stat-icon"><TCIcon name={icon} size={21} /></div>
             <div style={{ color: "#fff", fontSize: "1.15rem", fontWeight: 900 }}>{value}</div>
             <div style={{ color: "#a1a1aa", fontSize: "0.62rem", fontWeight: 800, textTransform: "uppercase" }}>{label}</div>
           </div>
