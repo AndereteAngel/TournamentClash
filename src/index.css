@@ -2580,3 +2580,37 @@ strong .tc-icon-frame {
 .tc-medal-gold .tc-icon-frame { box-shadow: 0 0 16px rgba(250,204,21,.12), inset 0 1px rgba(255,255,255,.14) !important; }
 .tc-medal-silver .tc-icon-frame { box-shadow: 0 0 14px rgba(203,213,225,.08), inset 0 1px rgba(255,255,255,.12) !important; }
 .tc-medal-bronze .tc-icon-frame { box-shadow: 0 0 14px rgba(217,119,6,.1), inset 0 1px rgba(255,255,255,.12) !important; }
+
+
+/* MEDALLERO CLARO: medalla reconocible y acceso con etiqueta visible */
+.tc-icon-frame.tc-icon-medal,
+.tc-icon-frame.tc-icon-medalGold,
+.tc-icon-frame.tc-icon-medalSilver,
+.tc-icon-frame.tc-icon-medalBronze,
+.tc-medal-emblem .tc-icon-frame,
+.tc-medal-counts .tc-icon-frame {
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+.tc-icon-frame.tc-icon-medal svg,
+.tc-icon-frame.tc-icon-medalGold svg,
+.tc-icon-frame.tc-icon-medalSilver svg,
+.tc-icon-frame.tc-icon-medalBronze svg {
+  overflow: visible;
+}
+.tc-navbar .tc-icon-frame.tc-icon-medal { color: #fcd34d; filter: drop-shadow(0 1px 3px rgba(0,0,0,.5)); }
+.tc-medal-emblem { min-height: 36px; margin-bottom: .2rem; }
+.tc-medal-emblem .tc-icon-frame { filter: drop-shadow(0 2px 3px rgba(0,0,0,.3)); }
+.tc-medal-total {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 1.35rem; height: 1.35rem; padding: 0 .25rem;
+  border-radius: 999px; background: #facc15; color: #171426;
+  font-size: .68rem; font-weight: 900; line-height: 1;
+}
+.tc-navbar button[title="Ver historial de medallas"] { gap: .45rem !important; }
+@media (max-width: 640px) {
+  .tc-navbar .tc-medal-total { min-width: 1.5rem; height: 1.5rem; }
+}
