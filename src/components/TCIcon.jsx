@@ -21,12 +21,15 @@ const paths = {
   users: <><circle cx="9" cy="8" r="3"/><path d="M3 20v-1a6 6 0 0 1 12 0v1M16 5a3 3 0 0 1 0 6M18 14a5 5 0 0 1 3 5v1"/></>,
   chart: <><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></>,
 };
+
 export function TCIcon({ name, size = 19, className = "", title }) {
   return (
-    <span className={`tc-icon-frame ${className}`} aria-hidden="true" title={title}>
-      <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        {paths[name] || paths.bolt}
-      </svg>
+    <span className={`tc-icon-frame tc-icon-${name || "bolt"} ${className}`} aria-hidden="true" title={title}>
+      <span className="tc-icon-core">
+        <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          {paths[name] || paths.bolt}
+        </svg>
+      </span>
     </span>
   );
 }
