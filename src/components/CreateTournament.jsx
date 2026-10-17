@@ -607,7 +607,7 @@ export function CreateTournament({
         >
           {isEditing
             ? "💾 Guardar modificaciones"
-            : "Crear Torneo ⚔️"}
+            : <><TCIcon name="sword" size={16} /> Crear Torneo</>}
         </button>
       </form>
       </div>
