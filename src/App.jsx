@@ -923,7 +923,7 @@ function AdminStats({ onBack }) {
           }}
         >
           <h3 style={{ color: "#fff", margin: 0 }}>
-            📅 Historial de visitas ({visitasFechaSeleccionada.length})
+            <TCIcon name="calendar" /> Historial de visitas ({visitasFechaSeleccionada.length})
           </h3>
           <label style={{ color: "#d1d5db", fontSize: "0.8rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
             Fecha:
