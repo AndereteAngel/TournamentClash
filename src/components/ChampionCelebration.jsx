@@ -1,4 +1,5 @@
 import { getPlayerTournamentStats, getTournamentPodium } from "../utils/tournamentAwards";
+import { TCIcon } from "./TCIcon";
 
 export function ChampionCelebration({ tournament, onClose }) {
   const podium = getTournamentPodium(tournament);
@@ -99,9 +100,9 @@ export function ChampionCelebration({ tournament, onClose }) {
       </p>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(115px, 1fr))", gap: "0.45rem" }}>
         {[
-          ["⚔️", "Jugados", stats.played],
-          ["🏆", "Victorias", stats.wins],
-          ["🛡️", "Derrotas", stats.losses],
+          ["sword", "Jugados", stats.played],
+          ["trophy", "Victorias", stats.wins],
+          ["shield", "Derrotas", stats.losses],
           ["🎯", "Efectividad", stats.winRate + "%"],
         ].map(([icon, label, value]) => (
           <div key={label} className="tc-champion-stat" style={{ padding: "0.7rem 0.25rem", borderRadius: "10px", background: "rgba(255,255,255,0.055)", border: "1px solid rgba(255,255,255,0.09)" }}>
@@ -112,7 +113,7 @@ export function ChampionCelebration({ tournament, onClose }) {
         ))}
       </div>
       <p style={{ color: "#facc15", fontSize: "0.7rem", fontWeight: 800, margin: "1rem 0 0.8rem" }}>
-        🥇 TÍTULO REGISTRADO EN EL MEDALLERO
+        <TCIcon name="medalGold" size={16} /> TÍTULO REGISTRADO EN EL MEDALLERO
       </p>
       <button type="button" onClick={onClose} className="cr-btn-gold" style={{ maxWidth: "260px", padding: "0.65rem 1rem", fontSize: "0.8rem" }}>
         Ver torneo
