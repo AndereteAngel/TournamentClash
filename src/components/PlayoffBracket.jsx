@@ -267,7 +267,7 @@ export function PlayoffBracket({
                           match.winner === match.team2 ? "#4ade80" : "#fff",
                       }}
                     >
-                      {match.team2} {match.winner === match.team2 && "👑"}
+                      {match.team2} {match.winner === match.team2 && <TCIcon name="crown" size={14} />}
                     </span>
                   </div>
                 </div>
@@ -289,7 +289,7 @@ export function PlayoffBracket({
             boxShadow: "0 0 20px rgba(255, 215, 0, 0.4)",
           }}
         >
-          <div style={{ fontSize: "40px", marginBottom: "6px" }}>👑🏆👑</div>
+          <div className="tc-playoff-champion-icons"><TCIcon name="crown" size={26} /><TCIcon name="trophy" size={40} /><TCIcon name="crown" size={26} /></div>
           <h3
             style={{
               fontSize: "1.2rem",
@@ -316,7 +316,7 @@ export function PlayoffBracket({
 
       {isTournamentComplete && !isFinalized && (
         <button onClick={onFinishTournament} className="cr-btn-gold">
-          Guardar y Salir al Lobby ⚔️
+          <TCIcon name="sword" size={16} /> Guardar y Salir al Lobby
         </button>
       )}
     </div>
