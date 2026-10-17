@@ -323,12 +323,12 @@ export function GroupStageView({
       >
         {isCreator ? (
           <>
-            🛡️ <strong>Organizador:</strong> sos el responsable de cargar y
+            <TCIcon name="shield" size={15} /> <strong>Organizador:</strong> sos el responsable de cargar y
             validar los resultados.
           </>
         ) : (
           <>
-            👁️ Los resultados son cargados exclusivamente por el organizador del
+            <TCIcon name="eye" size={15} /> Los resultados son cargados exclusivamente por el organizador del
             torneo.
           </>
         )}
@@ -714,7 +714,7 @@ export function GroupStageView({
             width: "100%",
           }}
         >
-          Avanzar a Playoff · Eliminación Directa 🏆
+          <TCIcon name="trophy" size={16} /> Avanzar a Playoff · Eliminación Directa
         </button>
       )}
     </div>
