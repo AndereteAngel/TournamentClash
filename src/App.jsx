@@ -284,7 +284,7 @@ function AdminStats({ onBack }) {
           textAlign: "center",
         }}
       >
-        <h2 className="cr-title">📊 Estadísticas</h2>
+        <h2 className="cr-title"><TCIcon name="chart" /> Estadísticas</h2>
 
         <p style={{ color: "#9ca3af" }}>Cargando estadísticas...</p>
       </div>
@@ -301,7 +301,7 @@ function AdminStats({ onBack }) {
           textAlign: "center",
         }}
       >
-        <h2 className="cr-title">📊 Estadísticas</h2>
+        <h2 className="cr-title"><TCIcon name="chart" /> Estadísticas</h2>
 
         <p style={{ color: "#f87171" }}>{errorStats}</p>
 
@@ -344,7 +344,7 @@ function AdminStats({ onBack }) {
         >
           <div>
             <h2 className="cr-title" style={{ marginBottom: "4px" }}>
-              📊 Estadísticas
+              <TCIcon name="chart" /> Estadísticas
             </h2>
 
             <p
@@ -376,7 +376,7 @@ function AdminStats({ onBack }) {
                 fontWeight: "bold",
               }}
             >
-              🔄 Actualizar
+              <TCIcon name="refresh" /> Actualizar
             </button>
 
             <button
@@ -408,11 +408,11 @@ function AdminStats({ onBack }) {
         }}
       >
         {[
-          ["👁️", "Sesiones registradas", visitas.length],
-          ["📅", "Sesiones hoy", visitasHoy],
-          ["👥", "Jugadores", usuariosRegistrados],
-          ["🟢", "Activos", usuariosActivos],
-          ["⏱️", "Tiempo promedio", formatearDuracion(tiempoPromedio)],
+          ["eye", "Sesiones registradas", visitas.length],
+          ["calendar", "Sesiones hoy", visitasHoy],
+          ["users", "Jugadores", usuariosRegistrados],
+          ["bolt", "Activos", usuariosActivos],
+          ["clock", "Tiempo promedio", formatearDuracion(tiempoPromedio)],
         ].map(([icono, titulo, valor]) => (
           <div
             key={titulo}
@@ -422,7 +422,7 @@ function AdminStats({ onBack }) {
               textAlign: "center",
             }}
           >
-            <div style={{ fontSize: "1.4rem" }}>{icono}</div>
+            <div className="tc-stat-icon"><TCIcon name={icono} size={23} /></div>
 
             <div
               style={{
@@ -465,7 +465,7 @@ function AdminStats({ onBack }) {
             marginBottom: "1rem",
           }}
         >
-          📱 Dispositivos
+          <TCIcon name="devices" /> Dispositivos
         </h3>
 
         <div
@@ -483,7 +483,7 @@ function AdminStats({ onBack }) {
               textAlign: "center",
             }}
           >
-            <div style={{ fontSize: "1.5rem" }}>📱</div>
+            <div className="tc-stat-icon"><TCIcon name="mobile" size={25} /></div>
 
             <strong
               style={{
@@ -506,7 +506,7 @@ function AdminStats({ onBack }) {
               textAlign: "center",
             }}
           >
-            <div style={{ fontSize: "1.5rem" }}>💻</div>
+            <div className="tc-stat-icon"><TCIcon name="desktop" size={25} /></div>
 
             <strong
               style={{
@@ -538,7 +538,7 @@ function AdminStats({ onBack }) {
             marginBottom: "1rem",
           }}
         >
-          📅 Visitas por día
+          <TCIcon name="calendar" /> Visitas por día
         </h3>
 
         {diasOrdenados.length === 0 ? (
@@ -681,7 +681,7 @@ function AdminStats({ onBack }) {
             marginBottom: "1rem",
           }}
         >
-          <h3 style={{ color: "#fff", margin: 0 }}>👥 Jugadores registrados</h3>
+          <h3 style={{ color: "#fff", margin: 0 }}><TCIcon name="users" /> Jugadores registrados</h3>
           <span style={{ color: "#9ca3af", fontSize: "0.8rem" }}>
             {jugadores.length} cuentas
           </span>
@@ -691,7 +691,7 @@ function AdminStats({ onBack }) {
           type="search"
           value={busquedaJugador}
           onChange={(e) => setBusquedaJugador(e.target.value)}
-          placeholder="🔎 Buscar por alias o correo..."
+          placeholder="Buscar por alias o correo..."
           aria-label="Buscar jugador por alias o correo"
           style={{
             width: "100%",
@@ -734,7 +734,7 @@ function AdminStats({ onBack }) {
                     {jugador.username}
                   </strong>
                   <span style={{ color: "#60a5fa", fontSize: "0.75rem", display: "block", overflowWrap: "anywhere" }}>
-                    📧 {jugador.email || "Email no registrado"}
+                    <TCIcon name="mail" size={13} /> {jugador.email || "Email no registrado"}
                   </span>
                   <span style={{ color: "#9ca3af", fontSize: "0.7rem", display: "block", marginTop: "3px" }}>
                     Registro: {formatearFecha(jugador.creadoEn)}
@@ -749,7 +749,7 @@ function AdminStats({ onBack }) {
                 </div>
                 <div style={{ textAlign: "center" }}>
                   <span style={{ color: "#9ca3af", fontSize: "0.65rem", display: "block" }}>Dispositivo</span>
-                  <span>{jugador.device === "mobile" ? "📱" : jugador.device === "desktop" ? "💻" : "—"}</span>
+                  <span>{jugador.device === "mobile" ? <TCIcon name="mobile" size={16} /> : jugador.device === "desktop" ? <TCIcon name="desktop" size={16} /> : "—"}</span>
                 </div>
                 <button
                   type="button"
@@ -774,7 +774,7 @@ function AdminStats({ onBack }) {
                 >
                   {jugadorExpandido === jugador.id
                     ? "▲ Ocultar actividad"
-                    : "📋 Ver actividad"}
+                    : <><TCIcon name="chart" size={14} /> Ver actividad</>}
                 </button>
                 {jugadorExpandido === jugador.id && (
                   <div
@@ -837,7 +837,7 @@ function AdminStats({ onBack }) {
                               >
                                 <div>
                                   <span style={{ color: "#d1d5db", display: "block", fontSize: "0.78rem" }}>
-                                    📅 {formatearFecha(visita.started_at || visita.created_at)}
+                                    <TCIcon name="calendar" size={13} /> {formatearFecha(visita.started_at || visita.created_at)}
                                   </span>
                                   <span style={{ color: "#9ca3af", fontSize: "0.7rem" }}>
                                     Última actividad: {formatearFecha(visita.last_seen_at)}
@@ -845,7 +845,7 @@ function AdminStats({ onBack }) {
                                 </div>
                                 <div style={{ textAlign: "right" }}>
                                   <span style={{ color: "#60a5fa", display: "block", fontSize: "0.75rem" }}>
-                                    {visita.device === "mobile" ? "📱 Móvil" : visita.device === "desktop" ? "💻 PC" : "Dispositivo —"}
+                                    {visita.device === "mobile" ? <><TCIcon name="mobile" size={13} /> Móvil</> : visita.device === "desktop" ? <><TCIcon name="desktop" size={13} /> PC</> : "Dispositivo —"}
                                   </span>
                                   <span style={{ color: "#9ca3af", fontSize: "0.7rem" }}>
                                     Duración: {formatearDuracion(visita.duration_seconds)}
@@ -867,7 +867,7 @@ function AdminStats({ onBack }) {
 
       <div className="cr-card" style={{ marginBottom: "1rem" }}>
         <h3 style={{ color: "#fff", marginTop: 0, marginBottom: "1rem" }}>
-          🟢 Quiénes están conectados
+          <TCIcon name="bolt" /> Quiénes están conectados
         </h3>
         <p style={{ color: "#9ca3af", fontSize: "0.75rem", marginTop: "-0.5rem" }}>
           Actividad registrada durante los últimos 5 minutos.
@@ -976,7 +976,7 @@ function AdminStats({ onBack }) {
                     {formatearFecha(visita.started_at || visita.created_at)}
                   </span>
                   <span style={{ color: "#9ca3af", fontSize: "0.7rem" }}>
-                    {visita.device === "mobile" ? "📱 Móvil" : visita.device === "desktop" ? "💻 PC" : "Dispositivo desconocido"}
+                    {visita.device === "mobile" ? <><TCIcon name="mobile" size={13} /> Móvil</> : visita.device === "desktop" ? <><TCIcon name="desktop" size={13} /> PC</> : "Dispositivo desconocido"}
                   </span>
                 </div>
               </div>
@@ -2261,7 +2261,7 @@ export function TournamentClashApp() {
                   fontSize: "18px",
                 }}
               >
-                👑
+                <TCIcon name="crown" size={22} />
               </div>
 
               <div>
@@ -2326,7 +2326,7 @@ export function TournamentClashApp() {
                 fontWeight: "bold",
               }}
             >
-              📊 Ver estadísticas
+              <TCIcon name="chart" size={17} /> Ver estadísticas
             </button>
           )}
 
@@ -2706,7 +2706,7 @@ export function TournamentClashApp() {
                             fontSize: "15px",
                           }}
                         >
-                          {deletingTournamentId === t.id ? "…" : "🗑️"}
+                          {deletingTournamentId === t.id ? "…" : <TCIcon name="trash" size={16} />}
                         </button>
                       )}
                     </div>
@@ -2768,7 +2768,7 @@ export function TournamentClashApp() {
                 fontSize: "1.1rem",
               }}
             >
-              🔑 Unirse a Torneo
+              <TCIcon name="key" /> Unirse a Torneo
             </h2>
 
             <button
@@ -2831,7 +2831,7 @@ export function TournamentClashApp() {
                 marginTop: "0.5rem",
               }}
             >
-              Ingresar a la Batalla ⚔️
+              <TCIcon name="sword" /> Ingresar a la Batalla
             </button>
           </form>
         </div>
@@ -2877,10 +2877,10 @@ export function TournamentClashApp() {
                     <p style={{ color: "#9ca3af", fontSize: "0.8rem" }}>El creador dará comienzo al torneo cuando esté listo. Al iniciar, se cerrarán las inscripciones y se sortearán los grupos y partidos.</p>
                     {(isOwner || currentUser?.id === ADMIN_UID) && (
                       <div style={{ marginTop: "1rem", padding: "0.85rem", background: "#171522", border: "1px solid #3b82f6", borderRadius: "10px" }}>
-                        <h3 style={{ color: "#fff", margin: "0 0 0.35rem" }}>👥 Agregar jugadores registrados</h3>
+                        <h3 style={{ color: "#fff", margin: "0 0 0.35rem" }}><TCIcon name="users" /> Agregar jugadores registrados</h3>
                         <p style={{ color: "#9ca3af", fontSize: "0.78rem", marginTop: 0 }}>Seleccioná cuentas existentes. Podés filtrar por alias o correo y se respeta el cupo.</p>
                         <button type="button" onClick={handleLoadRegisteredProfiles} disabled={loadingRegisteredProfiles} style={{ width: "100%", padding: "0.65rem", borderRadius: "8px", background: "#1b5fa8", border: "1px solid #60a5fa", color: "#fff", cursor: loadingRegisteredProfiles ? "wait" : "pointer", fontWeight: "bold" }}>
-                          {loadingRegisteredProfiles ? "Cargando usuarios..." : registeredProfiles.length ? "↻ Recargar lista de usuarios" : "🔎 Cargar lista de usuarios"}
+                          {loadingRegisteredProfiles ? "Cargando usuarios..." : registeredProfiles.length ? "↻ Recargar lista de usuarios" : "Cargar lista de usuarios"}
                         </button>
                         {registeredProfiles.length > 0 && (
                           <>
@@ -2900,18 +2900,18 @@ export function TournamentClashApp() {
                                 );
                               })}
                             </div>
-                            <button type="button" onClick={handleAddSelectedRegisteredProfiles} disabled={!selectedRegisteredProfileIds.length} className="cr-btn-gold" style={{ width: "100%", marginTop: "0.65rem", opacity: selectedRegisteredProfileIds.length ? 1 : 0.55 }}>➕ Agregar seleccionados ({selectedRegisteredProfileIds.length})</button>
+                            <button type="button" onClick={handleAddSelectedRegisteredProfiles} disabled={!selectedRegisteredProfileIds.length} className="cr-btn-gold" style={{ width: "100%", marginTop: "0.65rem", opacity: selectedRegisteredProfileIds.length ? 1 : 0.55 }}><TCIcon name="plus" size={15} /> Agregar seleccionados ({selectedRegisteredProfileIds.length})</button>
                           </>
                         )}
                       </div>
                     )}
                     {(isOwner || currentUser?.id === ADMIN_UID) && (
                       <button type="button" className="cr-btn-gold" onClick={handleStartRegistrationTournament} style={{ width: "100%", marginTop: "0.5rem" }}>
-                        🏁 Dar comienzo al torneo
+                        <TCIcon name="flag" /> Dar comienzo al torneo
                       </button>
                     )}
                     <button type="button" onClick={fetchTournaments} style={{ marginTop: "0.65rem", width: "100%", padding: "0.65rem", borderRadius: "8px", background: "#121019", border: "1px solid #3b82f6", color: "#93c5fd", cursor: "pointer" }}>
-                      ↻ Actualizar inscriptos
+                      <TCIcon name="refresh" /> Actualizar inscriptos
                     </button>
                   </>
                 );
@@ -2955,7 +2955,7 @@ export function TournamentClashApp() {
                   className="cr-btn-gold"
                   style={adminTournamentButtonStyle}
                 >
-                  ⚙️ Modificar torneo
+                  <TCIcon name="settings" /> Modificar torneo
                 </button>
               )}
               {isTournamentAdmin && String(activeTournament.format || "").trim().toLocaleLowerCase("es") === "league" && (
