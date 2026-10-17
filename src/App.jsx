@@ -3014,7 +3014,7 @@ export function TournamentClashApp() {
                 className="cr-btn-gold"
                 style={adminTournamentButtonStyle}
               >
-                🏁 Finalizar torneo
+                <TCIcon name="flag" /> Finalizar torneo
               </button>
             </div>
           )}
