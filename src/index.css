@@ -2511,3 +2511,30 @@ a:hover .tc-icon-frame,
 .tc-medal-bronze { color:#d97706; }
 .tc-medal-counts { display:inline-flex; align-items:center; gap:3px; }
 .tc-medal-counts .tc-icon-frame { padding:1px; border-radius:4px; }
+
+
+/* Ajustes de alineación para iconos integrados en títulos y acciones */
+h2 .tc-icon-frame,
+h3 .tc-icon-frame,
+button .tc-icon-frame,
+p .tc-icon-frame,
+strong .tc-icon-frame {
+  margin-right: .28rem;
+}
+.tc-playoff-champion-icons {
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:.5rem;
+  margin-bottom:6px;
+}
+.tc-playoff-champion-icons .tc-icon-frame { padding:7px; border-radius:11px; }
+.tc-playoff-champion-icons .tc-icon-trophy { transform:translateY(-3px); }
+.tc-stat-icon .tc-icon-frame { animation:tc-icon-glow 3.2s ease-in-out infinite; }
+@keyframes tc-icon-glow {
+  0%,100% { box-shadow:inset 0 1px rgba(255,255,255,.08),0 2px 7px rgba(0,0,0,.24),0 0 0 rgba(59,130,246,0); }
+  50% { box-shadow:inset 0 1px rgba(255,255,255,.1),0 3px 10px rgba(0,0,0,.28),0 0 11px rgba(59,130,246,.16); }
+}
+@media(prefers-reduced-motion:reduce) {
+  .tc-stat-icon .tc-icon-frame { animation:none !important; }
+}
