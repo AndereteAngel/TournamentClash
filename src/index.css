@@ -2538,3 +2538,45 @@ strong .tc-icon-frame {
 @media(prefers-reduced-motion:reduce) {
   .tc-stat-icon .tc-icon-frame { animation:none !important; }
 }
+
+
+/* REFINAMIENTO: usuario limpio y medallas con siluetas propias */
+.tc-icon-frame.tc-icon-user {
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: #93c5fd;
+  filter: drop-shadow(0 0 4px rgba(96,165,250,.22));
+}
+.tc-navbar .tc-icon-frame.tc-icon-user { color: #bfdbfe; }
+.tc-icon-frame.tc-icon-medal,
+.tc-icon-frame.tc-icon-medalGold,
+.tc-icon-frame.tc-icon-medalSilver,
+.tc-icon-frame.tc-icon-medalBronze {
+  padding: 4px !important;
+  border-radius: 10px 10px 13px 13px !important;
+  background: linear-gradient(155deg,rgba(255,255,255,.09),rgba(5,12,27,.96)) !important;
+  box-shadow: inset 0 1px rgba(255,255,255,.12), 0 3px 8px rgba(0,0,0,.32) !important;
+}
+.tc-icon-frame.tc-icon-medal,
+.tc-icon-frame.tc-icon-medalGold {
+  color: #fcd34d;
+  border-color: rgba(250,204,21,.62) !important;
+}
+.tc-icon-frame.tc-icon-medalSilver {
+  color: #e2e8f0;
+  border-color: rgba(203,213,225,.58) !important;
+}
+.tc-icon-frame.tc-icon-medalBronze {
+  color: #fdba74;
+  border-color: rgba(217,119,6,.65) !important;
+}
+.tc-medal-emblem .tc-icon-frame {
+  padding: 7px !important;
+  border-radius: 12px 12px 15px 15px !important;
+}
+.tc-medal-gold .tc-icon-frame { box-shadow: 0 0 16px rgba(250,204,21,.12), inset 0 1px rgba(255,255,255,.14) !important; }
+.tc-medal-silver .tc-icon-frame { box-shadow: 0 0 14px rgba(203,213,225,.08), inset 0 1px rgba(255,255,255,.12) !important; }
+.tc-medal-bronze .tc-icon-frame { box-shadow: 0 0 14px rgba(217,119,6,.1), inset 0 1px rgba(255,255,255,.12) !important; }
