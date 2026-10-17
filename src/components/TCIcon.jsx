@@ -20,6 +20,20 @@ const paths = {
   calendar: <><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4M17 3v4M3 10h18"/></>,
   users: <><circle cx="9" cy="8" r="3"/><path d="M3 20v-1a6 6 0 0 1 12 0v1M16 5a3 3 0 0 1 0 6M18 14a5 5 0 0 1 3 5v1"/></>,
   chart: <><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></>,
+  eye: <><path d="M2.5 12s3.2-6 9.5-6 9.5 6 9.5 6-3.2 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.5"/></>,
+  clock: <><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></>,
+  devices: <><rect x="3" y="4" width="13" height="10" rx="1.5"/><path d="M7 18h5M9.5 14v4"/><rect x="17" y="8" width="4" height="11" rx="1"/></>,
+  mobile: <><rect x="6.5" y="2.5" width="11" height="19" rx="2.2"/><path d="M10 5h4M11 18.5h2"/></>,
+  desktop: <><rect x="2.5" y="4" width="19" height="13" rx="1.8"/><path d="M12 17v4M8 21h8M8 8h8"/></>,
+  mail: <><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m4 7 8 6 8-6"/></>,
+  trash: <><path d="M4 7h16M9 7V4h6v3M7 7l1 13h8l1-13M10 10v7M14 10v7"/></>,
+  plus: <><path d="M12 4v16M4 12h16"/></>,
+  play: <path d="m8 5 11 7-11 7z"/>,
+  shield: <><path d="M12 3 20 6v5c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6z"/><path d="m9 12 2 2 4-4"/></>,
+  chat: <><path d="M4 5h16v12H9l-5 3z"/><path d="M8 9h8M8 13h5"/></>,
+  medalGold: <><circle cx="12" cy="9" r="5"/><path d="m8.5 13-1 8 4.5-2.5 4.5 2.5-1-8M10 9l1.3 1.3L14 7.8"/></>,
+  medalSilver: <><circle cx="12" cy="9" r="5"/><path d="m8.5 13-1 8 4.5-2.5 4.5 2.5-1-8M10 9l1.3 1.3L14 7.8"/></>,
+  medalBronze: <><circle cx="12" cy="9" r="5"/><path d="m8.5 13-1 8 4.5-2.5 4.5 2.5-1-8M10 9l1.3 1.3L14 7.8"/></>,
 };
 
 export function TCIcon({ name, size = 19, className = "", title }) {
