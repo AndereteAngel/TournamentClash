@@ -24,7 +24,7 @@ export function Navbar({
 
   const username = currentUser?.username || "Jugador";
   const medals = getPlayerMedals(tournaments, username);
-  const medalButtonStyle = { padding: "0.35rem 0.55rem", background: "#0c0a12", border: "2px solid #8b7a39", borderRadius: "8px", color: "#fff", fontSize: "10px", fontWeight: 900, cursor: "pointer", whiteSpace: "nowrap" };
+  const medalButtonStyle = { display: "inline-flex", alignItems: "center", justifyContent: "center", gap: "0.45rem", padding: "0.45rem 0.7rem", background: "linear-gradient(145deg, #29220f, #0c0a12)", border: "1px solid #b89b45", borderRadius: "9px", color: "#fff", fontSize: "0.72rem", fontWeight: 900, cursor: "pointer", whiteSpace: "nowrap", boxShadow: "inset 0 1px rgba(255,255,255,.08), 0 3px 10px rgba(0,0,0,.22)" };
 
   return (
     <div
@@ -191,7 +191,7 @@ export function Navbar({
           style={medalButtonStyle}
           title="Ver historial de medallas"
         >
-          <TCIcon name="medal" size={15} /> {medals.gold + medals.silver + medals.bronze}
+          <TCIcon name="medal" size={19} /> <span>Medallero</span> <span className="tc-medal-total">{medals.gold + medals.silver + medals.bronze}</span>
         </button>
 
         <button
@@ -307,7 +307,7 @@ export function Navbar({
             onClick={() => setMedalOpen((open) => !open)}
             style={{ ...medalButtonStyle, padding: "0.7rem", fontSize: "0.8rem" }}
           >
-            <TCIcon name="medal" size={16} /> Medallero: <span className="tc-medal-counts"><TCIcon name="medalGold" size={13} /> {medals.gold} · <TCIcon name="medalSilver" size={13} /> {medals.silver} · <TCIcon name="medalBronze" size={13} /> {medals.bronze}</span>
+            <TCIcon name="medal" size={19} /> <span>Mi medallero</span> <span className="tc-medal-total">{medals.gold + medals.silver + medals.bronze}</span>
           </button>
 
           <button
