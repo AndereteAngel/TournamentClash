@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { TCIcon } from "./TCIcon";
 
 export function useTournamentNotice() {
   const [notice, setNotice] = useState(null);
@@ -70,7 +71,7 @@ export function TournamentNotice({ notice, onClose, confirmation, onResolveConfi
             TOURNAMENTCLASH
           </div>
           <div aria-hidden="true" style={{ width: "48px", height: "48px", margin: "0.7rem auto", display: "grid", placeItems: "center", borderRadius: "50%", border: "1px solid #fbbf24", background: "rgba(251,191,36,0.09)", fontSize: "1.55rem" }}>
-            ⚠️
+            <TCIcon name="shield" size={25} />
           </div>
           <p style={{ margin: "0 0 1.2rem", color: "#e5e7eb", fontSize: "0.9rem", lineHeight: 1.55, overflowWrap: "anywhere", whiteSpace: "pre-wrap" }}>
             {confirmation.message.replace(/^⚠️\s*/, "")}
@@ -94,7 +95,7 @@ export function TournamentNotice({ notice, onClose, confirmation, onResolveConfi
   const isSuccess = /✅|🏆|correctamente|se agregaron|te inscribiste|torneo en marcha/i.test(message);
   const isWarning = /⚠️|🔒|🚫|solo el creador|seleccioná|necesitás|necesitas/i.test(message);
   const accent = isSuccess ? "#86efac" : isWarning ? "#fbbf24" : "#a5b4fc";
-  const symbol = isSuccess ? "⚔️" : isWarning ? "🛡️" : "💬";
+  const symbol = isSuccess ? "sword" : isWarning ? "shield" : "chat";
 
   return (
     <div
@@ -148,7 +149,7 @@ export function TournamentNotice({ notice, onClose, confirmation, onResolveConfi
             fontSize: "1.55rem",
           }}
         >
-          {symbol}
+          <TCIcon name={symbol} size={25} />
         </div>
         <p style={{ margin: "0 0 1rem", color: "#e5e7eb", fontSize: "0.9rem", lineHeight: 1.55, overflowWrap: "anywhere", whiteSpace: "pre-wrap" }}>
           {message.replace(/^[❌✅⚠️🔒🚫🏆]\s*/, "")}
