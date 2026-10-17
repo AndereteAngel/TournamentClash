@@ -2177,7 +2177,7 @@ export function TournamentClashApp() {
                 marginTop: "0.5rem",
               }}
             >
-              {authMode === "login" ? "Entrar a la Arena ⚔️" : "Registrarse 🛡️"}
+              {authMode === "login" ? <><TCIcon name="sword" size={17} /> Entrar a la Arena</> : <><TCIcon name="shield" size={17} /> Registrarse</>}
             </button>
 
             <div
@@ -2965,7 +2965,7 @@ export function TournamentClashApp() {
                   className="cr-btn-gold"
                   style={adminTournamentButtonStyle}
                 >
-                  🏁 Finalizar liga
+                  <TCIcon name="flag" /> Finalizar liga
                 </button>
               )}
               {isAdmin && (
@@ -2975,7 +2975,7 @@ export function TournamentClashApp() {
                   className="cr-btn-gold"
                   style={adminTournamentButtonStyle}
                 >
-                  🏁 Finalizar torneo
+                  <TCIcon name="flag" /> Finalizar torneo
                 </button>
               )}
             </div>
