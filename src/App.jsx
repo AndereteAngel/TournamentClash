@@ -1675,32 +1675,46 @@ export function TournamentClashApp() {
     if (!confirmar) return;
 
     const shuffled = [...participants].sort(() => Math.random() - 0.5);
-    const groups = Array.from({ length: numGroups }, (_, index) => ({
-      id: index + 1,
-      name: `Grupo ${String.fromCharCode(65 + index)}`,
-      teams: [],
-      matches: [],
-    }));
+    const isDirectElimination = activeTournament.format === "single_elimination";
+    let groups;
+    let playoffs = null;
 
-    shuffled.forEach((team, index) => groups[index % numGroups].teams.push(team));
-    groups.forEach((group) => {
-      const teams = group.teams;
-      for (let i = 0; i < teams.length; i++) {
-        for (let j = i + 1; j < teams.length; j++) {
-          group.matches.push({
-            id: `${teams[i]}-${teams[j]}`,
-            team1: teams[i],
-            team2: teams[j],
-            score1: null,
-            score2: null,
-          });
+    if (isDirectElimination) {
+      groups = [{
+        id: 1,
+        name: "Llaves de eliminación",
+        teams: shuffled,
+        matches: [],
+      }];
+      playoffs = generatePlayoffBrackets(shuffled);
+    } else {
+      groups = Array.from({ length: numGroups }, (_, index) => ({
+        id: index + 1,
+        name: `Grupo ${String.fromCharCode(65 + index)}`,
+        teams: [],
+        matches: [],
+      }));
+
+      shuffled.forEach((team, index) => groups[index % numGroups].teams.push(team));
+      groups.forEach((group) => {
+        const teams = group.teams;
+        for (let i = 0; i < teams.length; i++) {
+          for (let j = i + 1; j < teams.length; j++) {
+            group.matches.push({
+              id: `${teams[i]}-${teams[j]}`,
+              team1: teams[i],
+              team2: teams[j],
+              score1: null,
+              score2: null,
+            });
+          }
         }
-      }
-    });
+      });
+    }
 
     const { data, error } = await supabase
       .from("tournaments")
-      .update({ groups, status: "En curso" })
+      .update({ groups, playoffs, status: "En curso" })
       .eq("id", activeTournament.id)
       .eq("status", "Inscripciones")
       .select();
@@ -1714,8 +1728,10 @@ export function TournamentClashApp() {
 
     setActiveTournament(data[0]);
     setTournaments((prev) => prev.map((item) => item.id === data[0].id ? data[0] : item));
-    setActiveView("groups");
-    showNotice("🏆 ¡Torneo en marcha! Los grupos y partidos se generaron automáticamente.");
+    setActiveView(data[0].format === "single_elimination" ? "playoffs" : "groups");
+    showNotice(data[0].format === "single_elimination"
+      ? "🏆 ¡Torneo en marcha! Se generaron las llaves de eliminación directa."
+      : "🏆 ¡Torneo en marcha! Los grupos y partidos se generaron automáticamente.");
   };
 
   // =========================================================
@@ -1759,42 +1775,50 @@ export function TournamentClashApp() {
     }
 
     const shuffled = [...config.teams].sort(() => 0.5 - Math.random());
-
+    const isDirectElimination = config.format === "single_elimination";
     const numGroups = config.format === "groups_playoff" ? config.numGroups : 1;
-
     const groups = [];
 
-    for (let i = 0; i < numGroups; i++) {
+    if (isDirectElimination) {
       groups.push({
-        id: i + 1,
-        name: `Grupo ${String.fromCharCode(65 + i)}`,
-        teams: [],
+        id: 1,
+        name: "Llaves de eliminación",
+        teams: shuffled,
         matches: [],
       });
-    }
-
-    shuffled.forEach((team, idx) => {
-      groups[idx % numGroups].teams.push(team);
-    });
-
-    groups.forEach((group) => {
-      const groupMatches = [];
-      const t = group.teams;
-
-      for (let i = 0; i < t.length; i++) {
-        for (let j = i + 1; j < t.length; j++) {
-          groupMatches.push({
-            id: `${t[i]}-${t[j]}`,
-            team1: t[i],
-            team2: t[j],
-            score1: null,
-            score2: null,
-          });
-        }
+    } else {
+      for (let i = 0; i < numGroups; i++) {
+        groups.push({
+          id: i + 1,
+          name: `Grupo ${String.fromCharCode(65 + i)}`,
+          teams: [],
+          matches: [],
+        });
       }
 
-      group.matches = groupMatches;
-    });
+      shuffled.forEach((team, idx) => {
+        groups[idx % numGroups].teams.push(team);
+      });
+
+      groups.forEach((group) => {
+        const groupMatches = [];
+        const t = group.teams;
+
+        for (let i = 0; i < t.length; i++) {
+          for (let j = i + 1; j < t.length; j++) {
+            groupMatches.push({
+              id: `${t[i]}-${t[j]}`,
+              team1: t[i],
+              team2: t[j],
+              score1: null,
+              score2: null,
+            });
+          }
+        }
+
+        group.matches = groupMatches;
+      });
+    }
 
     const updatedTournament = {
       ...activeTournament,
@@ -1804,6 +1828,7 @@ export function TournamentClashApp() {
       qualifiers_per_group: config.qualifiersPerGroup,
       is_public: config.isPublic,
       groups,
+      playoffs: isDirectElimination ? generatePlayoffBrackets(shuffled) : null,
     };
 
     const { data, error } = await supabase
@@ -1815,6 +1840,7 @@ export function TournamentClashApp() {
         qualifiers_per_group: updatedTournament.qualifiers_per_group,
         is_public: updatedTournament.is_public,
         groups: updatedTournament.groups,
+        playoffs: updatedTournament.playoffs,
       })
       .eq("id", updatedTournament.id)
       .select();
@@ -1835,6 +1861,11 @@ export function TournamentClashApp() {
       );
 
       setEditingTournament(false);
+      if (data[0].format === "single_elimination" && data[0].playoffs?.length) {
+        setActiveView("playoffs");
+      } else if (data[0].format !== "single_elimination") {
+        setActiveView("groups");
+      }
 
       showNotice("✅ Torneo modificado correctamente.");
     }
