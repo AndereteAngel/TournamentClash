@@ -74,9 +74,7 @@ export function CreateTournament({
     setLoadingProfiles(true);
     setProfileError("");
     const { data, error } = await supabase
-      .from("profiles")
-      .select("id, username")
-      .order("username", { ascending: true });
+      .rpc("list_registered_players");
 
     if (error) {
       console.error("Error al cargar perfiles:", error);
