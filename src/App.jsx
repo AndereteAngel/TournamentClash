@@ -1739,16 +1739,17 @@ export function TournamentClashApp() {
   // =========================================================
 
   const tournamentHasResults = (tournament) => {
-    if (!tournament?.groups) return false;
-
-    return tournament.groups.some((group) =>
-      (group.matches || []).some(
-        (match) =>
-          match.score1 !== null &&
-          match.score1 !== undefined &&
-          match.score2 !== null &&
-          match.score2 !== undefined
-      )
+    const groupMatches = (tournament?.groups || []).flatMap((group) => group.matches || []);
+    const playoffRounds = Array.isArray(tournament?.playoffs) ? tournament.playoffs : [];
+    const playoffMatches = playoffRounds.flatMap((round) => Array.isArray(round) ? round : []);
+    return [...groupMatches, ...playoffMatches].some(
+      (match) =>
+        match.score1 !== null &&
+        match.score1 !== undefined &&
+        match.score2 !== null &&
+        match.score2 !== undefined &&
+        match.team1 !== "Pasaje Directo" &&
+        match.team2 !== "Pasaje Directo"
     );
   };
 
@@ -1983,7 +1984,7 @@ export function TournamentClashApp() {
       });
 
       if (!rounds.length || hasIncompleteMatch) {
-        showNotice("⚠️ Para finalizar un torneo de Grupos + Playoffs, primero hay que completar todos los partidos de grupos y todas las llaves eliminatorias.");
+        showNotice("⚠️ Para finalizar el torneo, primero hay que completar todos los partidos y las llaves eliminatorias.");
         return;
       }
 
