@@ -340,6 +340,8 @@ export function CreateTournament({
             >
               <option value="groups_playoff">Grupos + Playoffs</option>
 
+              <option value="single_elimination">Solo llaves · Eliminación directa</option>
+
               <option value="league">Todos contra Todos</option>
             </select>
           </div>
