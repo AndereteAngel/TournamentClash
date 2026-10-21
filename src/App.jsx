@@ -1671,7 +1671,8 @@ export function TournamentClashApp() {
       return;
     }
 
-    const confirmar = await confirmTournament(`¿Dar comienzo a "${activeTournament.title}" con ${participants.length} participantes? Las inscripciones se cerrarán y se generarán los grupos y partidos.`);
+    const detalleInicio = activeTournament.format === "single_elimination" ? "Las inscripciones se cerrarán y se generarán las llaves de eliminación directa." : "Las inscripciones se cerrarán y se generarán los grupos y partidos.";
+    const confirmar = await confirmTournament(`¿Dar comienzo a "${activeTournament.title}" con ${participants.length} participantes? ${detalleInicio}`);
     if (!confirmar) return;
 
     const shuffled = [...participants].sort(() => Math.random() - 0.5);
