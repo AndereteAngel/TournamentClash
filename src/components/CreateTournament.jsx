@@ -121,8 +121,13 @@ export function CreateTournament({
     ).values()];
 
     if (isEditing) {
-      if (teams.length < 4) {
-        showNotice("Necesitas al menos 4 participantes para armar el torneo.");
+      const minimumParticipants = formData.format === "single_elimination" ? 2 : 4;
+      if (teams.length < minimumParticipants) {
+        showNotice(
+          formData.format === "single_elimination"
+            ? "Necesitas al menos 2 participantes para armar un Playoff."
+            : "Necesitas al menos 4 participantes para armar el torneo."
+        );
         return;
       }
 
@@ -340,7 +345,7 @@ export function CreateTournament({
             >
               <option value="groups_playoff">Grupos + Playoffs</option>
 
-              <option value="single_elimination">Solo llaves · Eliminación directa</option>
+              <option value="single_elimination">Playoff</option>
 
               <option value="league">Todos contra Todos</option>
             </select>
