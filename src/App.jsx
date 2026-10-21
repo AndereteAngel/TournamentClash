@@ -3031,24 +3031,49 @@ export function TournamentClashApp() {
             onFinishTournament={handleFinishTournament}
           />
 
-          {isAdmin && activeTournament.status !== "Finalizado" && (
+          {(isTournamentAdmin || isAdmin) && activeTournament.status !== "Finalizado" && (
             <div
               style={{
                 width: "100%",
                 maxWidth: "600px",
                 display: "flex",
                 justifyContent: "center",
+                alignItems: "center",
+                gap: "0.5rem",
+                flexWrap: "wrap",
                 marginTop: "0.25rem",
               }}
             >
-              <button
-                type="button"
-                onClick={handleAdminForceFinishTournament}
-                className="cr-btn-gold"
-                style={adminTournamentButtonStyle}
-              >
-                <TCIcon name="flag" /> Finalizar torneo
-              </button>
+              {isTournamentAdmin && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (tournamentHasResults(activeTournament)) {
+                      showNotice(
+                        "🔒 Este torneo ya tiene resultados cargados. No se puede modificar su organización."
+                      );
+                      return;
+                    }
+
+                    setEditingTournament(true);
+                    setActiveView("edit");
+                  }}
+                  className="cr-btn-gold"
+                  style={adminTournamentButtonStyle}
+                >
+                  <TCIcon name="settings" /> Modificar torneo
+                </button>
+              )}
+              {isAdmin && (
+                <button
+                  type="button"
+                  onClick={handleAdminForceFinishTournament}
+                  className="cr-btn-gold"
+                  style={adminTournamentButtonStyle}
+                >
+                  <TCIcon name="flag" /> Finalizar torneo
+                </button>
+              )}
             </div>
           )}
         </div>
