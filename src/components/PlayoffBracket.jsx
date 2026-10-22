@@ -39,20 +39,47 @@ export function PlayoffBracket({
       (m) => m.winner !== null && m.winner !== "Empate (Definir)"
     );
 
-    // Si la ronda actual está completa y quedan más enfrentamientos por definir, generamos la siguiente ronda
+    // Al completar las semifinales, creamos la final y el partido por el tercer puesto.
+    // En las demás rondas, avanzan los ganadores como siempre.
     if (isCurrentRoundComplete && currentRound.length > 1) {
-      const winners = currentRound.map((m) => m.winner);
       const nextRoundMatches = [];
+      const roundId = roundIdx + 2;
 
-      for (let i = 0; i < winners.length; i += 2) {
+      if (currentRound.length === 2) {
+        const [firstSemi, secondSemi] = currentRound;
+        const loserOf = (match) =>
+          match.winner === match.team1 ? match.team2 : match.team1;
+
         nextRoundMatches.push({
-          id: `r${roundIdx + 2}-m${nextRoundMatches.length + 1}`,
-          team1: winners[i],
-          team2: winners[i + 1] || "Pasaje Directo",
+          id: `r${roundId}-final`,
+          stage: "final",
+          team1: firstSemi.winner,
+          team2: secondSemi.winner,
           score1: null,
           score2: null,
           winner: null,
         });
+        nextRoundMatches.push({
+          id: `r${roundId}-third-place`,
+          stage: "third_place",
+          team1: loserOf(firstSemi),
+          team2: loserOf(secondSemi),
+          score1: null,
+          score2: null,
+          winner: null,
+        });
+      } else {
+        const winners = currentRound.map((m) => m.winner);
+        for (let i = 0; i < winners.length; i += 2) {
+          nextRoundMatches.push({
+            id: `r${roundId}-m${nextRoundMatches.length + 1}`,
+            team1: winners[i],
+            team2: winners[i + 1] || "Pasaje Directo",
+            score1: null,
+            score2: null,
+            winner: null,
+          });
+        }
       }
 
       updatedRounds.push(nextRoundMatches);
@@ -62,8 +89,10 @@ export function PlayoffBracket({
   };
 
   const finalRound = rounds[rounds.length - 1];
-  const champion =
-    finalRound && finalRound.length === 1 ? finalRound[0].winner : null;
+  const finalMatch =
+    finalRound?.find((match) => match.stage === "final") ||
+    (finalRound?.length === 1 ? finalRound[0] : null);
+  const champion = finalMatch?.winner;
   const isTournamentComplete = champion && champion !== "Empate (Definir)";
 
   return (
@@ -152,11 +181,12 @@ export function PlayoffBracket({
                 paddingBottom: "4px",
               }}
             >
-              {rounds.length === 1 ||
-              (rIdx === rounds.length - 1 && rounds.length > 2)
-                ? rounds.length > 2 && rIdx === rounds.length - 1
-                  ? "Gran Final"
-                  : "Eliminación Directa"
+              {round.some((match) => match.stage === "third_place")
+                ? "Gran Final y partido por el tercer puesto"
+                : round.some((match) => match.stage === "final") || (rIdx === rounds.length - 1 && round.length === 1)
+                ? "Gran Final"
+                : rounds.length === 1
+                ? "Eliminación Directa"
                 : rIdx === 0
                 ? "Cuartos de Final"
                 : rIdx === 1
@@ -181,6 +211,16 @@ export function PlayoffBracket({
                     borderRadius: "10px",
                   }}
                 >
+                  {match.stage === "third_place" && (
+                    <div style={{ color: "#facc15", fontSize: "0.68rem", fontWeight: 800, textAlign: "center", marginBottom: "0.4rem", textTransform: "uppercase" }}>
+                      Partido por el 3.er puesto
+                    </div>
+                  )}
+                  {match.stage === "final" && (
+                    <div style={{ color: "#ffd700", fontSize: "0.68rem", fontWeight: 800, textAlign: "center", marginBottom: "0.4rem", textTransform: "uppercase" }}>
+                      Gran final
+                    </div>
+                  )}
                   <div
                     style={{
                       display: "flex",
