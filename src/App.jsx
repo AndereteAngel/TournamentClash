@@ -1989,7 +1989,10 @@ export function TournamentClashApp() {
       }
 
       const finalRound = rounds[rounds.length - 1];
-      const finalMatch = Array.isArray(finalRound) && finalRound.length === 1 ? finalRound[0] : null;
+      const finalMatch = Array.isArray(finalRound)
+        ? finalRound.find((match) => match.stage === "final") ||
+          (finalRound.length === 1 ? finalRound[0] : null)
+        : null;
       const champion = finalMatch?.winner ||
         (finalMatch && Number(finalMatch.score1) !== Number(finalMatch.score2)
           ? Number(finalMatch.score1) > Number(finalMatch.score2) ? finalMatch.team1 : finalMatch.team2
