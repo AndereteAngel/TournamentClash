@@ -45,7 +45,7 @@ export function PlayoffBracket({
       const nextRoundMatches = [];
       const roundId = roundIdx + 2;
 
-      if (currentRound.length === 2) {
+      if (currentRound.length === 2 && currentRound.every((match) => match.team1 !== "Pasaje Directo" && match.team2 !== "Pasaje Directo")) {
         const [firstSemi, secondSemi] = currentRound;
         const loserOf = (match) =>
           match.winner === match.team1 ? match.team2 : match.team1;
