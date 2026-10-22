@@ -41,7 +41,7 @@ export function PlayoffBracket({
 
     // Al completar las semifinales, creamos la final y el partido por el tercer puesto.
     // En las demás rondas, avanzan los ganadores como siempre.
-    if (isCurrentRoundComplete && currentRound.length > 1) {
+    if (isCurrentRoundComplete && currentRound.length > 1 && !currentRound.some((match) => match.stage === "final" || match.stage === "third_place")) {
       const nextRoundMatches = [];
       const roundId = roundIdx + 2;
 
