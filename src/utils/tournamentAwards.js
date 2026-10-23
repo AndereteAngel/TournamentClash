@@ -32,6 +32,7 @@ export function getTournamentPodium(tournament) {
       champion: standings[0]?.name || null,
       runnerUp: standings[1]?.name || null,
       bronze: standings[2]?.name ? [standings[2].name] : [],
+      diploma: standings[3]?.name || null,
     };
   }
 
@@ -39,7 +40,10 @@ export function getTournamentPodium(tournament) {
   const rawPlayoffs = Array.isArray(tournament.playoffs) ? tournament.playoffs : [];
   const rounds = rawPlayoffs.length && !Array.isArray(rawPlayoffs[0]) ? [rawPlayoffs] : rawPlayoffs;
   const finalRound = rounds[rounds.length - 1];
-  const finalMatch = Array.isArray(finalRound) && finalRound.length === 1 ? finalRound[0] : null;
+  const finalMatch = Array.isArray(finalRound)
+    ? finalRound.find((match) => match.stage === "final") ||
+      (finalRound.length === 1 ? finalRound[0] : null)
+    : null;
   const hasScores = (match) => match &&
     match.score1 !== null && match.score1 !== undefined &&
     match.score2 !== null && match.score2 !== undefined;
@@ -57,10 +61,18 @@ export function getTournamentPodium(tournament) {
   const runnerUp = [finalMatch.team1, finalMatch.team2].find(
     (name) => name && name !== champion && name !== "Pasaje Directo"
   );
-  const semifinalRound = rounds.length >= 2 ? rounds[rounds.length - 2] : [];
+  const semifinalRound = rounds.flat().filter((match) => !["final", "third_place"].includes(match.stage));
   const bronze = [];
-  if (Array.isArray(semifinalRound) && semifinalRound.length === 2) {
-    semifinalRound.forEach((match) => {
+  const thirdPlaceMatch = rounds.flat().find((match) => match.stage === "third_place");
+  const thirdPlaceWinner = winnerOf(thirdPlaceMatch);
+  const diploma = thirdPlaceMatch && thirdPlaceWinner
+    ? [thirdPlaceMatch.team1, thirdPlaceMatch.team2].find(
+        (name) => name && name !== thirdPlaceWinner && name !== "Pasaje Directo"
+      ) || null
+    : null;
+
+  if (Array.isArray(semifinalRound) && semifinalRound.length >= 2 && !thirdPlaceMatch) {
+    semifinalRound.slice(-2).forEach((match) => {
       const matchWinner = winnerOf(match);
       if (!matchWinner) return;
       const loser = [match.team1, match.team2].find(
@@ -69,7 +81,7 @@ export function getTournamentPodium(tournament) {
       if (loser && loser !== champion && loser !== runnerUp) bronze.push(loser);
     });
   }
-  return { champion, runnerUp: runnerUp || null, bronze: [...new Set(bronze)] };
+  return { champion, runnerUp: runnerUp || null, bronze: thirdPlaceWinner ? [thirdPlaceWinner] : [...new Set(bronze)], diploma };
 }
 
 export function getPlayerTournamentStats(tournament, playerName) {
@@ -110,7 +122,7 @@ export function getPlayerTournamentStats(tournament, playerName) {
 export function getPlayerMedals(tournaments, playerName) {
   const normalize = (value) => String(value || "").trim().toLocaleLowerCase("es");
   const target = normalize(playerName);
-  const medals = { gold: 0, silver: 0, bronze: 0, history: [] };
+  const medals = { gold: 0, silver: 0, bronze: 0, diploma: 0, history: [] };
 
   (tournaments || []).forEach((tournament) => {
     const podium = getTournamentPodium(tournament);
@@ -123,9 +135,12 @@ export function getPlayerMedals(tournaments, playerName) {
     } else if (normalize(podium.runnerUp) === target) {
       medals.silver += 1;
       medal = "silver";
-    } else if (podium.bronze.some((name) => normalize(name) === target)) {
+    } else if ((podium.bronze || []).some((name) => normalize(name) === target)) {
       medals.bronze += 1;
       medal = "bronze";
+    } else if (normalize(podium.diploma) === target) {
+      medals.diploma += 1;
+      medal = "diploma";
     }
 
     if (medal) medals.history.push({
