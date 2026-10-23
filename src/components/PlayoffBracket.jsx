@@ -94,6 +94,11 @@ export function PlayoffBracket({
     (finalRound?.length === 1 ? finalRound[0] : null);
   const champion = finalMatch?.winner;
   const isTournamentComplete = champion && champion !== "Empate (Definir)";
+  const thirdPlaceMatch = rounds.flat().find((match) => match.stage === "third_place");
+  const thirdPlaceWinner = thirdPlaceMatch?.winner && thirdPlaceMatch.winner !== "Empate (Definir)" ? thirdPlaceMatch.winner : null;
+  const thirdPlaceLoser = thirdPlaceWinner
+    ? [thirdPlaceMatch.team1, thirdPlaceMatch.team2].find((name) => name && name !== thirdPlaceWinner && name !== "Pasaje Directo")
+    : null;
 
   return (
     <div className="cr-card" style={{ maxWidth: "600px" }}>
@@ -351,6 +356,19 @@ export function PlayoffBracket({
           >
             {champion} se corona como el rey indiscutible.
           </p>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(115px, 1fr))", gap: "0.5rem", marginTop: "1rem" }}>
+            {[
+              { place: "🥇 1.er puesto · Oro", name: champion, color: "#ffd700" },
+              { place: "🥈 2.º puesto · Plata", name: finalMatch?.team1 === champion ? finalMatch?.team2 : finalMatch?.team1, color: "#d1d5db" },
+              ...(thirdPlaceWinner ? [{ place: "🥉 3.er puesto · Bronce", name: thirdPlaceWinner, color: "#d97706" }] : []),
+              ...(thirdPlaceLoser ? [{ place: "📜 4.º puesto · Diploma", name: thirdPlaceLoser, color: "#c4b5fd" }] : []),
+            ].filter((award) => award.name && award.name !== "Pasaje Directo").map((award) => (
+              <div key={award.place} style={{ background: "rgba(0,0,0,0.25)", border: "1px solid rgba(255,255,255,0.14)", borderRadius: "8px", padding: "0.6rem 0.35rem", minWidth: 0 }}>
+                <div style={{ color: award.color, fontSize: "0.65rem", fontWeight: 900 }}>{award.place}</div>
+                <div style={{ color: "#fff", fontSize: "0.8rem", fontWeight: 800, overflowWrap: "anywhere", marginTop: "0.25rem" }}>{award.name}</div>
+              </div>
+            ))}
+          </div>
         </div>
       )}
 
