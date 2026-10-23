@@ -191,7 +191,7 @@ export function Navbar({
           style={medalButtonStyle}
           title="Ver historial de medallas"
         >
-          <TCIcon name="medal" size={19} /> <span>Medallero</span> <span className="tc-medal-total">{medals.gold + medals.silver + medals.bronze}</span>
+          <TCIcon name="medal" size={19} /> <span>Medallero</span> <span className="tc-medal-total">{medals.gold + medals.silver + medals.bronze + medals.diploma}</span>
         </button>
 
         <button
@@ -307,7 +307,7 @@ export function Navbar({
             onClick={() => setMedalOpen((open) => !open)}
             style={{ ...medalButtonStyle, padding: "0.7rem", fontSize: "0.8rem" }}
           >
-            <TCIcon name="medal" size={19} /> <span>Mi medallero</span> <span className="tc-medal-total">{medals.gold + medals.silver + medals.bronze}</span>
+            <TCIcon name="medal" size={19} /> <span>Mi medallero</span> <span className="tc-medal-total">{medals.gold + medals.silver + medals.bronze + medals.diploma}</span>
           </button>
 
           <button
@@ -341,11 +341,12 @@ export function Navbar({
             <strong style={{ color: "#facc15", fontSize: "0.85rem" }}><TCIcon name="medal" size={16} /> MI MEDALLERO</strong>
             <button type="button" onClick={() => setMedalOpen(false)} aria-label="Cerrar medallero" className="tc-close-button" style={{ background: "transparent", border: 0, color: "#d1d5db", fontSize: "1rem", cursor: "pointer" }}>✕</button>
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, minmax(0, 1fr))", gap: "0.4rem", marginBottom: "0.9rem" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, minmax(0, 1fr))", gap: "0.4rem", marginBottom: "0.9rem" }}>
             {[
               ["medalGold", "Oro", medals.gold, "#facc15"],
               ["medalSilver", "Plata", medals.silver, "#d1d5db"],
               ["medalBronze", "Bronce", medals.bronze, "#d97706"],
+              ["diploma", "Diploma", medals.diploma, "#c4b5fd"],
             ].map(([icon, label, count, color]) => (
               <div key={label} style={{ textAlign: "center", padding: "0.65rem 0.2rem", borderRadius: "9px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)" }}>
                 <div className={`tc-medal-emblem tc-medal-${label.toLowerCase()}`}><TCIcon name={icon} size={25} /></div>
@@ -356,15 +357,15 @@ export function Navbar({
           </div>
           <div style={{ color: "#9ca3af", fontSize: "0.68rem", fontWeight: 800, marginBottom: "0.4rem" }}>HISTORIAL DE TORNEOS</div>
           {medals.history.length === 0 ? (
-            <p style={{ color: "#a1a1aa", fontSize: "0.78rem", lineHeight: 1.5, margin: 0 }}>Todavía no tenés medallas. ¡Jugá torneos y conquistá el podio!</p>
+            <p style={{ color: "#a1a1aa", fontSize: "0.78rem", lineHeight: 1.5, margin: 0 }}>Todavía no tenés medallas ni diplomas. ¡Jugá torneos y conquistá el podio!</p>
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: "0.45rem" }}>
               {medals.history.map((item, index) => (
                 <div key={String(item.id) + "-" + index} style={{ display: "flex", alignItems: "center", gap: "0.55rem", padding: "0.55rem", borderRadius: "8px", background: "rgba(255,255,255,0.04)" }}>
-                  <span className={`tc-medal-emblem tc-medal-${item.medal}`}><TCIcon name={item.medal === "gold" ? "medalGold" : item.medal === "silver" ? "medalSilver" : "medalBronze"} size={23} /></span>
+                  <span className={`tc-medal-emblem tc-medal-${item.medal}`}><TCIcon name={item.medal === "gold" ? "medalGold" : item.medal === "silver" ? "medalSilver" : item.medal === "bronze" ? "medalBronze" : "diploma"} size={23} /></span>
                   <div style={{ minWidth: 0 }}>
                     <div style={{ color: "#fff", fontSize: "0.75rem", fontWeight: 800, overflowWrap: "anywhere" }}>{item.title}</div>
-                    <div style={{ color: "#9ca3af", fontSize: "0.65rem" }}>{item.medal === "gold" ? "Primer puesto" : item.medal === "silver" ? "Segundo puesto" : "Tercer puesto"}</div>
+                    <div style={{ color: "#9ca3af", fontSize: "0.65rem" }}>{item.medal === "gold" ? "Primer puesto" : item.medal === "silver" ? "Segundo puesto" : item.medal === "bronze" ? "Tercer puesto" : "Cuarto puesto · Diploma"}</div>
                   </div>
                 </div>
               ))}
