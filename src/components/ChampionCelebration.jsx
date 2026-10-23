@@ -6,6 +6,12 @@ export function ChampionCelebration({ tournament, onClose }) {
   if (!podium?.champion) return null;
 
   const stats = getPlayerTournamentStats(tournament, podium.champion);
+  const awardWinners = [
+    { place: "1.er puesto · Oro", name: podium.champion, icon: "medalGold", color: "#facc15" },
+    { place: "2.º puesto · Plata", name: podium.runnerUp, icon: "medalSilver", color: "#d1d5db" },
+    ...(podium.bronze || []).map((name) => ({ place: "3.er puesto · Bronce", name, icon: "medalBronze", color: "#d97706" })),
+    ...(podium.diploma ? [{ place: "4.º puesto · Diploma", name: podium.diploma, icon: "diploma", color: "#c4b5fd" }] : []),
+  ].filter((award) => award.name);
 
   return (
     <div
@@ -112,8 +118,22 @@ export function ChampionCelebration({ tournament, onClose }) {
           </div>
         ))}
       </div>
+      <div style={{ marginTop: "1rem", textAlign: "left" }}>
+        <div style={{ color: "#facc15", fontSize: "0.7rem", fontWeight: 900, marginBottom: "0.5rem", textAlign: "center" }}>
+          🏅 GANADORES DEL TORNEO
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(125px, 1fr))", gap: "0.45rem" }}>
+          {awardWinners.map((award) => (
+            <div key={award.place} style={{ padding: "0.65rem 0.45rem", borderRadius: "10px", background: "rgba(255,255,255,0.055)", border: "1px solid rgba(255,255,255,0.1)", textAlign: "center", minWidth: 0 }}>
+              <TCIcon name={award.icon} size={25} />
+              <div style={{ color: award.color, fontSize: "0.62rem", fontWeight: 900, marginTop: "0.25rem" }}>{award.place}</div>
+              <div style={{ color: "#fff", fontSize: "0.8rem", fontWeight: 900, overflowWrap: "anywhere", marginTop: "0.2rem" }}>{award.name}</div>
+            </div>
+          ))}
+        </div>
+      </div>
       <p style={{ color: "#facc15", fontSize: "0.7rem", fontWeight: 800, margin: "1rem 0 0.8rem" }}>
-        <TCIcon name="medalGold" size={16} /> TÍTULO REGISTRADO EN EL MEDALLERO
+        <TCIcon name="medalGold" size={16} /> MEDALLAS Y DIPLOMA REGISTRADOS EN EL MEDALLERO
       </p>
       <button type="button" onClick={onClose} className="cr-btn-gold" style={{ maxWidth: "260px", padding: "0.65rem 1rem", fontSize: "0.8rem" }}>
         Ver torneo
