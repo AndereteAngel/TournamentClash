@@ -107,12 +107,10 @@ export function CreateTournament({
       .map((name) => name.trim())
       .filter((name) => name.length > 0);
 
-    const selectedTeams = !isEditing
-      ? registeredProfiles
-          .filter((profile) => selectedProfileIds.includes(profile.id))
-          .map((profile) => String(profile.username || "").trim())
-          .filter(Boolean)
-      : [];
+    const selectedTeams = registeredProfiles
+      .filter((profile) => selectedProfileIds.includes(profile.id))
+      .map((profile) => String(profile.username || "").trim())
+      .filter(Boolean);
 
     const teams = [...new Map(
       [...selectedTeams, ...manualTeams].map((name) => [name.toLocaleLowerCase("es"), name])
@@ -551,6 +549,54 @@ export function CreateTournament({
         {/* ===================================================
             PARTICIPANTES
             =================================================== */}
+
+        <div style={{ padding: "0.85rem", border: "1px solid rgba(96,165,250,0.45)", borderRadius: "10px", background: "rgba(27,95,168,0.12)" }}>
+          <label style={{ display: "block", fontSize: "0.75rem", fontWeight: "bold", textTransform: "uppercase", color: "#d1d5db", marginBottom: "8px" }}>
+            Agregar desde usuarios registrados
+          </label>
+          <button type="button" onClick={loadRegisteredProfiles} disabled={loadingProfiles} style={{ width: "100%", padding: "0.65rem", borderRadius: "8px", background: "#1b5fa8", border: "1px solid #60a5fa", color: "#fff", cursor: loadingProfiles ? "wait" : "pointer", fontWeight: "bold" }}>
+            {loadingProfiles ? "Cargando jugadores..." : registeredProfiles.length ? "↻ Actualizar lista de jugadores" : "🔎 Cargar usuarios registrados"}
+          </button>
+          {profileError && <p role="alert" style={{ color: "#fca5a5", fontSize: "0.75rem", lineHeight: 1.4 }}>{profileError}</p>}
+          {registeredProfiles.length > 0 && (
+            <>
+              <input type="search" value={profileSearch} onChange={(e) => setProfileSearch(e.target.value)} placeholder="Filtrar por alias..." aria-label="Filtrar jugadores registrados" className="cr-input" style={{ marginTop: "0.65rem" }} />
+              <div style={{ maxHeight: "190px", overflowY: "auto", display: "grid", gap: "0.35rem", marginTop: "0.55rem" }}>
+                {registeredProfiles.filter((profile) => {
+                  const query = profileSearch.trim().toLocaleLowerCase("es");
+                  return !query || String(profile.username || "").toLocaleLowerCase("es").includes(query);
+                }).map((profile) => {
+                  const currentNames = formData.participantsInput.split("\n").map((name) => name.trim().toLocaleLowerCase("es"));
+                  const alreadyAdded = currentNames.includes(String(profile.username || "").trim().toLocaleLowerCase("es"));
+                  return (
+                    <label key={profile.id} style={{ display: "flex", alignItems: "center", gap: "0.55rem", padding: "0.5rem", borderRadius: "7px", background: "#121019", color: alreadyAdded ? "#6b7280" : "#e5e7eb", fontSize: "0.82rem", cursor: alreadyAdded ? "not-allowed" : "pointer" }}>
+                      <input type="checkbox" checked={alreadyAdded || selectedProfileIds.includes(profile.id)} disabled={alreadyAdded} onChange={(e) => setSelectedProfileIds((prev) => e.target.checked ? [...prev, profile.id] : prev.filter((id) => id !== profile.id))} />
+                      <span>{profile.username || "Sin alias"}</span>
+                      {alreadyAdded && <span>✓ Ya agregado</span>}
+                    </label>
+                  );
+                })}
+              </div>
+              <button type="button" onClick={() => {
+                const chosen = registeredProfiles.filter((profile) => selectedProfileIds.includes(profile.id)).map((profile) => String(profile.username || "").trim()).filter(Boolean);
+                if (!chosen.length) return;
+                setFormData((prev) => {
+                  const existing = prev.participantsInput.split("\n").map((name) => name.trim()).filter(Boolean);
+                  const seen = new Set(existing.map((name) => name.toLocaleLowerCase("es")));
+                  const merged = [...existing];
+                  chosen.forEach((name) => {
+                    const key = name.toLocaleLowerCase("es");
+                    if (!seen.has(key)) { seen.add(key); merged.push(name); }
+                  });
+                  return { ...prev, participantsInput: merged.join("\n") };
+                });
+                setSelectedProfileIds([]);
+              }} disabled={!selectedProfileIds.length} className="cr-btn-gold" style={{ width: "100%", marginTop: "0.65rem", opacity: selectedProfileIds.length ? 1 : 0.55 }}>
+                <TCIcon name="plus" size={15} /> Incorporar seleccionados ({selectedProfileIds.length})
+              </button>
+            </>
+          )}
+        </div>
 
         <div>
           <label
