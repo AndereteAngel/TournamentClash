@@ -29,6 +29,27 @@ export function GroupStageView({
     return () => window.clearTimeout(timer);
   }, [activeGroupIndex, targetMatchId]);
 
+  const handleShareStandings = async () => {
+    if (!tournament?.id) return;
+    const shareUrl = `${window.location.origin}/share/${encodeURIComponent(tournament.id)}`;
+    const message = `🏆 ${tournament.title}\nMirá la tabla de posiciones actualizada en TournamentClash:\n${shareUrl}`;
+
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      window.alert("¡Enlace copiado! Pegalo en WhatsApp o en el chat que quieras compartir.");
+    } catch {
+      window.prompt("Copiá este enlace para compartir la tabla:", shareUrl);
+    }
+
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: tournament.title, text: message, url: shareUrl });
+      } catch (error) {
+        if (error?.name !== "AbortError") console.error("No se pudo abrir el menú para compartir:", error);
+      }
+    }
+  };
+
   const currentGroup = tournament.groups[activeGroupIndex];
 
   const standings = calculateGroupStandings(
@@ -176,6 +197,16 @@ export function GroupStageView({
             {tournament.title}
           </h2>
         </div>
+
+        <button
+          type="button"
+          onClick={handleShareStandings}
+          className="cr-btn-gold"
+          style={{ alignSelf: "flex-start", flexShrink: 0, fontSize: "0.72rem", padding: "0.55rem 0.7rem" }}
+          title="Copiar enlace directo a la tabla de posiciones"
+        >
+          ↗ Compartir tabla
+        </button>
 
         <span
           className="tournament-phase-badge"
