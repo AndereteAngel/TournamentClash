@@ -31,7 +31,7 @@ export function GroupStageView({
 
   const handleShareStandings = async () => {
     if (!tournament?.id) return;
-    const shareUrl = `${window.location.origin}/share/${encodeURIComponent(tournament.id)}`;
+    const shareUrl = `${window.location.origin}/?tournament=${encodeURIComponent(tournament.id)}`;
     try {
       await navigator.clipboard.writeText(shareUrl);
       window.alert("¡Enlace copiado! Pegalo en WhatsApp o en el chat que quieras compartir.");
