@@ -32,21 +32,11 @@ export function GroupStageView({
   const handleShareStandings = async () => {
     if (!tournament?.id) return;
     const shareUrl = `${window.location.origin}/share/${encodeURIComponent(tournament.id)}`;
-    const message = `🏆 ${tournament.title}\nMirá la tabla de posiciones actualizada en TournamentClash:\n${shareUrl}`;
-
     try {
       await navigator.clipboard.writeText(shareUrl);
       window.alert("¡Enlace copiado! Pegalo en WhatsApp o en el chat que quieras compartir.");
     } catch {
       window.prompt("Copiá este enlace para compartir la tabla:", shareUrl);
-    }
-
-    if (navigator.share) {
-      try {
-        await navigator.share({ title: tournament.title, text: message, url: shareUrl });
-      } catch (error) {
-        if (error?.name !== "AbortError") console.error("No se pudo abrir el menú para compartir:", error);
-      }
     }
   };
 
