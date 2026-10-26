@@ -188,16 +188,6 @@ export function GroupStageView({
           </h2>
         </div>
 
-        <button
-          type="button"
-          onClick={handleShareStandings}
-          className="cr-btn-gold"
-          style={{ alignSelf: "flex-start", flexShrink: 0, fontSize: "0.72rem", padding: "0.55rem 0.7rem" }}
-          title="Copiar enlace directo a la tabla de posiciones"
-        >
-          ↗ Compartir tabla
-        </button>
-
         <span
           className="tournament-phase-badge"
           style={{
@@ -494,15 +484,36 @@ export function GroupStageView({
             Tabla de posiciones
           </h3>
 
-          <span
-            style={{
-              fontSize: "0.7rem",
-              color: "#ffd700",
-              fontWeight: "bold",
-            }}
-          >
-            {currentGroup.name}
-          </span>
+          <div style={{ display: "flex", alignItems: "center", gap: "0.65rem", flexShrink: 0 }}>
+            <span
+              style={{
+                fontSize: "0.7rem",
+                color: "#ffd700",
+                fontWeight: "bold",
+              }}
+            >
+              {currentGroup.name}
+            </span>
+            <button
+              type="button"
+              onClick={handleShareStandings}
+              title="Copiar enlace para compartir este torneo"
+              aria-label="Compartir tabla de posiciones"
+              style={{
+                padding: "0.3rem 0.45rem",
+                border: "1px solid rgba(156,163,175,0.22)",
+                borderRadius: "6px",
+                background: "rgba(255,255,255,0.025)",
+                color: "#9ca3af",
+                fontSize: "0.68rem",
+                lineHeight: 1.2,
+                cursor: "pointer",
+                whiteSpace: "nowrap",
+              }}
+            >
+              ↗ Compartir
+            </button>
+          </div>
         </div>
 
         <div
