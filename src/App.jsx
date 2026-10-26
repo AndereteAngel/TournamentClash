@@ -998,7 +998,9 @@ export function TournamentClashApp() {
     resolveConfirmation,
   } = useTournamentNotice();
   const [currentUser, setCurrentUser] = useState(null);
-  const [authMode, setAuthMode] = useState("login");
+  const [authMode, setAuthMode] = useState(() =>
+    new URLSearchParams(window.location.search).has("tournament") ? "register" : "login"
+  );
   const [authInput, setAuthInput] = useState({
     username: "",
     email: "",
