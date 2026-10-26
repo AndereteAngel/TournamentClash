@@ -1226,6 +1226,19 @@ export function TournamentClashApp() {
     else setTournaments([]);
   }, [currentUser]);
 
+  useEffect(() => {
+    const sharedTournamentId = new URLSearchParams(window.location.search).get("tournament");
+    if (!currentUser || !sharedTournamentId || tournaments.length === 0) return;
+
+    const sharedTournament = tournaments.find((item) => String(item.id) === sharedTournamentId);
+    if (!sharedTournament) return;
+
+    setActiveTournament(sharedTournament);
+    setShowChampionCard(String(sharedTournament.status || "").trim().toLocaleLowerCase("es") === "finalizado");
+    setActiveView(sharedTournament.playoffs && sharedTournament.playoffs.length > 0 ? "playoffs" : "groups");
+    window.history.replaceState({}, "", window.location.pathname);
+  }, [currentUser, tournaments]);
+
   const fetchTournaments = async () => {
     setLoading(true);
 
