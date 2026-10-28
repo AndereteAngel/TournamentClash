@@ -93,11 +93,11 @@ export function GrandesGanadores({ tournaments = [], onBack }) {
               <thead>
                 <tr style={{ background: "#121019", color: "#ffd700" }}>
                   <th style={{ padding: "0.75rem", textAlign: "left" }}># / Jugador</th>
+                  <th style={{ padding: "0.75rem" }}>Puntos</th>
                   <th style={{ padding: "0.75rem" }}>🥇</th>
                   <th style={{ padding: "0.75rem" }}>🥈</th>
                   <th style={{ padding: "0.75rem" }}>🥉</th>
                   <th style={{ padding: "0.75rem" }}>📜</th>
-                  <th style={{ padding: "0.75rem" }}>Puntos</th>
                 </tr>
               </thead>
               <tbody>
@@ -107,11 +107,11 @@ export function GrandesGanadores({ tournaments = [], onBack }) {
                       <span style={{ color: index === 0 ? "#ffd700" : "#9ca3af", marginRight: "0.5rem" }}>{index === 0 ? "👑" : index + 1}</span>
                       {player.name}
                     </td>
+                    <td style={{ padding: "0.8rem", color: "#ffd700", fontWeight: 900 }}>{player.points}</td>
                     <td style={{ padding: "0.8rem", color: "#facc15" }}>{player.gold}</td>
                     <td style={{ padding: "0.8rem", color: "#d1d5db" }}>{player.silver}</td>
                     <td style={{ padding: "0.8rem", color: "#d97706" }}>{player.bronze}</td>
                     <td style={{ padding: "0.8rem", color: "#93c5fd" }}>{player.diploma}</td>
-                    <td style={{ padding: "0.8rem", color: "#ffd700", fontWeight: 900 }}>{player.points}</td>
                   </tr>
                 ))}
               </tbody>
