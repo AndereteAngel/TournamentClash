@@ -11,6 +11,7 @@ import { TCIcon } from "./components/TCIcon";
 import { ChampionCelebration } from "./components/ChampionCelebration";
 import { TournamentNotice, useTournamentNotice } from "./components/TournamentNotice";
 import { PlayoffBracket } from "./components/PlayoffBracket";
+import { GrandesGanadores } from "./components/GrandesGanadores";
 import { supabase } from "./supabaseClient";
 
 const ADMIN_UID = "c2089fce-5fb1-430a-8abc-89f5b762b69a";
@@ -2262,6 +2263,8 @@ export function TournamentClashApp() {
         <div className="tc-form-screen tc-stats-screen">
           <AdminStats onBack={() => setActiveView("home")} />
         </div>
+      ) : activeView === "winners" ? (
+        <GrandesGanadores tournaments={tournaments} onBack={() => setActiveView("home")} />
       ) : activeView === "home" ? (
         <div className="tc-home-screen">
         <section className="tc-arena-hero" aria-label="Bienvenido a la arena de TournamentClash">
@@ -2379,6 +2382,29 @@ export function TournamentClashApp() {
               <TCIcon name="chart" size={17} /> Ver estadísticas
             </button>
           )}
+
+          <button
+            type="button"
+            onClick={() => setActiveView("winners")}
+            style={{
+              width: "100%",
+              marginBottom: "1rem",
+              padding: "0.85rem 1rem",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "0.6rem",
+              background: "linear-gradient(110deg, #201b2d, #11101a)",
+              border: "1px solid rgba(212,175,55,0.55)",
+              borderRadius: "10px",
+              color: "#facc15",
+              cursor: "pointer",
+              fontWeight: 900,
+              fontSize: "0.85rem",
+            }}
+          >
+            <TCIcon name="trophy" size={20} /> GRANDES GANADORES <span style={{ color: "#9ca3af", fontSize: "0.7rem", fontWeight: 500 }}>· Medallero histórico</span>
+          </button>
 
           <div
             style={{
