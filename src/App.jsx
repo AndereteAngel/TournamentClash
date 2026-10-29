@@ -3061,16 +3061,6 @@ export function TournamentClashApp() {
                   className="cr-btn-gold"
                   style={adminTournamentButtonStyle}
                 >
-                  <TCIcon name="flag" /> Finalizar liga
-                </button>
-              )}
-              {isAdmin && (
-                <button
-                  type="button"
-                  onClick={handleAdminForceFinishTournament}
-                  className="cr-btn-gold"
-                  style={adminTournamentButtonStyle}
-                >
                   <TCIcon name="flag" /> Finalizar torneo
                 </button>
               )}
