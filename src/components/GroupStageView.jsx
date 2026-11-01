@@ -11,7 +11,6 @@ export function GroupStageView({
   const [activeGroupIndex, setActiveGroupIndex] = useState(0);
   const [targetMatchId, setTargetMatchId] = useState(null);
   const [myMatchesView, setMyMatchesView] = useState("pending");
-  const qualifiersPerGroup = Number(tournament.qualifiers_per_group ?? tournament.qualifiersPerGroup ?? 2);
 
   useEffect(() => {
     if (!targetMatchId) return;
@@ -546,7 +545,7 @@ export function GroupStageView({
 
             <tbody>
               {standings.map((team, idx) => {
-                const isQualified = idx < qualifiersPerGroup;
+                const isQualified = idx < tournament.qualifiersPerGroup;
 
                 return (
                   <tr
