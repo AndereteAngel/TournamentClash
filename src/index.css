@@ -2765,3 +2765,80 @@ strong .tc-icon-frame {
   }
 }
 
+/* =========================================================
+   FIX DEFINITIVO: TEXTO LEGIBLE EN TODAS LAS PANTALLAS CLASH
+   Los estilos anteriores no alcanzaban textos con color inline
+   ni elementos fuera de .cr-card. Esta regla cubre toda la app.
+========================================================= */
+.tc-theme-clash :is(
+  h1, h2, h3, h4, h5, h6,
+  p, label, small, li, td, th, legend, summary,
+  span, strong, em, b, i, div
+):not(.tc-medal-total):not(.tc-icon-frame):not(.tc-icon-frame *) {
+  color: #e5e7eb !important;
+}
+
+/* Mantener títulos principales y acentos de la identidad Clash. */
+.tc-theme-clash .cr-title,
+.tc-theme-clash .tc-home-tournaments-heading,
+.tc-theme-clash .tc-home-eyebrow,
+.tc-theme-clash .tc-home-hero-tag,
+.tc-theme-clash .tournament-phase-badge {
+  color: #fcd34d !important;
+}
+
+.tc-theme-clash .tc-home-hero-overlay h1,
+.tc-theme-clash .tc-home-hero-overlay p,
+.tc-theme-clash .tc-home-hero-overlay span,
+.tc-theme-clash .tc-auth-card .cr-logo-title,
+.tc-theme-clash .tc-auth-card .tc-auth-kicker,
+.tc-theme-clash .tc-auth-card .tc-auth-tagline {
+  color: #f8fafc !important;
+}
+
+/* Textos de controles: contraste alto en botones comunes.
+   Los botones dorados conservan texto oscuro sobre fondo dorado. */
+.tc-theme-clash button:not(.cr-btn-gold),
+.tc-theme-clash button:not(.cr-btn-gold) span {
+  color: #f8fafc !important;
+}
+
+.tc-theme-clash .cr-btn-gold,
+.tc-theme-clash .cr-btn-gold span {
+  color: #172033 !important;
+}
+
+/* Estados semánticos que deben conservar su señal visual. */
+.tc-theme-clash [style*="#34d399"],
+.tc-theme-clash [style*="#4ade80"],
+.tc-theme-clash [style*="#22c55e"] {
+  color: #4ade80 !important;
+}
+
+.tc-theme-clash [style*="#f87171"],
+.tc-theme-clash [style*="#fca5a5"],
+.tc-theme-clash [style*="#dc2626"] {
+  color: #fca5a5 !important;
+}
+
+.tc-theme-clash [style*="#ffd700"],
+.tc-theme-clash [style*="#facc15"],
+.tc-theme-clash [style*="#fbbf24"],
+.tc-theme-clash [style*="#fcd34d"] {
+  color: #fcd34d !important;
+}
+
+/* Campos, texto auxiliar y opciones de select en todas las vistas. */
+.tc-theme-clash input,
+.tc-theme-clash select,
+.tc-theme-clash textarea,
+.tc-theme-clash option {
+  color: #f8fafc !important;
+}
+
+.tc-theme-clash input::placeholder,
+.tc-theme-clash textarea::placeholder {
+  color: #a9bdd9 !important;
+  opacity: 1 !important;
+}
+
